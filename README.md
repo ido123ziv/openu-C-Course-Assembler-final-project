@@ -3,7 +3,7 @@ The final project of [20465 Course](https://www.openu.ac.il/courses/20465.htm)  
 
 ## Main Language 
 ```C
-printf("We write in C !")
+printf("We write in C !!")
 ```
 
 ## Authors
