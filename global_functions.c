@@ -32,7 +32,25 @@ int skip_whitespaces_at_end(char c[], int end){
             return i+1;
     return 1;
 }
-
+/**
+ * @brief gets a string that represent a number, if the string contains characters that are not numbers returns false
+ * 
+ * @param number number represented by a string
+ * @return boolean whether it is a valid number
+ */
+boolean isnumber(char number[])
+{
+	int i;
+	if(number[0] == '-' || number[0]== '+' || isdigit(number[0]))/*whether the first character is a digit or a sign*/
+	{
+		for(i=1; i < strlen(number) -1; i++)
+			if(!isdigit(number[i]))
+				return FALSE;
+	}
+	else
+		return FALSE;
+	return TRUE;
+}
 
 /**
  * @brief Create a file object
