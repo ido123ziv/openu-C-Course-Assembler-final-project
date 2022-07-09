@@ -31,8 +31,12 @@ typedef enum {FILE_OBJECT,FILE_ENTRY,FILE_INPUT,FILE_EXTERN}filetypes;
     ****************************************************
    ****************************************************
 */
+
 #define MAX_EXTENSION_LENGTH 5
 #define ERROR 1
+
+/* Length Constants */
+#define LINE_LEN 82
 
 /* ****************************************************
     ****************************************************
