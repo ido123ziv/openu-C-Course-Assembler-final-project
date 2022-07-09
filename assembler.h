@@ -22,7 +22,7 @@ order to provide central place for all of the constants and functions declaratio
    ****************************************************
 */
 typedef enum {FALSE,TRUE}boolean;
-typedef enum {FILE_OBJECT,FILE_ENTRY,FILE_INPUT,FILE_EXTERN}filetypes;
+typedef enum {FILE_MACRO, FILE_OBJECT,FILE_ENTRY,FILE_INPUT,FILE_EXTERN}filetypes;
 /* ****************************************************
     ****************************************************
     ****************************************************
@@ -56,7 +56,42 @@ const char *directives[] = {
 #define ERROR 1
 
 /* Length Constants */
-#define LINE_LEN 82
+#define LINE_LEN 82  /* Line max size is 80 , extra 2 bits space for \n or \0 */
+#define LABEL_LEN 30
+
+
+/* ****************************************************
+    ****************************************************
+    ****************************************************
+    ************          Variables             *******
+    ****************************************************
+   ****************************************************
+*/
+
+extern int ic, dc;
+extern boolean is_error, error_exist;
+
+
+/* ****************************************************
+    ****************************************************
+    ****************************************************
+    ************          Structures             *******
+    ****************************************************
+   ****************************************************
+*/
+
+/* 
+Defining linked list of macros and a pointer to that list
+We will assume that Max Macro name length is as Max Label length 
+ */
+typedef struct structMacros * macroPtr;
+typedef struct structMacros {
+	char name[LABEL_LEN]; /* Macro name (size same as label) */
+	unsigned int address; /* the address of the label */
+	macroPtr next; /* a pointer to the next label in the list */
+} Labels;
+
+
 
 #define REGISTER_LENGTH 2 /* a register's name contains 2 characters */
 #define MIN_REGISTER 0 /* r0 is the first register */
