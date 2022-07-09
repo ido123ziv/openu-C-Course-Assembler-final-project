@@ -38,7 +38,7 @@ int skip_whitespaces_at_end(char c[], int end){
  * @param number number represented by a string
  * @return boolean whether it is a valid number
  */
-boolean isnumber(char number[])
+boolean is_number(char number[])
 {
 	int i;
 	if(number[0] == '-' || number[0]== '+' || isdigit(number[0]))/*whether the first character is a digit or a sign*/
@@ -113,7 +113,7 @@ boolean syntax_validator(char operand[], int line_num, char *file_name)
 		
 		if(strlen(operand)>1)
 		{
-			if(!isnumber(operand+1))
+			if(!is_number(operand+1))
 			{
 			fprintf(stderr,"<file %s, line %d> Illegal input, The operand after '#' must be a real number)\n", file_name, line_num);
 			return FALSE;
@@ -142,4 +142,19 @@ boolean syntax_validator(char operand[], int line_num, char *file_name)
 	}
 	
 	return TRUE;
+}
+
+
+/**
+ * @brief gets a string that represent a register, and validates the format
+ * 
+ * @param token the address of the string
+ * @return boolean whether or not this is valida register
+ */
+boolean is_register(char *index)
+{
+    /* register is in the format of r0-r7 */
+    return strlen(index) == REGISTER_LENGTH && index[0] == 'r' &&
+            index[1] >= '0' &&
+            index[1] <= '7';
 }
