@@ -22,9 +22,11 @@ int main (int argc, char *argv[]){
             
             if(fp != NULL){ /* File exists */
                 printf("Start assemble the file: %s\n", get_filename);
+                assembler(fp,argv[i]);
+				fclose(fp);
             }
             else{
-                fprintf(stderr, "there was an error while trying to open the requested file.\n");
+                fprintf(stderr, "there was an error while trying to open the requested file or file not exist.\n");
             }
         }
     }
