@@ -35,3 +35,14 @@ int main (int argc, char *argv[]){
     }
     return 0;
 }
+
+
+/*
+The main function that will translate the file provided in assembler to machine language.
+It will read the file line by line in two phases, using 3 linked list for the code, data and symbol list.
+The function will also check for errors on each line and will return false if there's an error,
+also if there's an errot the functio will not create the .ext and .ent files. 
+*/
+void assembler(FILE *file, char *file_name){
+
+}
