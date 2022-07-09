@@ -7,3 +7,10 @@ order to provide central place for all of the constants and functions declaratio
 #include <ctype.h>
 #include <stdlib.h>
 
+typedef enum {FALSE,TRUE}boolean;
+enum filetypes {FILE_OBJECT,FILE_ENTRY,FILE_INPUT,FILE_EXTERN};
+
+#define MAX_EXTENSION_LENGTH 5
+#define ERROR 1
+
+
