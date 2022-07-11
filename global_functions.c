@@ -2,6 +2,7 @@
 Project by Eran Cohen and Ido Ziv
 */
 #include "assembler.h"
+#include "global_functions.h"
 /* 
 This script will include all the global function that will be require for more than 1 script
 for example: ignore spaces and tabs on input etc.
@@ -172,6 +173,15 @@ void copy_word(char *word, char *line)
         i++;
     }
     word[i] = '\0';
+}
+
+/* This function skips spaces of a string and returns a pointer to the first non-blank character */
+char *skip_spaces(char *ch)
+{
+    if(ch == NULL) return NULL;
+    while (isspace(*ch)) /* Continue the loop if the character is a whitespace */
+        ch++;
+    return ch;
 }
 
 /* Function that ignores a line if it's blank/a comment */

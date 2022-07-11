@@ -8,8 +8,11 @@ translate it to different files as needed
 */
 
 #include "assembler.h"
+#include "global_functions.h"
+#include "pre_assembler.h"
 
-int main (int argc, char *argv[]){
+int main (int argc, char *argv[])
+{
     int i; 
     char *get_filename;
     FILE *fp;
@@ -43,6 +46,3 @@ It will read the file line by line in 3 phases, using 3 linked list for the code
 The function will also check for errors on each line and will return false if there's an error,
 also if there's an error the functio will not create the .ext and .ent files. 
 */
-void assembler(FILE *file, char *file_name){
-
-}

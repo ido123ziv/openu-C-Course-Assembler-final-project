@@ -9,6 +9,8 @@ It will run first before the first_transition happen
 */
 
 #include "assembler.h"
+#include "pre_assembler.h"
+#include "global_functions.h"
 
 /*************** DECLARETIONS  ****************/
 void read_line(char *line, boolean is_macro, int line_num);
