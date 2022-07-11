@@ -10,6 +10,12 @@ It will run first before the first_transition happen
 
 #include "assembler.h"
 
+/*************** DECLARETIONS  ****************/
+void read_line(char *line, boolean is_macro, int line_num);
+int ignore(char *line);
+boolean is_label(char *word);
+
+
 void pre_assembler(FILE *file, char *file_name){
     char line[LINE_LEN];
     boolean is_macro = FALSE;

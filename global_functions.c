@@ -173,3 +173,10 @@ void copy_word(char *word, char *line)
     }
     word[i] = '\0';
 }
+
+/* Function that ignores a line if it's blank/a comment */
+int ignore(char *line)
+{
+    line = skip_spaces(line);
+    return *line == ';' || *line == '\0' || *line == '\n';
+}

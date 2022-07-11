@@ -70,7 +70,7 @@ const char *directives[] = {
 
 extern int ic, dc;
 extern boolean is_error, error_exist;
-extern macroPtr macro_table;
+/* extern macroPtr macro_table; */
 
 
 
@@ -112,4 +112,5 @@ boolean is_number(char number[]);
 char *create_file(char *original, int type);
 boolean syntax_validator(char operand[], int line_num, char *file_name);
 void copy_word(char *word, char *line);
+void pre_assembler(FILE *file, char *file_name);
 /* ****** Assembler.c ******* */
