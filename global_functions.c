@@ -158,3 +158,18 @@ boolean is_register(char *index)
             index[1] >= '0' &&
             index[1] <= '7';
 }
+
+
+/* Function will copy the next word (until a space or end of line) to a string */
+void copy_word(char *word, char *line)
+{
+    int i = 0;
+    if(word == NULL || line == NULL) return;
+
+    while(i < LINE_LEN && !isspace(line[i]) && line[i] != '\0') /* Copying token until its end to *dest */
+    {
+        word[i] = line[i];
+        i++;
+    }
+    word[i] = '\0';
+}

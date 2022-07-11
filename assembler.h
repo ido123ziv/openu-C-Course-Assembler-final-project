@@ -70,6 +70,8 @@ const char *directives[] = {
 
 extern int ic, dc;
 extern boolean is_error, error_exist;
+extern macroPtr macro_table;
+
 
 
 /* ****************************************************

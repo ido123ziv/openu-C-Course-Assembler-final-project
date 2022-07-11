@@ -19,7 +19,7 @@ void pre_assembler(FILE *file, char *file_name){
     {
         /* is_error = FALSE; */
         if(!ignore(line)) /* Ignore line if it's blank or ; */
-            read_line(line, is_macro);
+            read_line(line, is_macro, line_count);
         
         line_count++;
     }
@@ -27,9 +27,18 @@ void pre_assembler(FILE *file, char *file_name){
 
 /* TODO: added line_num to indicate the line error happen */
 
-void read_line(char *line, boolean is_macro){
-    boolean macro = FALSE;
-    macroPtr macro_node = NULL;
+void read_line(char *line, boolean is_macro, int line_num){
+    
+    int c, i = 0;
+    char* word;
 
+    macroPtr macro_node = NULL;
     line = skip_whitespaces_at_begining(line, 0);
+    
+    copy_word(word, line);
+    while(i < LINE_LEN && !isspace(line[i]) && line[i] != '\0'){
+        word[i] = line[i];
+        i++;
+    }
+    word[i] = '\0';
 }
