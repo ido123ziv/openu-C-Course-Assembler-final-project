@@ -7,5 +7,5 @@ assembler.o: assembler.c assembler.h pre_assembler.h global_functions.h
 pre_assembler.o: pre_assembler.c assembler.h pre_assembler.h global_functions.h 
 	gcc -c -ansi -Wall -pedantic pre_assembler.c -o pre_assembler.o
 
-global_functions.o: global_functions.c assembler.h global_functions.h 
+global_functions.o: global_functions.c global_functions.h 
 	gcc -c -ansi -Wall -pedantic global_functions.c -o global_functions.o

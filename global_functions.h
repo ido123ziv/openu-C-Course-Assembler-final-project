@@ -1,7 +1,7 @@
 #ifndef FUNCS_H
 
 #define FUNCS_H
-
+#include "assembler.h"
 /*************** DECLARETIONS  ****************/
 int skip_whitespaces_at_begining(char c[], int start);
 int skip_whitespaces_at_end(char c[], int end);

@@ -26,7 +26,7 @@ order to provide central place for all of the constants and functions declaratio
    ****************************************************
 */
 typedef enum {FALSE,TRUE}boolean;
-typedef enum {FILE_MACRO, FILE_OBJECT,FILE_ENTRY,FILE_INPUT,FILE_EXTERN}filetypes;
+typedef enum {FILE_INPUT, FILE_MACRO, FILE_OBJECT,FILE_ENTRY,FILE_EXTERN }filetypes;
 /* ****************************************************
     ****************************************************
     ****************************************************
@@ -38,20 +38,6 @@ typedef enum {FILE_MACRO, FILE_OBJECT,FILE_ENTRY,FILE_INPUT,FILE_EXTERN}filetype
 /* Length Constants */
 #define LINE_LEN 82  /* Line max size is 80 , extra 2 bits space for \n or \0 */
 #define LABEL_LEN 30
-
-const char *commands[] = {
-        "mov", "cmp", "add", "sub", "not", "clr", "lea", "inc", "dec", "jmp", "bne",
-        "get", "prn", "jsr", "rts", "hlt"
-};
-
-const char base32[32] = {
-        '!', '@', '#', '$', '%', '^', '&', '*', '<', '>', 'a', 'b', 'c',
-        'd', 'e', 'f', 'g', 'h', 'i', 'j', 'k', 'l', 'm', 'n', 'o', 'p',
-        'q', 'r', 's', 't', 'u', 'v'};
-
-const char *directives[] = {
-        ".data", ".string", ".struct", ".entry", ".extern"
-};
 
 /* ****************************************************
     ****************************************************
@@ -77,8 +63,7 @@ const char *directives[] = {
    ****************************************************
 */
 
-extern int ic, dc;
-extern boolean is_error, error_exist;
+
 /* extern macroPtr macro_table; */
 
 #define REGISTER_LENGTH 2 /* a register's name contains 2 characters */

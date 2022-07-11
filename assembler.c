@@ -11,6 +11,22 @@ translate it to different files as needed
 #include "global_functions.h"
 #include "pre_assembler.h"
 
+/*
+const char *commands[] = {
+        "mov", "cmp", "add", "sub", "not", "clr", "lea", "inc", "dec", "jmp", "bne",
+        "get", "prn", "jsr", "rts", "hlt"
+};
+
+const char base32[32] = {
+        '!', '@', '#', '$', '%', '^', '&', '*', '<', '>', 'a', 'b', 'c',
+        'd', 'e', 'f', 'g', 'h', 'i', 'j', 'k', 'l', 'm', 'n', 'o', 'p',
+        'q', 'r', 's', 't', 'u', 'v'};
+
+const char *directives[] = {
+        ".data", ".string", ".struct", ".entry", ".extern"
+};
+*/
+
 int main (int argc, char *argv[])
 {
     int i; 
@@ -21,6 +37,8 @@ int main (int argc, char *argv[])
     {
         for (i=1; i < argc; i++){
             get_filename = create_file(argv[i], FILE_INPUT); 
+            printf("aasfasfasf");
+            printf("%s", get_filename);
             fp = fopen(get_filename, "r");
             
             if(fp != NULL){ /* File exists */
@@ -29,7 +47,7 @@ int main (int argc, char *argv[])
 				fclose(fp);
             }
             else{
-                fprintf(stderr, "there was an error while trying to open the requested file or file not exist.\n");
+                fprintf(stdout, "there was an error while trying to open the requested file or file not exist.\n"); 
             }
         }
     }

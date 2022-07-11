@@ -78,10 +78,6 @@ char *create_file(char *original, int type)
         case FILE_INPUT:
             strcat(modified, ".as");
             break;
-        
-        case FILE_MACRO:
-            strcat(modified, ".am");
-            break;
 
         case FILE_OBJECT:
             strcat(modified, ".ob");
@@ -93,7 +89,11 @@ char *create_file(char *original, int type)
 
         case FILE_EXTERN:
             strcat(modified, ".ext");
-
+			break;
+			
+		case FILE_MACRO:
+            strcat(modified, ".am");
+            
     }
     return modified;
 }
