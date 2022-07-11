@@ -38,13 +38,14 @@ void pre_assembler(FILE *file, char *file_name){
 void read_line(char *line, boolean is_macro, int line_num){
     
     int c, i = 0;
-    char word[LINE_LEN];
+    char *word;
     int words_len = 0;
 
     macroPtr macro_node = NULL;
     line = skip_whitespaces_at_begining(line, 0);
     
     copy_word(word, line);
+    printf("The word is: %s\n", word);
     if(is_label(word)){
         /* check next word for macro */
         words_len += strlen(word);

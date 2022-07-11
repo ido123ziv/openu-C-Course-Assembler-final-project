@@ -37,8 +37,7 @@ int main (int argc, char *argv[])
     {
         for (i=1; i < argc; i++){
             get_filename = create_file(argv[i], FILE_INPUT); 
-            printf("aasfasfasf");
-            printf("%s", get_filename);
+            printf("file is: %s\n", get_filename);
             fp = fopen(get_filename, "r");
             
             if(fp != NULL){ /* File exists */
