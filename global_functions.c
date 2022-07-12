@@ -2,6 +2,7 @@
 Project by Eran Cohen and Ido Ziv
 */
 #include "assembler.h"
+#include "global_functions.h"
 /* 
 This script will include all the global function that will be require for more than 1 script
 for example: ignore spaces and tabs on input etc.
@@ -77,10 +78,6 @@ char *create_file(char *original, int type)
         case FILE_INPUT:
             strcat(modified, ".as");
             break;
-        
-        case FILE_MACRO:
-            strcat(modified, ".am");
-            break;
 
         case FILE_OBJECT:
             strcat(modified, ".ob");
@@ -92,7 +89,11 @@ char *create_file(char *original, int type)
 
         case FILE_EXTERN:
             strcat(modified, ".ext");
-
+			break;
+			
+		case FILE_MACRO:
+            strcat(modified, ".am");
+            
     }
     return modified;
 }
@@ -157,4 +158,51 @@ boolean is_register(char *index)
     return strlen(index) == REGISTER_LENGTH && index[0] == 'r' &&
             index[1] >= '0' &&
             index[1] <= '7';
+}
+
+
+/* Function will copy the next word (until a space or end of line) to a string */
+void copy_word(char *word, char *line)
+{
+    int i = 0;
+    if(word == NULL || line == NULL) return;
+
+    while(i < LINE_LEN && !isspace(line[i]) && line[i] != '\0') /* Copying token until its end to *dest */
+    {
+        word[i] = line[i];
+        i++;
+    }
+    word[i] = '\0';
+}
+
+/* This function returns a pointer to the start of next token in the line */
+char *next_word(char *str)
+{
+    if(str == NULL) return NULL;
+    while(!isspace(*str) && !end_of_line(str)) str++; /* Skip rest of characters in the current token (until a space) */
+    str = skip_spaces(str); /* Skip spaces */
+    if(end_of_line(str)) return NULL;
+    return str;
+}
+
+/* This function skips spaces of a string and returns a pointer to the first non-blank character */
+char *skip_spaces(char *ch)
+{
+    if(ch == NULL) return NULL;
+    while (isspace(*ch)) /* Continue the loop if the character is a whitespace */
+        ch++;
+    return ch;
+}
+
+/* Function that ignores a line if it's blank/a comment */
+int ignore(char *line)
+{
+    line = skip_spaces(line);
+    return *line == ';' || *line == '\0' || *line == '\n';
+}
+
+/* Checking for the end of line/given token in the character that char* points to */
+int end_of_line(char *line)
+{
+    return line == NULL || *line == '\0' || *line == '\n';
 }

@@ -8,8 +8,27 @@ translate it to different files as needed
 */
 
 #include "assembler.h"
+#include "global_functions.h"
+#include "pre_assembler.h"
 
-int main (int argc, char *argv[]){
+/*
+const char *commands[] = {
+        "mov", "cmp", "add", "sub", "not", "clr", "lea", "inc", "dec", "jmp", "bne",
+        "get", "prn", "jsr", "rts", "hlt"
+};
+
+const char base32[32] = {
+        '!', '@', '#', '$', '%', '^', '&', '*', '<', '>', 'a', 'b', 'c',
+        'd', 'e', 'f', 'g', 'h', 'i', 'j', 'k', 'l', 'm', 'n', 'o', 'p',
+        'q', 'r', 's', 't', 'u', 'v'};
+
+const char *directives[] = {
+        ".data", ".string", ".struct", ".entry", ".extern"
+};
+*/
+
+int main (int argc, char *argv[])
+{
     int i; 
     char *get_filename;
     FILE *fp;
@@ -18,6 +37,7 @@ int main (int argc, char *argv[]){
     {
         for (i=1; i < argc; i++){
             get_filename = create_file(argv[i], FILE_INPUT); 
+            printf("file is: %s\n", get_filename);
             fp = fopen(get_filename, "r");
             
             if(fp != NULL){ /* File exists */
@@ -26,7 +46,7 @@ int main (int argc, char *argv[]){
 				fclose(fp);
             }
             else{
-                fprintf(stderr, "there was an error while trying to open the requested file or file not exist.\n");
+                fprintf(stdout, "there was an error while trying to open the requested file or file not exist.\n"); 
             }
         }
     }
@@ -43,6 +63,3 @@ It will read the file line by line in 3 phases, using 3 linked list for the code
 The function will also check for errors on each line and will return false if there's an error,
 also if there's an error the functio will not create the .ext and .ent files. 
 */
-void assembler(FILE *file, char *file_name){
-
-}
