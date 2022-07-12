@@ -50,11 +50,6 @@ typedef enum {FILE_INPUT, FILE_MACRO, FILE_OBJECT,FILE_ENTRY,FILE_EXTERN }filety
 #define MAX_EXTENSION_LENGTH 5
 #define ERROR 1
 
-/* Length Constants */
-#define LINE_LEN 82  /* Line max size is 80 , extra 2 bits space for \n or \0 */
-#define LABEL_LEN 30
-
-
 /* ****************************************************
     ****************************************************
     ****************************************************
