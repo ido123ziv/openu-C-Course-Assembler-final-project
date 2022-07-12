@@ -9,3 +9,6 @@ pre_assembler.o: pre_assembler.c assembler.h pre_assembler.h global_functions.h
 
 global_functions.o: global_functions.c global_functions.h 
 	gcc -c -ansi -Wall -pedantic global_functions.c -o global_functions.o
+
+clean: 
+	rm *.o assembler
