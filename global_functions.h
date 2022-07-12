@@ -12,7 +12,7 @@ boolean is_register(char *index);
 void copy_word(char *word, char *line);
 char *skip_spaces(char *ch);
 int ignore(char *line);
+void write_error_code(int error_code,int current_line);
 int end_of_line(char *line);
 char *next_word(char *str);
-
 #endif
