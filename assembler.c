@@ -46,12 +46,13 @@ int main (int argc, char *argv[])
 				fclose(fp);
             }
             else{
-                fprintf(stdout, "there was an error while trying to open the requested file or file not exist.\n"); 
+                write_error_code(34,-1);
+                // fprintf(stderr, "there was an error while trying to open the requested file or file not exist.\n"); 
             }
         }
     }
     else{
-        fprintf(stderr, "Not enough arguments,\ncommand line should be like this: ./assembler file1 file2 .. \n");
+        write_error_code(35,-1);
     }
     return 0;
 }
