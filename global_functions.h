@@ -12,11 +12,10 @@ boolean is_register(char *index);
 void copy_word(char *word, char *line);
 char *skip_spaces(char *ch);
 int ignore(char *line);
-<<<<<<< HEAD
 int end_of_line(char *line);
 char *next_word(char *str);
-
-=======
 void write_error_code(int error_code,int current_line);
->>>>>>> 625aa69805bdf81e71ad4e6199450e3ae2547bc5
+void write_error_code(int error_code,int current_line);
+int end_of_line(char *line);
+char *next_word(char *str);
 #endif

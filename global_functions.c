@@ -201,13 +201,11 @@ int ignore(char *line)
     return *line == ';' || *line == '\0' || *line == '\n';
 }
 
-<<<<<<< HEAD
 /* Checking for the end of line/given token in the character that char* points to */
 int end_of_line(char *line)
 {
     return line == NULL || *line == '\0' || *line == '\n';
 }
-=======
 
 void write_error_code(int error_code,int current_line){
     if (current_line != -1)
@@ -388,4 +386,10 @@ void write_error_code(int error_code,int current_line){
             break;
     }
 }
->>>>>>> 625aa69805bdf81e71ad4e6199450e3ae2547bc5
+
+
+/* Checking for the end of line/given token in the character that char* points to */
+int end_of_line(char *line)
+{
+    return line == NULL || *line == '\0' || *line == '\n';
+}
