@@ -178,7 +178,12 @@ void copy_word(char *word, char *line)
     word[i] = '\0';
 }
 
-/* This function returns a pointer to the start of next token in the line */
+/**
+ * @brief skip to the next non spaces to
+ * 
+ * @param line the line we are working on
+ * @return char* the pointer to the char that starts next word
+ */
 char *next_word(char *str)
 {
     if(str == NULL) return NULL;
@@ -418,23 +423,7 @@ int end_of_line(char *line)
 {
     return line == NULL || *line == '\0' || *line == '\n';
 }
-/**
- * @brief skip to the next non spaces to
- * 
- * @param line the line we are working on
- * @return char* the pointer to the char that starts next word
- */
-char *next_word(char *line)
-{
-    if(line == NULL) 
-        return NULL;
-    while(!isspace(*line) && !end_of_line(line)) 
-        line++; 
-    line = skip_spaces(line); 
-    if(end_of_line(line)) 
-        return NULL;
-    return line;
-}
+
 /**
  * @brief 
  * 
