@@ -17,4 +17,5 @@ void copy_line(char *from, char *to);
 char *next_word(char *line);
 int end_of_line(char *line);
 int find_command(char *line);
+int find_directive(char *line);
 #endif

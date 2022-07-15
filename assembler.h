@@ -59,6 +59,7 @@ extern const char *directives[];
 #define ERROR 1
 #define NOT_FOUND -1
 #define CMD_LEN 16;
+#define DIRECTIVE_LEN 5;
 
 /* ****************************************************
     ****************************************************

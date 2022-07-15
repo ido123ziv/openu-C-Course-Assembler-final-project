@@ -1,1 +1,9 @@
-check: this
+check: cmp
+.extern
+cmp
+; 12345678910
+ido:
+
+
+get
+.data

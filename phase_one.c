@@ -5,8 +5,7 @@ Project by Eran Cohen and Ido Ziv
 #include "global_functions.h"
 #include "phase_one.h"
 
-const char *directives[] = {
-    ".data", ".string", ".struct", ".entry", ".extern"};
+
 int ic;
 int dc;
 
@@ -36,37 +35,70 @@ void phase_one(FILE *fp, char *file_name)
 
 int read_line_am(char *line, int line_count)
 {
-    /* int dir_type = UNKNOWN_TYPE;
-     int command_type = UNKNOWN_COMMAND;
+     int dir_type = NOT_FOUND;
+     int command_type = NOT_FOUND;
 
-     boolean is_label_am = FALSE; */
     char *line_copy, current_word[LINE_LEN];
-    int k;
-
+    int label_count;
+    printf("######################################################\n");
+    printf("current line is: %s\n", line);
+    printf("######################################################\n");
     line = skip_spaces(line);
     if (end_of_line(line))
         return 0;
 
     if (!isalpha(*line) && *line != '.')
-    {   /* first non-blank character must be a letter or a dot */
-        /*  write_error_code(1,line_count); */
+       /* first non-blank character must be a letter or a dot */
         return 1;
-    }
+    
     line_copy = line;
     copy_word(current_word,line);
-    k = check_for_label(current_word, TRUE);
-    if (k)
+    label_count = check_for_label(current_word, TRUE);
+    if (label_count)
     {
-        if (k != 1)
-            write_error_code(k, line_count);
+        if (label_count > 1){
+         /* means that we have an error with the label */   
+            return label_count;
+        }
         else
         {
-            line = next_word(line);
+            line = next_word(line); 
+            if (end_of_line(line)){ /* line can't be just a label */
+                return 7;
+            }
             printf("One label found\n");
+            /*TODO: add label to table*/
         }
     }
-    else
-        printf("No label found\n");
+   /* else
+        printf("No label found\n");*/
+    copy_word(current_word,line);
+
+    dir_type = find_directive(current_word);
+    command_type = find_command(current_word);
+    if (dir_type == NOT_FOUND && command_type == NOT_FOUND)
+        return 25;
+
+    if (dir_type != NOT_FOUND){
+        printf("Directive found\n");
+        if (label_count){
+            /* TODO: edit label struct*/
+        }
+        printf("directive is: %s\n",directives[dir_type]);
+         line = next_word(line);
+        /*TODO: add directive to table*/
+    }
+    
+    if (command_type != NOT_FOUND){
+        printf("Command found\n");
+        if (label_count){
+            /* TODO: edit label struct*/
+        }
+        printf("command is: %s\n",commands[command_type]);
+         line = next_word(line);
+        /*TODO: add command to table*/
+    }
+
 
     return 0;
 }
@@ -74,18 +106,23 @@ int check_for_label(char *line, boolean COLON){
     boolean has_digits = FALSE;
     int line_lentgh = strlen(line);
     int i;
-
-    printf("check min line length:\n");
-    if (line == NULL || line_lentgh < (COLON ? MINIMUM_LABEL_LENGTH_WITH_COLON : MINIMUM_LABEL_LENGTH_WITHOUT_COLON))
+    
+    if (line == NULL || line_lentgh < (COLON ? MINIMUM_LABEL_LENGTH_WITH_COLON : MINIMUM_LABEL_LENGTH_WITHOUT_COLON)){
+       /* printf("check min line length:\n");*/
         return 0;
+    }
 
-    printf("line end with :\n");
-    if (COLON && line[line_lentgh - 1] != ':')
+    if (COLON && line[line_lentgh - 1] != ':'){
+   /*     printf("line not ending with :\n");*/
         return 0; /* search for :, if colon is a must then we need to have : */
+    }
 
-    printf("check max line length:\n");
-    if (line_lentgh > LABEL_LEN) /* checking label size */
-        return 3;
+    if (line_lentgh > LABEL_LEN) /* checking label size */{
+        if (COLON) /*error only if it is a label with ':' */
+            return 3;
+      /*  printf("check max line length:\n");*/
+        return 0;
+    }
 
     if (!isalpha(*line)) /* first symbol in label must be letter */
         return 4;
@@ -108,10 +145,13 @@ int check_for_label(char *line, boolean COLON){
         if (find_command(line) != NOT_FOUND)
             return 6;
     }
-
+    printf("current REGS is: %s\n", line);
     /* labels can't be registers */
-    if (is_register(line))
+    i = is_register(line);
+    if (i){
+        printf("my valus is: %d\n", i);
         return 8;
+    }
 
     return 1;
 }
