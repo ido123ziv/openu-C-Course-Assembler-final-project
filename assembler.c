@@ -11,7 +11,6 @@ translate it to different files as needed
 #include "global_functions.h"
 #include "pre_assembler.h"
 
-/*
 const char * commands[] = {
         "mov", "cmp", "add", "sub", "not", "clr", "lea", "inc", "dec", "jmp", "bne",
         "get", "prn", "jsr", "rts", "hlt"
@@ -26,7 +25,6 @@ const char * directives[] = {
         ".data", ".string", ".struct", ".entry", ".extern"
 };
 
-*/
 int main (int argc, char *argv[])
 {
     int i; 
