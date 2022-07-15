@@ -34,6 +34,9 @@ void read_line(char *line, int line_num);
 void pre_assembler(FILE *file, char *file_name);
 boolean is_label(char *word);
 void isMacro(char *word, char *line);
-
+void addMacro(macroPtr * macroTable, char * macroName);
+void addLine (char * line, char * word);
+macroPtr checkMacro(macroPtr macroTable ,char * word);
+void freelist(macroPtr * macroTable);
 
 #endif

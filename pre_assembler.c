@@ -12,11 +12,6 @@ It will run first before the first_transition happen
 #include "pre_assembler.h"
 #include "global_functions.h"
 
-/*************** DECLARETIONS  ****************/
-void read_line(char *line, int line_num);
-int ignore(char *line);
-boolean is_label(char *word);
-
 boolean is_macro;
 macroPtr macro_node;
 macroPtr pointer;
@@ -25,8 +20,9 @@ FILE *macroFile;
 void pre_assembler(FILE *file, char *file_name){
     char line[LINE_LEN];
     is_macro = FALSE;
-    int line_count = 1; /* Line number we are at starting from 1 */
-    macroFile = fopen(strcat(file_name, '.am'), "w");
+    int line_count = 1; /* Line number from 1 */
+    macroFile = fopen(strcat(file_name, ".am"), "w");  
+    macro_node = NULL;
 
     while(fgets(line, LINE_LEN, file) != NULL) /* Read lines until end of file */
     {
@@ -37,8 +33,7 @@ void pre_assembler(FILE *file, char *file_name){
         line_count++;
     }
 
-    freelist(macro_node);
-    fclose(file);
+    freelist(&macro_node);
     fclose(macroFile);
 }
 
@@ -50,11 +45,9 @@ void read_line(char *line, int line_num){
     int words_len = 0;
 
     char * all_line = line;
-
-    macro_node = NULL;
     line = skip_spaces(line);
     copy_word(word,line);
-    
+    printf("First word of line is: %s\n", word);
     /* check if first word is label, if it is we will check the next word */
     if(is_label(word)){
         /* check next word for macro */
@@ -94,6 +87,7 @@ void isMacro(char *word, char *line){
                 /* get the name of the macro and enter to Macro table */
                 line = next_word(line);
                 copy_word(word, line);
+                printf("Macro name is: %s\n", word);
                 /* TODO: add test to check macro name is allowed (not other macro name, command, etc.) */
                 addMacro(&macro_node, word); 
     }
@@ -126,7 +120,7 @@ void addLine (char * line, char * word){
     }
     else{
         /* add line depend if it's macro name or regular */
-        if((pointer = findMacro(macro_node, word)) != NULL){
+        if((pointer = checkMacro(macro_node, word)) != NULL){
             fputs(pointer -> contents, macroFile);
         }
         else

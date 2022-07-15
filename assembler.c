@@ -12,7 +12,7 @@ translate it to different files as needed
 #include "pre_assembler.h"
 
 /*
-const char *commands[] = {
+const char * commands[] = {
         "mov", "cmp", "add", "sub", "not", "clr", "lea", "inc", "dec", "jmp", "bne",
         "get", "prn", "jsr", "rts", "hlt"
 };
@@ -22,11 +22,11 @@ const char base32[32] = {
         'd', 'e', 'f', 'g', 'h', 'i', 'j', 'k', 'l', 'm', 'n', 'o', 'p',
         'q', 'r', 's', 't', 'u', 'v'};
 
-const char *directives[] = {
+const char * directives[] = {
         ".data", ".string", ".struct", ".entry", ".extern"
 };
-*/
 
+*/
 int main (int argc, char *argv[])
 {
     int i; 
@@ -39,15 +39,15 @@ int main (int argc, char *argv[])
             get_filename = create_file(argv[i], FILE_INPUT); 
             printf("file is: %s\n", get_filename);
             fp = fopen(get_filename, "r");
-            
             if(fp != NULL){ /* File exists */
                 printf("Start assemble the file: %s\n", get_filename);
+                printf("New name: %s\n", argv[i]);
                 pre_assembler(fp,argv[i]);
 				fclose(fp);
             }
             else{
                 write_error_code(34,-1);
-                // fprintf(stderr, "there was an error while trying to open the requested file or file not exist.\n"); 
+                /* fprintf(stderr, "there was an error while trying to open the requested file or file not exist.\n"); */
             }
         }
     }
