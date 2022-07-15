@@ -17,7 +17,9 @@ void phase_one(FILE *fp, char *file_name){
     int error_code;
     ic = 0;
     dc = 0;
-
+    printf("---------------------------------------------------------\n");
+    printf("let's do this shit %s\n", file_name);
+    printf("---------------------------------------------------------\n");
     while (fgets(current_line,line_count,fp) != NULL)
     {
         error_code = 0;
@@ -25,9 +27,11 @@ void phase_one(FILE *fp, char *file_name){
             error_code = read_line_am(current_line, line_count);
         if (error_code != 0)
             write_error_code(error_code,line_count);
+        
         line_count ++;
         /* code */
     }
+    printf("Didn't find errors yet! \n");
     
 }
 
@@ -44,13 +48,17 @@ int read_line_am(char *line, int line_count){
         return 0;
     
     if(!isalpha(*line) && *line != '.') { /* first non-blank character must be a letter or a dot */
-        write_error_code(1,line_count);
+      /*  write_error_code(1,line_count); */
         return 1;
     }
     copy_line(line,line_copy);
     k = check_for_label(line,line_count);
-    if (k)
+    if (k){
         line = next_word(line);
+        printf("One label found\n");
+    }
+    else printf("No label found\n");
+    
     return 0;    
 }
 
