@@ -8,7 +8,12 @@ Project by Eran Cohen and Ido Ziv
 
 int ic;
 int dc;
-
+/**
+ * @brief 
+ * 
+ * @param fp 
+ * @param file_name 
+ */
 void phase_one(FILE *fp, char *file_name)
 {
     char current_line[LINE_LEN]; /* holds the current line */
@@ -32,7 +37,13 @@ void phase_one(FILE *fp, char *file_name)
     }
     printf("Didn't find errors yet! \n");
 }
-
+/**
+ * @brief 
+ * 
+ * @param line 
+ * @param line_count 
+ * @return int 
+ */
 int read_line_am(char *line, int line_count)
 {
      int dir_type = NOT_FOUND;
@@ -42,7 +53,7 @@ int read_line_am(char *line, int line_count)
     int label_count;
     printf("######################################################\n");
     printf("current line is: %s\n", line);
-    printf("######################################################\n");
+   /* printf("######################################################\n"); */
     line = skip_spaces(line);
     if (end_of_line(line))
         return 0;
@@ -66,7 +77,7 @@ int read_line_am(char *line, int line_count)
             if (end_of_line(line)){ /* line can't be just a label */
                 return 7;
             }
-            printf("One label found\n");
+            printf("One label found\t");
             /*TODO: add label to table*/
         }
     }
@@ -80,7 +91,7 @@ int read_line_am(char *line, int line_count)
         return 25;
 
     if (dir_type != NOT_FOUND){
-        printf("Directive found\n");
+        printf("Directive found\t");
         if (label_count){
             /* TODO: edit label struct*/
         }
@@ -90,7 +101,7 @@ int read_line_am(char *line, int line_count)
     }
     
     if (command_type != NOT_FOUND){
-        printf("Command found\n");
+        printf("Command found\t");
         if (label_count){
             /* TODO: edit label struct*/
         }
@@ -102,6 +113,13 @@ int read_line_am(char *line, int line_count)
 
     return 0;
 }
+/**
+ * @brief 
+ * 
+ * @param line 
+ * @param COLON 
+ * @return int 
+ */
 int check_for_label(char *line, boolean COLON){
     boolean has_digits = FALSE;
     int line_lentgh = strlen(line);
@@ -145,11 +163,9 @@ int check_for_label(char *line, boolean COLON){
         if (find_command(line) != NOT_FOUND)
             return 6;
     }
-    printf("current REGS is: %s\n", line);
+   /* printf("current REGS is: %s\n", line);*/
     /* labels can't be registers */
-    i = is_register(line);
-    if (i){
-        printf("my valus is: %d\n", i);
+    if (is_register(line)){
         return 8;
     }
 
