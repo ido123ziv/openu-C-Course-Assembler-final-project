@@ -237,8 +237,13 @@ void copy_line(char *from, char *to)
  * @param error_code which error to show message on
  * @param current_line which line had an error
  */
-void write_error_code(int error_code, int current_line)
-{
+
+/* Checking for the end of line/given token in the character that char* points to */
+int end_of_line(char *line){
+    return line == NULL || *line == '\0' || *line == '\n';
+}
+
+void write_error_code(int error_code,int current_line){
     if (current_line != -1)
         fprintf(stderr, "ERROR (line %d): ", current_line);
     switch (error_code)

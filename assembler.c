@@ -13,7 +13,7 @@ translate it to different files as needed
 #include "phase_one.h"
 
 /*
-const char *commands[] = {
+const char * commands[] = {
         "mov", "cmp", "add", "sub", "not", "clr", "lea", "inc", "dec", "jmp", "bne",
         "get", "prn", "jsr", "rts", "hlt"
 };
@@ -23,11 +23,11 @@ const char base32[32] = {
         'd', 'e', 'f', 'g', 'h', 'i', 'j', 'k', 'l', 'm', 'n', 'o', 'p',
         'q', 'r', 's', 't', 'u', 'v'};
 
-const char *directives[] = {
+const char * directives[] = {
         ".data", ".string", ".struct", ".entry", ".extern"
 };
-*/
 
+*/
 int main (int argc, char *argv[])
 {
     int i; 
@@ -41,8 +41,9 @@ int main (int argc, char *argv[])
             printf("file is: %s\n", get_filename);
             fp = fopen(get_filename, "r");
             if(fp != NULL){ /* File exists */
-                printf("Start assemble the file: %s\n", get_filename); 
-                /* pre_assembler(fp,argv[i]); */
+                printf("Start assemble the file: %s\n", get_filename);
+                printf("New name: %s\n", argv[i]);
+                pre_assembler(fp,argv[i]);
 				fclose(fp);
             }
             else{
