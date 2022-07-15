@@ -20,7 +20,7 @@ void phase_one(FILE *fp, char *file_name){
     printf("---------------------------------------------------------\n");
     printf("let's do this shit %s\n", file_name);
     printf("---------------------------------------------------------\n");
-    while (fgets(current_line,line_count,fp) != NULL)
+    while (fgets(current_line,LINE_LEN,fp) != NULL)
     {
         error_code = 0;
         if (!ignore(current_line))
@@ -40,18 +40,18 @@ int read_line_am(char *line, int line_count){
     int command_type = UNKNOWN_COMMAND;
 
     boolean is_label_am = FALSE; */
-    char line_copy[LINE_LEN];
+    char *line_copy;
     int k;
 
     line = skip_spaces(line);
-    if (line == NULL || *line == '\0' || *line == '\n')
+    if (end_of_line(line))
         return 0;
     
     if(!isalpha(*line) && *line != '.') { /* first non-blank character must be a letter or a dot */
       /*  write_error_code(1,line_count); */
         return 1;
     }
-    copy_line(line,line_copy);
+    line_copy = line;
     k = check_for_label(line,line_count);
     if (k){
         line = next_word(line);
