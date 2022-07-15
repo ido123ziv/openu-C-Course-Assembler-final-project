@@ -23,7 +23,7 @@ void pre_assembler(FILE *file, char *file_name){
     char line[LINE_LEN];
     is_macro = FALSE;
     line_count = 1; /* Line number from 1 */
-    new_filename = strcat(file_name, ".am");
+    new_filename = create_file(file_name, FILE_MACRO);
     macroFile = fopen(new_filename, "w");  
     macro_node = NULL;
 
@@ -32,7 +32,6 @@ void pre_assembler(FILE *file, char *file_name){
         /* is_error = FALSE; */
         if(!ignore(line)) /* Ignore line if it's blank or ; */
             read_line(line);
-        
         line_count++;
     }
 
