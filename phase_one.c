@@ -5,7 +5,6 @@ Project by Eran Cohen and Ido Ziv
 #include "global_functions.h"
 #include "phase_one.h"
 
-
 int ic;
 int dc;
 /**

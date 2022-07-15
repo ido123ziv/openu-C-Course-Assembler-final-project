@@ -427,12 +427,6 @@ void write_error_code(int error_code,int current_line){
  * @return int
  */
 
-/* Checking for the end of line/given token in the character that char* points to */
-int end_of_line(char *line)
-{
-    return line == NULL || *line == '\0' || *line == '\n';
-}
-
 /**
  * @brief
  *
