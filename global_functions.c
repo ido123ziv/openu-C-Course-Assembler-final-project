@@ -178,6 +178,16 @@ void copy_word(char *word, char *line)
     word[i] = '\0';
 }
 
+/* This function returns a pointer to the start of next token in the line */
+char *next_word(char *str)
+{
+    if(str == NULL) return NULL;
+    while(!isspace(*str) && !end_of_line(str)) str++; /* Skip rest of characters in the current token (until a space) */
+    str = skip_spaces(str); /* Skip spaces */
+    if(end_of_line(str)) return NULL;
+    return str;
+}
+
 /* This function skips spaces of a string and returns a pointer to the first non-blank character */
 char *skip_spaces(char *ch)
 {
@@ -402,6 +412,8 @@ void write_error_code(int error_code,int current_line){
  * @param line line working on
  * @return int 
  */
+
+/* Checking for the end of line/given token in the character that char* points to */
 int end_of_line(char *line)
 {
     return line == NULL || *line == '\0' || *line == '\n';
