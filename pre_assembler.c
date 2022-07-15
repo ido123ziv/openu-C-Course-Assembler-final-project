@@ -19,6 +19,7 @@ boolean is_label(char *word);
 
 boolean is_macro;
 macroPtr macro_node;
+macroPtr pointer;
 FILE *macroFile;
 
 void pre_assembler(FILE *file, char *file_name){
@@ -35,6 +36,10 @@ void pre_assembler(FILE *file, char *file_name){
         
         line_count++;
     }
+
+    freelist(macro_node);
+    fclose(file);
+    fclose(macroFile);
 }
 
 /* TODO: added line_num to indicate the line error happen */
@@ -63,13 +68,13 @@ void read_line(char *line, int line_num){
             is_macro = FALSE;
             return;
         }
-        addLine(all_line);
+        addLine(all_line, word);
     }
     else{ /* Check for macro */
         isMacro(word,line);
         if(!is_macro){
             /* TODO: add check if word in line equal to macro in the macro table */
-            addLine(all_line);
+            addLine(all_line, word);
         }
     }
 }
@@ -115,11 +120,40 @@ void addMacro(macroPtr * macroTable, char * macroName){
 }
 
 /* Create new line on the new file without macros */
-void addLine (char * line){
+void addLine (char * line, char * word){
     if(is_macro){
         strcat(macro_node->contents, line);
     }
     else{
-        /* TODO: add line depend if it's macro name or regular */
+        /* add line depend if it's macro name or regular */
+        if((pointer = findMacro(macro_node, word)) != NULL){
+            fputs(pointer -> contents, macroFile);
+        }
+        else
+            fputs(line, macroFile);
+    }
+}
+
+macroPtr checkMacro(macroPtr macroTable ,char * word){
+    macroPtr ptr1; 
+    ptr1 = macroTable;
+    while (ptr1 != NULL)
+    {
+        if(!strcmp(ptr1->name, word))
+            return ptr1;
+        ptr1 = ptr1 -> next;
+    }
+    return NULL;
+} 
+
+/* Free the memory we allocated for the macro list */
+void freelist(macroPtr * macroTable){
+    
+    macroPtr p;
+    while (*macroTable)
+    {
+         p=*macroTable;
+        *macroTable = (*macroTable)->next;
+        free(p);
     }
 }
