@@ -14,5 +14,8 @@ char *skip_spaces(char *ch);
 int ignore(char *line);
 int end_of_line(char *line);
 char *next_word(char *str);
-
+void write_error_code(int error_code,int current_line);
+void write_error_code(int error_code,int current_line);
+int end_of_line(char *line);
+char *next_word(char *str);
 #endif

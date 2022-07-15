@@ -206,3 +206,183 @@ int end_of_line(char *line)
 {
     return line == NULL || *line == '\0' || *line == '\n';
 }
+
+void write_error_code(int error_code,int current_line){
+    if (current_line != -1)
+        fprintf(stderr, "ERROR (line %d): ", current_line);
+     switch (error_code)
+    {
+        case 1:
+            fprintf(stderr, "first non-blank character must be a letter or a dot.\n");
+
+            break;
+
+        case 2:
+            fprintf(stderr, "label already exists.\n");
+
+            break;
+
+        case 3:
+            fprintf(stderr, "label is too long (LABEL_MAX_LENGTH: %d).\n", LABEL_LEN);
+
+            break;
+
+        case 4:
+            fprintf(stderr, "label must start with an alphanumeric character.\n");
+
+            break;
+
+        case 5:
+            fprintf(stderr, "label must only contain alphanumeric characters.\n");
+
+            break;
+
+        case 6:
+            fprintf(stderr, "label can't have the same name as a command.\n");
+
+            break;
+
+        case 7:
+            fprintf(stderr, "label can't have the same name as a register.\n");
+
+            break;
+
+        case 8:
+            fprintf(stderr, "label must be followed by a command or a directive.\n");
+
+            break;
+
+        case 9:
+            fprintf(stderr, "directive must have parameters.\n");
+
+            break;
+
+        case 10:
+            fprintf(stderr, "illegal number of parameters for a directive.\n");
+
+            break;
+
+        case 11:
+            fprintf(stderr, "incorrect usage of commas in a .data directive.\n");
+
+            break;
+
+        case 12:
+            fprintf(stderr, ".data expected a numeric parameter.\n");
+
+            break;
+
+        case 13:
+            fprintf(stderr, ".data expected a comma after a numeric parameter.\n");
+
+            break;
+
+        case 14:
+            fprintf(stderr, ".data got an unexpected comma after the last number.\n");
+
+            break;
+
+        case 15:
+            fprintf(stderr, ".string must contain exactly one parameter.\n");
+
+            break;
+
+        case 16:
+            fprintf(stderr, ".string operand is invalid.\n");
+
+            break;
+
+        case 17:
+            fprintf(stderr, ".struct first parameter must be a number.\n");
+
+            break;
+
+        case 18:
+            fprintf(stderr, ".struct must have 2 parameters.\n");
+
+            break;
+
+        case 19:
+            fprintf(stderr, ".struct second parameter is not a string.\n");
+
+            break;
+
+        case 20:
+            fprintf(stderr, ".struct must not have more than 2 operands.\n");
+
+            break;
+
+        case 21:
+            fprintf(stderr, ".struct must have 2 operands with a comma between them.\n");
+
+            break;
+
+        case 22:
+            fprintf(stderr, ".extern directive must be followed by a label.\n");
+
+            break;
+
+        case 23:
+            fprintf(stderr, ".extern directive received an invalid label.\n");
+
+            break;
+
+        case 24:
+            fprintf(stderr, ".extern must only have one operand that is a label.\n");
+
+            break;
+
+        case 25:
+            fprintf(stderr, "invalid command or directive.\n");
+
+            break;
+
+        case 26:
+            fprintf(stderr, "invalid syntax of a command.\n");
+
+            break;
+
+        case 27:
+            fprintf(stderr, "command can't have more than 2 operands.\n");
+
+            break;
+
+        case 28:
+            fprintf(stderr, "operand has invalid addressing method.\n");
+
+            break;
+
+        case 29:
+            fprintf(stderr, "number of operands does not match command requirements.\n");
+
+            break;
+
+        case 30:
+            fprintf(stderr, "operands' addressing methods do not match command requirements.\n");
+
+            break;
+
+        case 31:
+            fprintf(stderr, ".entry directive must be followed by an existing label.\n");
+
+            break;
+
+        case 32:
+            fprintf(stderr, ".entry can't apply to a label that was defined as external.\n");
+
+            break;
+
+        case 33:
+            fprintf(stderr, "label does not exist.\n");
+
+            break;
+
+        case 34:
+            fprintf(stderr, "there was an error while trying to open the requested file.\n");
+            break;
+
+        case 35:
+            fprintf(stderr, "Not enough arguments,\ncommand line should be like this: ./assembler file1 file2 .. \n");
+            break;
+    }
+}
