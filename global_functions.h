@@ -16,6 +16,9 @@ int end_of_line(char *line);
 char *next_word(char *str);
 void write_error_code(int error_code,int current_line);
 void write_error_code(int error_code,int current_line);
+void copy_line(char *from, char *to);
+char *next_word(char *line);
 int end_of_line(char *line);
-char *next_word(char *str);
+int find_command(char *line);
+int find_directive(char *line);
 #endif

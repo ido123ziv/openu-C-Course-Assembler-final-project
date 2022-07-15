@@ -1,0 +1,10 @@
+; aaaaaaaaaaaaaaaaaaaaaa
+; dsfKAFHHCIZHIVABCSBKAKLFHL46511946344893
+
+.entry L
+.entry ABC
+.entry CBA
+	.extern A
+ .extern B
+.extern C
+

@@ -10,6 +10,7 @@ translate it to different files as needed
 #include "assembler.h"
 #include "global_functions.h"
 #include "pre_assembler.h"
+#include "phase_one.h"
 
 /*
 const char * commands[] = {
@@ -43,6 +44,17 @@ int main (int argc, char *argv[])
                 printf("Start assemble the file: %s\n", get_filename);
                 printf("New name: %s\n", argv[i]);
                 pre_assembler(fp,argv[i]);
+				fclose(fp);
+            }
+            else{
+                write_error_code(34,-1);
+            }
+         /*   get_filename = create_file(argv[i], FILE_MACRO); */
+            printf("new file is: %s\n", argv[i]);
+            fp = fopen(argv[i], "r");
+            if(fp != NULL){ /* File exists */
+                printf("Start ido the file: %s\n", argv[i]); 
+                phase_one(fp,argv[i]);
 				fclose(fp);
             }
             else{

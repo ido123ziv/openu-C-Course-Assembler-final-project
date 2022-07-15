@@ -1,10 +1,7 @@
 check: this
 ido:
-
 me:
 `
-;
-;;
 .data
 ido: hlt
 cmp
