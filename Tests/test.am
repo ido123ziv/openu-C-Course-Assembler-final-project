@@ -1,9 +1,10 @@
-check: cmp
-.extern
-cmp
-; 12345678910
+check: this
 ido:
-
-
-get
+me:
+`
 .data
+ido: hlt
+cmp
+get
+.extern
+check_me: get 
