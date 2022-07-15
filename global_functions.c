@@ -432,10 +432,9 @@ int end_of_line(char *line)
  */
 int find_command(char *line){
     int line_len = strlen(line), i;
-    int size;
+    int size = CMD_LEN;
     if(line_len > MAX_COMMAND_LENGTH || line_len < MIN_COMMAND_LENGTH)
         return NOT_FOUND;
-    size = (int) sizeof(commands);
     for (i = 0; i < size; i++){
         if (strcmp(line, commands[i]) ==0 )
             return i;
