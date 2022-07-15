@@ -7,7 +7,10 @@ Project by Eran Cohen and Ido Ziv
 This script will include all the global function that will be require for more than 1 script
 for example: ignore spaces and tabs on input etc.
 */
-
+const char *commands[] = {
+        "mov", "cmp", "add", "sub", "not", "clr", "lea", "inc", "dec", "jmp", "bne",
+        "get", "prn", "jsr", "rts", "hlt"
+};
 /**
  * @brief 
  * This function skippes the whitespaces from the begining of a given string by incrementing the first index
@@ -149,7 +152,7 @@ boolean syntax_validator(char operand[], int line_num, char *file_name)
 /**
  * @brief gets a string that represent a register, and validates the format
  * 
- * @param token the address of the string
+ * @param index the address of the string
  * @return boolean whether or not this is valida register
  */
 boolean is_register(char *index)
@@ -190,8 +193,30 @@ int ignore(char *line)
     line = skip_spaces(line);
     return *line == ';' || *line == '\0' || *line == '\n';
 }
+/**
+ * @brief this method copies a line to a new string
+ * 
+ * @param from original string
+ * @param to new string
+ */
+void copy_line(char *from, char *to)
+{
+    int i = 0;
+    if(from == NULL || to == NULL) return;
 
-
+    while(i < LINE_LEN && !isspace(from[i]) && from[i] != '\0') /* Copying line until its end to *dest */
+    {
+        to[i] = from[i];
+        i++;
+    }
+    to[i] = '\0';
+}
+/**
+ * @brief prints an error message to the user according to a given table of erros (erros.json)
+ * 
+ * @param error_code which error to show message on
+ * @param current_line which line had an error
+ */
 void write_error_code(int error_code,int current_line){
     if (current_line != -1)
         fprintf(stderr, "ERROR (line %d): ", current_line);
@@ -371,3 +396,49 @@ void write_error_code(int error_code,int current_line){
             break;
     }
 }
+/**
+ * @brief whether this is the end of the line
+ * 
+ * @param line line working on
+ * @return int 
+ */
+int end_of_line(char *line)
+{
+    return line == NULL || *line == '\0' || *line == '\n';
+}
+/**
+ * @brief skip to the next non spaces to
+ * 
+ * @param line the line we are working on
+ * @return char* the pointer to the char that starts next word
+ */
+char *next_word(char *line)
+{
+    if(line == NULL) 
+        return NULL;
+    while(!isspace(*line) && !end_of_line(line)) 
+        line++; 
+    line = skip_spaces(line); 
+    if(end_of_line(line)) 
+        return NULL;
+    return line;
+}
+/**
+ * @brief 
+ * 
+ * @param line 
+ * @return int 
+ */
+int find_command(char *line){
+    int line_len = strlen(line), i;
+    int size;
+    if(line_len > MAX_COMMAND_LENGTH || line_len < MIN_COMMAND_LENGTH)
+        return NOT_FOUND;
+    size = (int) sizeof(commands);
+    for (i = 0; i < size; i++){
+        if (strcmp(line, commands[i]) ==0 )
+            return i;
+    }
+    return NOT_FOUND;
+}
+

@@ -13,4 +13,8 @@ void copy_word(char *word, char *line);
 char *skip_spaces(char *ch);
 int ignore(char *line);
 void write_error_code(int error_code,int current_line);
+void copy_line(char *from, char *to);
+char *next_word(char *line);
+int end_of_line(char *line);
+int find_command(char *line);
 #endif
