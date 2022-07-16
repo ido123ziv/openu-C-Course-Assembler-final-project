@@ -38,6 +38,7 @@ enum commands {MOV, CMP, ADD, SUB, NOT, CLR, LEA, INC, DEC, JMP, BNE, RED, PRN, 
    ****************************************************
 */
 
+
 extern const char base32[32];
 extern const char *commands[];
 extern const char *directives[];
@@ -55,9 +56,15 @@ extern const char *directives[];
     ****************************************************
    ****************************************************
 */
-
+#define MINIMUM_LABEL_LENGTH_WITH_COLON 2
+#define MINIMUM_LABEL_LENGTH_WITHOUT_COLON 1
+#define MAX_COMMAND_LENGTH 4 /* maximum number of characters in a command */
+#define MIN_COMMAND_LENGTH 3 /* minimum number of characters in a command */
 #define MAX_EXTENSION_LENGTH 5
 #define ERROR 1
+#define NOT_FOUND -1
+#define CMD_LEN 16;
+#define DIRECTIVE_LEN 5;
 
 /* ****************************************************
     ****************************************************
