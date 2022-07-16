@@ -26,6 +26,11 @@ const char * directives[] = {
         ".data", ".string", ".struct", ".entry", ".extern"
 };
 
+
+int ic;
+int dc;
+labelPtr symbols_table;
+
 int main (int argc, char *argv[])
 {
     int i; 
