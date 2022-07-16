@@ -7,11 +7,12 @@ Project by Eran Cohen and Ido Ziv
 This script will include all the global function that will be require for more than 1 script
 for example: ignore spaces and tabs on input etc.
 */
+/*
 const char *commands[] = {
     "mov", "cmp", "add", "sub", "not", "clr", "lea", "inc", "dec", "jmp", "bne",
     "get", "prn", "jsr", "rts", "hlt"};
 const char *directives[] = {
-    ".data", ".string", ".struct", ".entry", ".extern"};
+    ".data", ".string", ".struct", ".entry", ".extern"};*/
 /**
  * @brief
  * This function skippes the whitespaces from the begining of a given string by incrementing the first index
@@ -453,7 +454,7 @@ int find_command(char *line)
  */
 int find_directive(char *line)
 {
-    int i, size = DIRECTIVE_LEN;
+    int i, size = DIR_LEN;
     if (line == NULL || *line != '.')
         return NOT_FOUND;
     for (i = 0; i < size; i++){

@@ -47,12 +47,12 @@ int main (int argc, char *argv[])
             else{
                 write_error_code(34,-1);
             }
-         /*   get_filename = create_file(argv[i], FILE_MACRO); */
-            printf("new file is: %s\n", argv[i]);
-            fp = fopen(argv[i], "r");
+            get_filename = create_file(argv[i], FILE_MACRO); 
+            printf("new file is: %s\n", get_filename);
+            fp = fopen(get_filename, "r");
             if(fp != NULL){ /* File exists */
-                printf("Start ido the file: %s\n", argv[i]); 
-                phase_one(fp,argv[i]);
+                printf("Start ido the file: %s\n", get_filename); 
+                phase_one(fp,get_filename);
 				fclose(fp);
             }
             else{
