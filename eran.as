@@ -1,4 +1,4 @@
-ido: mov r1
+ido: 
 macro m1
 mov r1,r2
 endmacro

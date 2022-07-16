@@ -194,7 +194,8 @@ macroPtr checkMacro(macroPtr macroTable, char *word)
                 is_dir = 1;
         }
 
-        if (is_dir == 0 && is_cmd == 0)
+        /* check if the word might be a macro that doesn't exist and will print an error */
+        if ((is_dir == 0 && is_cmd == 0) && !is_label(word))
         {
             printf("ERROR: The word '%s' on line %d is not recognized as macro, command or directive.\n", word, line_count);
             remove(new_filename);
