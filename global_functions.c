@@ -462,3 +462,34 @@ int find_directive(char *line)
     }
     return NOT_FOUND;
 }
+/**
+ * @brief Get the label address object
+ * 
+ * @param h 
+ * @param name 
+ * @return unsigned int 
+ */
+unsigned int get_label_address(labelPtr h, char *name)
+{
+    labelPtr label = get_label(h, name);
+    if(label != NULL) return label -> address;
+    return FALSE;
+}
+/**
+ * @brief Get the label object
+ * 
+ * @param label 
+ * @param name 
+ * @return labelPtr 
+ */
+labelPtr get_label(labelPtr label, char *name){
+{
+    while (label)
+    {
+        if (strcmp(label->name, name) == 0)
+            return label;
+        label = label->next;
+    }
+    return NULL;
+}
+}

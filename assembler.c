@@ -28,6 +28,10 @@ const char * directives[] = {
 };
 
 */
+int ic;
+int dc;
+labelPtr symbols_table;
+
 int main (int argc, char *argv[])
 {
     int i; 
@@ -54,6 +58,7 @@ int main (int argc, char *argv[])
             fp = fopen(argv[i], "r");
             if(fp != NULL){ /* File exists */
                 printf("Start ido the file: %s\n", argv[i]); 
+                symbols_table = NULL;
                 phase_one(fp,argv[i]);
 				fclose(fp);
             }

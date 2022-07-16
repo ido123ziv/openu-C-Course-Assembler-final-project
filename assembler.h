@@ -72,10 +72,18 @@ extern const char *directives[];
     ****************************************************
    ****************************************************
 */
-extern int ic, dc;
-
+ 
 /* extern macroPtr macro_table; */
+typedef struct structLabels * labelPtr;
+typedef struct  structLabels {
+	char name[LABEL_LEN]; /* Label name */
+    unsigned int address;
+	labelPtr next; /* a pointer to the next label in the list */
+} Labels;
 
+
+extern int ic, dc;
+extern labelPtr symbols_table;
 #define REGISTER_LENGTH 2 /* a register's name contains 2 characters */
 #define MIN_REGISTER 0 /* r0 is the first register */
 #define MAX_REGISTER 7 /* r7 is the last register */
