@@ -9,6 +9,7 @@
 /*************** PHASE TWO *****************/
 void write_output_files(char *src);
 int read_line_ph2(char * line, int line_num);
+
 /* ************** PHASE ONE ************** */
 int read_line_am(char *line, int line_count);
 int check_for_label(char *line, boolean COLON);
