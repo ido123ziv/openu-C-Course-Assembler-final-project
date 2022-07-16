@@ -171,8 +171,10 @@ void addLine(char *line, char *word)
 
 macroPtr checkMacro(macroPtr macroTable, char *word)
 {
+    /*
     int i;
     int is_dir = 0, is_cmd = 0;
+    */
     macroPtr ptr1;
     ptr1 = macroTable;
     while (ptr1 != NULL)
@@ -181,6 +183,7 @@ macroPtr checkMacro(macroPtr macroTable, char *word)
             return ptr1;
         ptr1 = ptr1->next;
     }
+    /*
     if (!is_macro)
     {
         for (i = 0; i < CMD_LEN; i++)
@@ -193,15 +196,17 @@ macroPtr checkMacro(macroPtr macroTable, char *word)
             if (!strcmp(word, directives[i]))
                 is_dir = 1;
         }
-
-        /* check if the word might be a macro that doesn't exist and will print an error */
+        
+        check if the word might be a macro that doesn't exist and will print an error 
+        
         if ((is_dir == 0 && is_cmd == 0) && !is_label(word))
         {
             printf("ERROR: The word '%s' on line %d is not recognized as macro, command or directive.\n", word, line_count);
             remove(new_filename);
             exit(1);
         }
-    }
+        }
+        */
     return NULL;
 }
 

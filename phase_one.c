@@ -3,10 +3,8 @@ Project by Eran Cohen and Ido Ziv
 */
 #include "assembler.h"
 #include "global_functions.h"
-#include "phase_one.h"
+#include "phases.h"
 
-int ic;
-int dc;
 /**
  * @brief
  *
@@ -17,9 +15,7 @@ void phase_one(FILE *fp, char *file_name)
 {
     char current_line[LINE_LEN]; /* holds the current line */
     int line_count = 1;          /* initializing the line counter to 1, the file starts with line 1 */
-    int error_code;
-    ic = 0;
-    dc = 0;
+
     printf("---------------------------------------------------------\n");
     printf("let's do this shit %s\n", file_name);
     printf("---------------------------------------------------------\n");

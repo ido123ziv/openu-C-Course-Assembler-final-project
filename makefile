@@ -4,7 +4,7 @@ assembler: assembler.o pre_assembler.o global_functions.o phase_one.o
 assembler.o: assembler.c assembler.h pre_assembler.h global_functions.h 
 	gcc -c -ansi -Wall -pedantic assembler.c -o assembler.o
 
-phase_one.o: phase_one.c assembler.h phase_one.h global_functions.h 
+phase_one.o: phase_one.c assembler.h phases.h global_functions.h 
 	gcc -c -ansi -Wall -pedantic phase_one.c -o phase_one.o
 
 pre_assembler.o: pre_assembler.c assembler.h pre_assembler.h global_functions.h 

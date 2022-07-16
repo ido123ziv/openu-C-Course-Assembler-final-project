@@ -10,7 +10,7 @@ translate it to different files as needed
 #include "assembler.h"
 #include "global_functions.h"
 #include "pre_assembler.h"
-#include "phase_one.h"
+#include "phases.h"
 
 const char * commands[] = {
         "mov", "cmp", "add", "sub", "not", "clr", "lea", "inc", "dec", "jmp", "bne",
@@ -27,12 +27,22 @@ const char * directives[] = {
 };
 
 
-int ic;
-int dc;
+int ic, dc;
+int error_code;
+boolean error_exists, has_entry, has_extern;
 labelPtr symbols_table;
 
 int main (int argc, char *argv[])
 {
+    /* Initialize global vars */
+    error_exists = FALSE;
+    has_entry = FALSE;
+    has_extern = FALSE;
+    ic = 0;
+    dc = 0;
+
+    /*****************************/
+
     int i; 
     char *get_filename;
     FILE *fp;

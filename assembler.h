@@ -38,10 +38,12 @@ enum commands {MOV, CMP, ADD, SUB, NOT, CLR, LEA, INC, DEC, JMP, BNE, RED, PRN, 
    ****************************************************
 */
 
-
 extern const char base32[32];
 extern const char *commands[];
 extern const char *directives[];
+extern int error_code;
+extern boolean error_exists, has_entry, has_extern;
+extern int ic, dc;
 
 /* Length Constants */
 #define LINE_LEN 82  /* Line max size is 80 , extra 2 bits space for \n or \0 */

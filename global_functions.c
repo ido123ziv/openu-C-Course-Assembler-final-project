@@ -434,14 +434,13 @@ void write_error_code(int error_code,int current_line){
  * @param line
  * @return int
  */
-int find_command(char *line)
+int find_command(char *word)
 {
-    int line_len = strlen(line), i;
-    int size = CMD_LEN;
-    if (line_len > MAX_COMMAND_LENGTH || line_len < MIN_COMMAND_LENGTH)
+    int word_len = strlen(word), i;
+    if (word_len > MAX_COMMAND_LENGTH || word_len < MIN_COMMAND_LENGTH)
         return NOT_FOUND;
-    for (i = 0; i < size; i++){
-        if (strcmp(line, commands[i]) == 0)
+    for (i = 0; i < CMD_LEN; i++){
+        if (strcmp(word, commands[i]) == 0)
             return i;
     }
     return NOT_FOUND;
