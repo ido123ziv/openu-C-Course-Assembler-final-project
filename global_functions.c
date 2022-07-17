@@ -72,7 +72,7 @@ char *create_file(char *original, int type)
     char *modified = (char *)malloc(strlen(original) + MAX_EXTENSION_LENGTH); /* extends the string to max */
     if (modified == NULL)
     {
-        fprintf(stderr, "Dynamic allocation error."); /* catching errors */
+        fprintf(stdout, "Dynamic allocation error."); /* catching errors */
         exit(ERROR);
     }
 
@@ -122,13 +122,13 @@ boolean syntax_validator(char operand[], int line_num, char *file_name)
         {
             if (!is_number(operand + 1))
             {
-                fprintf(stderr, "<file %s, line %d> Illegal input, The operand after '#' must be a real number)\n", file_name, line_num);
+                fprintf(stdout, "<file %s, line %d> Illegal input, The operand after '#' must be a real number)\n", file_name, line_num);
                 return FALSE;
             }
         }
         else
         {
-            fprintf(stderr, "<file %s, line %d> Illegal input, There is no char after the '#' sign must be a real number\n", file_name, line_num);
+            fprintf(stdout, "<file %s, line %d> Illegal input, There is no char after the '#' sign must be a real number\n", file_name, line_num);
             return FALSE;
         }
     }
@@ -138,13 +138,13 @@ boolean syntax_validator(char operand[], int line_num, char *file_name)
         {
             if (operand[1] == ' ') /*whether there is a space after % */
             {
-                fprintf(stderr, "<file %s, line %d> Illegal space after the precent sign\n", file_name, line_num);
+                fprintf(stdout, "<file %s, line %d> Illegal space after the precent sign\n", file_name, line_num);
                 return FALSE;
             }
         }
         else
         {
-            fprintf(stderr, "<file %s, line %d> Illegal input, There is no char after the precent sign\n", file_name, line_num);
+            fprintf(stdout, "<file %s, line %d> Illegal input, There is no char after the precent sign\n", file_name, line_num);
             return FALSE;
         }
     }
@@ -160,7 +160,7 @@ boolean syntax_validator(char operand[], int line_num, char *file_name)
  */
 boolean is_register(char *word)
 {
-     return strlen(word) == REGISTER_LENGTH && word[0] == 'r' && word[1] >= '0' && word[1] <= '7';
+    return strlen(word) == REGISTER_LENGTH && word[0] == 'r' && word[1] >= '0' && word[1] <= '7';
 }
 
 /* Function will copy the next word (until a space or end of line) to a string */
@@ -239,194 +239,194 @@ void copy_line(char *from, char *to)
  */
 
 /* Checking for the end of line/given token in the character that char* points to */
-int end_of_line(char *line){
+int end_of_line(char *line)
+{
     return line == NULL || *line == '\0' || *line == '\n';
 }
 
-void write_error_code(int error_code,int current_line){
+void write_error_code(int error_code, int current_line)
+{
     if (current_line != -1)
-        fprintf(stderr, "ERROR (line %d): ", current_line);
+        fprintf(stdout, "ERROR (line %d): ", current_line);
     switch (error_code)
     {
     case 1:
-        fprintf(stderr, "first non-blank character must be a letter or a dot.\n");
+        fprintf(stdout, "first non-blank character must be a letter or a dot.\n");
 
         break;
 
     case 2:
-        fprintf(stderr, "label already exists.\n");
+        fprintf(stdout, "label already exists.\n");
 
         break;
 
     case 3:
-        fprintf(stderr, "label is too long (LABEL_MAX_LENGTH: %d).\n", LABEL_LEN);
+        fprintf(stdout, "label is too long (LABEL_MAX_LENGTH: %d).\n", LABEL_LEN);
 
         break;
 
     case 4:
-        fprintf(stderr, "label must start with an alphanumeric character.\n");
+        fprintf(stdout, "label must start with an alphanumeric character.\n");
 
         break;
 
     case 5:
-        fprintf(stderr, "label must only contain alphanumeric characters.\n");
+        fprintf(stdout, "label must only contain alphanumeric characters.\n");
 
         break;
 
     case 6:
-        fprintf(stderr, "label can't have the same name as a command.\n");
+        fprintf(stdout, "label can't have the same name as a command.\n");
 
         break;
 
     case 7:
-        fprintf(stderr, "label must be followed by a command or a directive.\n");
+        fprintf(stdout, "label must be followed by a command or a directive.\n");
         break;
 
     case 8:
-        fprintf(stderr, "label can't have the same name as a register.\n");
+        fprintf(stdout, "label can't have the same name as a register.\n");
         break;
 
     case 9:
-        fprintf(stderr, "directive must have parameters.\n");
+        fprintf(stdout, "directive must have parameters.\n");
 
         break;
 
     case 10:
-        fprintf(stderr, "illegal number of parameters for a directive.\n");
+        fprintf(stdout, "illegal number of parameters for a directive.\n");
 
         break;
 
     case 11:
-        fprintf(stderr, "incorrect usage of commas in a .data directive.\n");
+        fprintf(stdout, "incorrect usage of commas in a .data directive.\n");
 
         break;
 
     case 12:
-        fprintf(stderr, ".data expected a numeric parameter.\n");
+        fprintf(stdout, ".data expected a numeric parameter.\n");
 
         break;
 
     case 13:
-        fprintf(stderr, ".data expected a comma after a numeric parameter.\n");
+        fprintf(stdout, ".data expected a comma after a numeric parameter.\n");
 
         break;
 
     case 14:
-        fprintf(stderr, ".data got an unexpected comma after the last number.\n");
+        fprintf(stdout, ".data got an unexpected comma after the last number.\n");
 
         break;
 
     case 15:
-        fprintf(stderr, ".string must contain exactly one parameter.\n");
+        fprintf(stdout, ".string must contain exactly one parameter.\n");
 
         break;
 
     case 16:
-        fprintf(stderr, ".string operand is invalid.\n");
+        fprintf(stdout, ".string operand is invalid.\n");
 
         break;
 
     case 17:
-        fprintf(stderr, ".struct first parameter must be a number.\n");
+        fprintf(stdout, ".struct first parameter must be a number.\n");
 
         break;
 
     case 18:
-        fprintf(stderr, ".struct must have 2 parameters.\n");
+        fprintf(stdout, ".struct must have 2 parameters.\n");
 
         break;
 
     case 19:
-        fprintf(stderr, ".struct second parameter is not a string.\n");
+        fprintf(stdout, ".struct second parameter is not a string.\n");
 
         break;
 
     case 20:
-        fprintf(stderr, ".struct must not have more than 2 operands.\n");
+        fprintf(stdout, ".struct must not have more than 2 operands.\n");
 
         break;
 
     case 21:
-        fprintf(stderr, ".struct must have 2 operands with a comma between them.\n");
+        fprintf(stdout, ".struct must have 2 operands with a comma between them.\n");
 
         break;
 
     case 22:
-        fprintf(stderr, ".extern directive must be followed by a label.\n");
+        fprintf(stdout, ".extern directive must be followed by a label.\n");
 
         break;
 
     case 23:
-        fprintf(stderr, ".extern directive received an invalid label.\n");
+        fprintf(stdout, ".extern directive received an invalid label.\n");
 
         break;
 
     case 24:
-        fprintf(stderr, ".extern must only have one operand that is a label.\n");
+        fprintf(stdout, ".extern must only have one operand that is a label.\n");
 
         break;
 
     case 25:
-        fprintf(stderr, "invalid command or directive.\n");
+        fprintf(stdout, "invalid command or directive.\n");
 
         break;
 
     case 26:
-        fprintf(stderr, "invalid syntax of a command.\n");
+        fprintf(stdout, "invalid syntax of a command.\n");
 
         break;
 
     case 27:
-        fprintf(stderr, "command can't have more than 2 operands.\n");
+        fprintf(stdout, "command can't have more than 2 operands.\n");
 
         break;
 
     case 28:
-        fprintf(stderr, "operand has invalid addressing method.\n");
+        fprintf(stdout, "operand has invalid addressing method.\n");
 
         break;
 
     case 29:
-        fprintf(stderr, "number of operands does not match command requirements.\n");
+        fprintf(stdout, "number of operands does not match command requirements.\n");
 
         break;
 
     case 30:
-        fprintf(stderr, "operands' addressing methods do not match command requirements.\n");
+        fprintf(stdout, "operands' addressing methods do not match command requirements.\n");
 
         break;
 
     case 31:
-        fprintf(stderr, ".entry directive must be followed by an existing label.\n");
+        fprintf(stdout, ".entry directive must be followed by an existing label.\n");
 
         break;
 
     case 32:
-        fprintf(stderr, ".entry can't apply to a label that was defined as external.\n");
+        fprintf(stdout, ".entry can't apply to a label that was defined as external.\n");
 
         break;
 
     case 33:
-        fprintf(stderr, "label does not exist.\n");
+        fprintf(stdout, "label does not exist.\n");
 
         break;
 
     case 34:
-        fprintf(stderr, "there was an error while trying to open the requested file.\n");
+        fprintf(stdout, "there was an error while trying to open the requested file.\n");
         break;
 
     case 35:
-        fprintf(stderr, "Not enough arguments,\ncommand line should be like this: ./assembler file1 file2 .. \n");
+        fprintf(stdout, "Not enough arguments,\ncommand line should be like this: ./assembler file1 file2 .. \n");
+        break;
+
+    case 36:
+        fprintf(stdout, "string must begin with "
+                        " \n");
         break;
     }
 }
-/**
- * @brief whether this is the end of the line
- *
- * @param line line working on
- * @return int
- */
-
 /**
  * @brief
  *
@@ -439,7 +439,8 @@ int find_command(char *line)
     int size = CMD_LEN;
     if (line_len > MAX_COMMAND_LENGTH || line_len < MIN_COMMAND_LENGTH)
         return NOT_FOUND;
-    for (i = 0; i < size; i++){
+    for (i = 0; i < size; i++)
+    {
         if (strcmp(line, commands[i]) == 0)
             return i;
     }
@@ -456,7 +457,8 @@ int find_directive(char *line)
     int i, size = DIRECTIVE_LEN;
     if (line == NULL || *line != '.')
         return NOT_FOUND;
-    for (i = 0; i < size; i++){
+    for (i = 0; i < size; i++)
+    {
         if (strcmp(line, directives[i]) == 0)
             return i;
     }
@@ -464,25 +466,26 @@ int find_directive(char *line)
 }
 /**
  * @brief Get the label address object
- * 
- * @param h 
- * @param name 
- * @return unsigned int 
+ *
+ * @param h
+ * @param name
+ * @return unsigned int
  */
 unsigned int get_label_address(labelPtr h, char *name)
 {
     labelPtr label = get_label(h, name);
-    if(label != NULL) return label -> address;
+    if (label != NULL)
+        return label->address;
     return FALSE;
 }
 /**
  * @brief Get the label object
- * 
- * @param label 
- * @param name 
- * @return labelPtr 
+ *
+ * @param label
+ * @param name
+ * @return labelPtr
  */
-labelPtr get_label(labelPtr label, char *name){
+labelPtr get_label(labelPtr label, char *name)
 {
     while (label)
     {
@@ -492,4 +495,12 @@ labelPtr get_label(labelPtr label, char *name){
     }
     return NULL;
 }
+
+void print_data(unsigned int *data)
+{
+    int i;
+    for (i = 0; i < (sizeof(data) / sizeof(data[0])); i++)
+    {
+        printf("%d\n", data[i]);
+    }
 }
