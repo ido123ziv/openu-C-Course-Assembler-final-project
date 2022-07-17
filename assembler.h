@@ -29,6 +29,17 @@ typedef enum {FALSE,TRUE}boolean;
 typedef enum {FILE_INPUT, FILE_MACRO, FILE_OBJECT,FILE_ENTRY,FILE_EXTERN }filetypes;
 typedef enum {DATA, STRING, STRUCT, ENTRY, EXTERN,UNKNOWN_TYPE}assm_directives;
 typedef enum {MOV, CMP, ADD, SUB, NOT, CLR, LEA, INC, DEC, JMP, BNE, RED, PRN, JSR, RTS, STOP, UNKNOWN_COMMAND}assm_commands;
+typedef enum {SYNTAX_ERR ,LABEL_ALREADY_EXISTS ,LABEL_TOO_LONG ,
+    LABEL_INVALID_FIRST_CHAR ,LABEL_ONLY_ALPHANUMERIC ,LABEL_CANT_BE_COMMAND ,
+    LABEL_ONLY ,LABEL_CANT_BE_REGISTER ,DIRECTIVE_NO_PARAMS ,
+    DIRECTIVE_INVALID_NUM_PARAMS ,DATA_COMMAS_IN_A_ROW ,
+    DATA_EXPECTED_NUM ,DATA_EXPECTED_COMMA_AFTER_NUM ,DATA_UNEXPECTED_COMMA ,
+    STRING_TOO_MANY_OPERANDS ,STRING_OPERAND_NOT_VALID ,STRUCT_EXPECTED_STRING ,
+    STRUCT_INVALID_STRING ,EXPECTED_COMMA_BETWEEN_OPERANDS ,STRUCT_INVALID_NUM ,
+    STRUCT_TOO_MANY_OPERANDS ,EXTERN_NO_LABEL ,EXTERN_INVALID_LABEL ,EXTERN_TOO_MANY_OPERANDS ,
+    COMMAND_NOT_FOUND ,COMMAND_UNEXPECTED_CHAR ,COMMAND_TOO_MANY_OPERANDS ,COMMAND_INVALID_METHOD ,
+    COMMAND_INVALID_NUMBER_OF_OPERANDS ,COMMAND_INVALID_OPERANDS_METHODS ,ENTRY_LABEL_DOES_NOT_EXIST ,
+    ENTRY_CANT_BE_EXTERN ,COMMAND_LABEL_DOES_NOT_EXIST ,CANNOT_OPEN_FILE ,NOT_ENOUGH_ARGUMENTS }errors;
 
 /* ****************************************************
     ****************************************************
@@ -62,9 +73,9 @@ extern const char *directives[];
 #define MAX_EXTENSION_LENGTH 5
 #define ERROR 1
 #define NOT_FOUND -1
-#define CMD_LEN 16;
-#define DIRECTIVE_LEN 5;
-
+#define CMD_LEN 16
+#define DIRECTIVE_LEN 5
+#define MACHINE_RAM 2000
 /* ****************************************************
     ****************************************************
     ****************************************************
@@ -84,6 +95,8 @@ typedef struct  structLabels {
 
 extern int ic, dc;
 extern labelPtr symbols_table;
+unsigned int data[];
+unsigned int instructions[];
 #define REGISTER_LENGTH 2 /* a register's name contains 2 characters */
 #define MIN_REGISTER 0 /* r0 is the first register */
 #define MAX_REGISTER 7 /* r7 is the last register */
