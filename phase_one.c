@@ -299,10 +299,10 @@ int handle_directive(int dir_type, char *line)
     return 0;
 }
 /**
- * @brief 
- * 
- * @param line 
- * @return int 
+ * @brief
+ *
+ * @param line
+ * @return int
  */
 int handle_data_directive(char *line)
 {
@@ -310,26 +310,34 @@ int handle_data_directive(char *line)
     char copy[LINE_LEN];
     while (!end_of_line(line))
     {
-        copy_word(copy,line);
+        copy_word(copy, line);
         line = next_word(line);
 
-        if (strlen(copy) > 0){
-            if (!isnumber){
-                if (!is_number(copy)){
+        if (strlen(copy) > 0)
+        {
+            if (!isnumber)
+            {
+                if (!is_number(copy))
+                {
                     return 12;
                 }
-                else{
+                else
+                {
                     isnumber = TRUE;
                     iscomma = FALSE;
-                    data[dc++] = (unsigned int) atoi(copy);
+                    data[dc++] = (unsigned int)atoi(copy);
                 }
             }
-            else{
+            else
+            {
                 if (*copy != ',')
                     return 13;
-                else{
-                    if (iscomma) return DATA_COMMAS_IN_A_ROW;
-                    else {
+                else
+                {
+                    if (iscomma)
+                        return DATA_COMMAS_IN_A_ROW;
+                    else
+                    {
                         iscomma = TRUE;
                         isnumber = FALSE;
                     }
@@ -338,15 +346,16 @@ int handle_data_directive(char *line)
         }
         /* code */
     }
-    if (iscomma) return DATA_UNEXPECTED_COMMA;
-    
+    if (iscomma)
+        return DATA_UNEXPECTED_COMMA;
+
     return 0;
 }
 /**
- * @brief 
- * 
- * @param line 
- * @return int 
+ * @brief
+ *
+ * @param line
+ * @return int
  */
 int handle_string_directive(char *line)
 {
@@ -354,31 +363,64 @@ int handle_string_directive(char *line)
     char copy[LINE_LEN], c = copy;
     printf("my line is: %s\n", line);
     copy_word(copy, line);
-    if (end_of_line(line) || (line != '"' && line[line_len - 1] != '"')) 
+    if (end_of_line(line) || (line != '"' && line[line_len - 1] != '"'))
         return STRING_OPERAND_NOT_VALID;
-        
+
     line = skip_spaces(line);
     if (end_of_line(line))
     {
         copy[line_len - 1] = "\0";
         c++;
-        printf("%x", data);
-        while (!end_of_line(copy))
-        {
-            data[dc++] = (unsigned int)*copy; /* Inserting a character to data array */
-            c++;
-        }
-        data[dc++] = '\0';
-        printf("%x", data);
+        write_string_to_data(c);
     }
 
     return 0;
 }
 int handle_struct_directive(char *line)
 {
+    int line_len = strlen(line);
+
+    char copy[LINE_LEN], c = copy;
+    printf("my line is: %s\n", line);
+    copy_word(copy, line);
+
+    if (end_of_line(copy) || !is_number(copy))
+        return STRUCT_INVALID_NUM;
+    data[dc++] = (unsigned int) atoi(copy);
+    line = next_word(line);
+    copy_word(copy, line);
+    if (!end_of_line(line) && *copy == ','){
+        line = next_word(line);
+        if (end_of_line(line))
+            return STRUCT_EXPECTED_STRING;
+        else{
+            if (line != '"' && line[line_len - 1] != '"')
+                return STRUCT_INVALID_STRING;
+            copy_word(copy, line);
+            copy[line_len - 1] = "\0";
+            c = copy;
+            c++;
+            write_string_to_data(c);
+        }
+    }
+    else{
+        return EXPECTED_COMMA_BETWEEN_OPERANDS;
+    }
+    line = next_word(line);
+    if (!end_of_line(line))
+        return STRUCT_TOO_MANY_OPERANDS;
     return 0;
 }
 int handle_extern_directive(char *line)
 {
     return 0;
+}
+void write_string_to_data(char *line){
+    char c = line;
+     while (!end_of_line(line))
+        {
+            data[dc++] = (unsigned int)*line; /* Inserting a character to data array */
+            c++;
+        }
+        data[dc++] = '\0';
 }

@@ -499,8 +499,10 @@ labelPtr get_label(labelPtr label, char *name)
 void print_data(unsigned int *data)
 {
     int i;
+    printf("$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$\nMe Printing Data ah?\n");
     for (i = 0; i < (sizeof(data) / sizeof(data[0])); i++)
     {
-        printf("%d\n", data[i]);
+        printf(" %u ", data[i]);
     }
+    printf("\n$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$\n");
 }
