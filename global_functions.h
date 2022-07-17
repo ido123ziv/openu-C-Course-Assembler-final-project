@@ -23,4 +23,5 @@ int find_command(char *line);
 int find_directive(char *line);
 unsigned int get_label_address(labelPtr h, char *name);
 labelPtr get_label(labelPtr label, char *name);
+void print_data(unsigned int *data);
 #endif

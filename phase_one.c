@@ -58,7 +58,7 @@ int read_line_am(char *line, int line_count)
         return 1;
 
     line_copy = line;
-    
+
     copy_word(current_word, line);
     label_count = check_for_label(current_word, TRUE);
     if (label_count)
@@ -72,11 +72,11 @@ int read_line_am(char *line, int line_count)
         {
             new_label = add_label(&symbols_table, current_word, 0, line_count);
             if (!new_label)
-                return 2;
+                return LABEL_ALREADY_EXISTS;
             line = next_word(line);
             if (end_of_line(line))
             { /* line can't be just a label */
-                return 7;
+                return LABEL_ONLY;
             }
             printf("One label found\t");
             /*TODO: add label to table*/
@@ -89,7 +89,7 @@ int read_line_am(char *line, int line_count)
     dir_type = find_directive(current_word);
     command_type = find_command(current_word);
     if (dir_type == NOT_FOUND && command_type == NOT_FOUND)
-        return 25;
+        return COMMAND_NOT_FOUND;
 
     if (dir_type != NOT_FOUND)
     {
@@ -97,16 +97,18 @@ int read_line_am(char *line, int line_count)
         printf("directive is: %s\n", directives[dir_type]);
         if (label_count)
         {
-            if (dir_type == EXTERN || dir_type == ENTRY){
+            if (dir_type == EXTERN || dir_type == ENTRY)
+            {
                 /*TODO: Remove from table*/
                 label_count = 0;
             }
             else
-                new_label ->address = dc; /* This is a data directive */
+                new_label->address = dc; /* This is a data directive */
         }
         line = next_word(line);
         is_error = handle_directive(dir_type, line);
-        if (is_error) return is_error;
+        if (is_error)
+            return is_error;
     }
 
     if (command_type != NOT_FOUND)
@@ -151,13 +153,13 @@ int check_for_label(char *line, boolean COLON)
     if (line_lentgh > LABEL_LEN) /* checking label size */
     {
         if (COLON) /*error only if it is a label with ':' */
-            return 3;
+            return LABEL_TOO_LONG;
         /*  printf("check max line length:\n");*/
         return 0;
     }
 
     if (!isalpha(*line)) /* first symbol in label must be letter */
-        return 4;
+        return LABEL_INVALID_FIRST_CHAR;
 
     if (COLON)
     { /* removing ':' from line*/
@@ -171,24 +173,32 @@ int check_for_label(char *line, boolean COLON)
         if (isdigit(line[i]))
             has_digits = TRUE;
         else if (!isalpha(line[i]))
-            return 5;
+            return LABEL_ONLY_ALPHANUMERIC;
     }
 
     if (!has_digits)
     {
         if (find_command(line) != NOT_FOUND)
-            return 6;
+            return LABEL_CANT_BE_COMMAND;
     }
     /* printf("current REGS is: %s\n", line);*/
     /* labels can't be registers */
     if (is_register(line))
     {
-        return 8;
+        return LABEL_CANT_BE_REGISTER;
     }
 
     return 1;
 }
-
+/**
+ * @brief
+ *
+ * @param table
+ * @param name
+ * @param address
+ * @param line_count
+ * @return labelPtr
+ */
 labelPtr add_label(labelPtr *table, char *name, unsigned int address, int line_count)
 {
     labelPtr temp, table_pointer = *table;
@@ -238,65 +248,133 @@ boolean existing_label(labelPtr label, char *name)
     return FALSE;
 }
 /**
+ * @brief
+ *
+ * @param dir_type
+ * @param line
+ * @return int
+ */
+int handle_directive(int dir_type, char *line)
+{
+    if (!line || end_of_line(line))
+    {
+        return DIRECTIVE_NO_PARAMS;
+    }
+
+    switch (dir_type)
+    {
+    case DATA:
+        /* Handle .data directive and insert values separated by ',' to the memory */
+        printf("handle data %d\n", DATA);
+        return handle_data_directive(line);
+
+    case STRING:
+        /* Handle .string directive and insert to memory */
+        printf("handle string %d\n", STRING);
+        return handle_string_directive(line);
+
+    case STRUCT:
+        /* Handle .struct directive and insert both number and string to memory */
+        printf("handle struct %d\n", STRUCT);
+        return handle_struct_directive(line);
+
+    case ENTRY:
+        /* Only check for syntax of entry (should not contain more than one parameter) */
+        printf("handle ENTRY %d\n", ENTRY);
+        if (!end_of_line(next_word(line))) /* If there's a next word (after the first one) */
+        {
+            return DIRECTIVE_INVALID_NUM_PARAMS;
+        }
+        break;
+
+    case EXTERN:
+        /* Handle .extern directive */
+        printf("handle extern %d\n", EXTERN);
+        return handle_extern_directive(line);
+    }
+    return 0;
+}
+/**
  * @brief 
  * 
- * @param dir_type 
  * @param line 
  * @return int 
  */
-int handle_directive(int dir_type, char* line){
-    printf("handling!!!!!!!!!!!  %d\n", dir_type);
-    if (!line || end_of_line(line)){
-        return 9;
-    }
-    
-    switch (dir_type)
+int handle_data_directive(char *line)
+{
+    boolean isnumber = FALSE, iscomma = FALSE;
+    char copy[LINE_LEN];
+    while (!end_of_line(line))
     {
-        case DATA:
-            /* Handle .data directive and insert values separated by ',' to the memory */
-            printf("handle data %d\n", DATA);
-            return handle_data_directive(line);
+        copy_word(copy,line);
+        line = next_word(line);
 
-        case STRING:
-            /* Handle .string directive and insert to memory */
-            printf("handle string %d\n", STRING);
-            return handle_string_directive(line);
-
-        case STRUCT:
-            /* Handle .struct directive and insert both number and string to memory */
-            printf("handle struct %d\n", STRUCT);
-            return handle_struct_directive(line);
-
-        case ENTRY:
-            /* Only check for syntax of entry (should not contain more than one parameter) */
-            printf("handle ENTRY %d\n", ENTRY);
-            if(!end_of_line(next_word(line))) /* If there's a next word (after the first one) */
-            {
-                return 10;
+        if (strlen(copy) > 0){
+            if (!isnumber){
+                if (!is_number(copy)){
+                    return 12;
+                }
+                else{
+                    isnumber = TRUE;
+                    iscomma = FALSE;
+                    data[dc++] = (unsigned int) atoi(copy);
+                }
             }
-            break;
-
-        case EXTERN:
-            /* Handle .extern directive */
-            printf("handle extern %d", EXTERN);
-            return handle_extern_directive(line);
+            else{
+                if (*copy != ',')
+                    return 13;
+                else{
+                    if (iscomma) return DATA_COMMAS_IN_A_ROW;
+                    else {
+                        iscomma = TRUE;
+                        isnumber = FALSE;
+                    }
+                }
+            }
+        }
+        /* code */
     }
+    if (iscomma) return DATA_UNEXPECTED_COMMA;
+    
     return 0;
 }
+/**
+ * @brief 
+ * 
+ * @param line 
+ * @return int 
+ */
+int handle_string_directive(char *line)
+{
+    int line_len = strlen(line);
+    char copy[LINE_LEN], c = copy;
+    printf("my line is: %s\n", line);
+    copy_word(copy, line);
+    if (end_of_line(line) || (line != '"' && line[line_len - 1] != '"')) 
+        return STRING_OPERAND_NOT_VALID;
+        
+    line = skip_spaces(line);
+    if (end_of_line(line))
+    {
+        copy[line_len - 1] = "\0";
+        c++;
+        printf("%x", data);
+        while (!end_of_line(copy))
+        {
+            data[dc++] = (unsigned int)*copy; /* Inserting a character to data array */
+            c++;
+        }
+        data[dc++] = '\0';
+        printf("%x", data);
+    }
 
-int handle_data_directive(char * line){
     return 0;
-
 }
-int handle_string_directive(char * line){
+int handle_struct_directive(char *line)
+{
     return 0;
-
 }
-int handle_struct_directive(char * line){
+int handle_extern_directive(char *line)
+{
     return 0;
-
-}
-int handle_extern_directive(char * line){
-    return 0;
-
 }

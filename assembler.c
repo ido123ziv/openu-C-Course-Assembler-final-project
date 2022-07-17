@@ -31,6 +31,8 @@ int ic, dc;
 int error_code;
 boolean error_exists, has_entry, has_extern;
 labelPtr symbols_table;
+unsigned int data[MACHINE_RAM];
+unsigned int instructions[MACHINE_RAM];
 
 int main (int argc, char *argv[])
 {
@@ -46,7 +48,8 @@ int main (int argc, char *argv[])
     int i; 
     char *get_filename;
     FILE *fp;
-    
+
+    print_data(data);
     if(argc > 1) /* check if there's atleast one file that is sent with the command */
     {
         for (i=1; i < argc; i++){
@@ -60,7 +63,7 @@ int main (int argc, char *argv[])
 				fclose(fp);
             }
             else{
-                write_error_code(34,-1);
+                write_error_code(CANNOT_OPEN_FILE,-1);
             }
             get_filename = create_file(argv[i], FILE_MACRO); 
             printf("new file is: %s\n", get_filename);
@@ -71,14 +74,15 @@ int main (int argc, char *argv[])
 				fclose(fp);
             }
             else{
-                write_error_code(34,-1);
+                write_error_code(CANNOT_OPEN_FILE,-1);
                 /* fprintf(stderr, "there was an error while trying to open the requested file or file not exist.\n"); */
             }
         }
     }
     else{
-        write_error_code(35,-1);
+        write_error_code(NOT_ENOUGH_ARGUMENTS,-1);
     }
+    print_data(data);
     return 0;
 }
 

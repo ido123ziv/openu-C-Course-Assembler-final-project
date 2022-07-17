@@ -65,7 +65,6 @@ extern int ic, dc;
 #define MAX_EXTENSION_LENGTH 5
 #define ERROR 1
 #define NOT_FOUND -1
-
 /* ****************************************************
     ****************************************************
     ****************************************************
@@ -85,6 +84,8 @@ typedef struct  structLabels {
 
 extern int ic, dc;
 extern labelPtr symbols_table;
+unsigned int data[];
+unsigned int instructions[];
 #define REGISTER_LENGTH 2 /* a register's name contains 2 characters */
 #define MIN_REGISTER 0 /* r0 is the first register */
 #define MAX_REGISTER 7 /* r7 is the last register */
