@@ -503,3 +503,17 @@ void print_data(unsigned int *data)
         printf("%d\n", data[i]);
     }
 }
+
+unsigned int get_bits(unsigned int word, int start, int end){
+    
+    unsigned int temp;
+    int len = end - start + 1; 
+    unsigned int mask = (int) pow(2, len) - 1; /* create a mask of '11....11' by len */
+
+    mask = mask << start;
+    temp = word & mask;
+    temp = temp >> start;
+
+    return temp;
+    
+}
