@@ -6,6 +6,10 @@
 #define DEST_START_POS 2
 #define DEST_END_POS 3
 
+/* How many operands a command needs by it's location on commands[] table */
+#define TWO_OPERANDS 5
+#define ONE_OPERANDS 14
+
 /*************** DECLARETIONS  ****************/
 /*************** PHASE TWO *****************/
 void phase_two(FILE *file, char *file_name);

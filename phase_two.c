@@ -118,17 +118,17 @@ void check_operands(int cmd, boolean *is_src, boolean *is_dest)
     /* cmd is a int this int it's the location of cmd on commands[cmd] 
     *  we sore commands[] so all the commands required 2 ops will be 0-4 in the array
     *  1 op will be 5 - 13 and no op are the last 2 */
-    if (cmd < 5)
+    if (cmd < TWO_OPERANDS)
     {
         *is_src = TRUE;
         *is_dest = TRUE;
     }
-    else if (cmd > 4 && cmd < 14)
+    else if (cmd > TWO_OPERANDS && cmd < ONE_OPERANDS)
     {
         *is_src = FALSE;
         *is_dest = TRUE;
     }
-    else{
+    else{ /* no operands */
         *is_src = FALSE;
         *is_dest = FALSE;
     }
