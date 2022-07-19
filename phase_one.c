@@ -74,7 +74,7 @@ int read_line_am(char *line, int line_count)
         }
         else
         {
-            new_label = add_label(&symbols_table, current_word, 0, line_count);
+            new_label = add_label(&symbols_table, current_word, 0);
             if (!new_label)
                 return LABEL_ALREADY_EXISTS;
             line = next_word(line);
@@ -203,7 +203,7 @@ int check_for_label(char *line, boolean COLON)
  * @param line_count
  * @return labelPtr
  */
-labelPtr add_label(labelPtr *table, char *name, unsigned int address, int line_count)
+labelPtr add_label(labelPtr *table, char *name, unsigned int address)
 {
     labelPtr temp, table_pointer = *table;
     temp = (labelPtr)malloc(sizeof(Labels));
@@ -376,6 +376,12 @@ int handle_string_directive(char *line)
 
     return 0;
 }
+/**
+ * @brief 
+ * 
+ * @param line 
+ * @return int 
+ */
 int handle_struct_directive(char *line)
 {
     int line_len = strlen(line);
@@ -411,10 +417,35 @@ int handle_struct_directive(char *line)
         return STRUCT_TOO_MANY_OPERANDS;
     return 0;
 }
+/**
+ * @brief 
+ * 
+ * @param line 
+ * @return int 
+ */
 int handle_extern_directive(char *line)
 {
+    labelPtr new_label = NULL;
+    char copy[LABEL_LEN];
+    copy_word(copy,line);
+    if (end_of_line(copy))
+        return EXTERN_NO_LABEL;
+    if (!check_for_label(copy,FALSE))
+        return EXTERN_INVALID_LABEL;
+    line = next_word(line);
+    if (!end_of_line(line))
+        return EXTERN_TOO_MANY_OPERANDS;
+    copy_word(copy,line);
+    new_label = add_label(&symbols_table, copy, 0);
+    if (!new_label)
+        return 1;
     return 0;
 }
+/**
+ * @brief 
+ * 
+ * @param line 
+ */
 void write_string_to_data(char *line){
     char c = line;
      while (!end_of_line(line))
@@ -423,4 +454,8 @@ void write_string_to_data(char *line){
             c++;
         }
         data[dc++] = '\0';
+}
+
+int handle_command(int type, char *line){
+    return 0;
 }
