@@ -171,7 +171,7 @@ void copy_word(char *word, char *line)
     if (word == NULL || line == NULL)
         return;
 
-    while (i < LINE_LEN && !isspace(line[i]) && line[i] != '\0') /* Copying token until its end to *dest */
+    while (i < LINE_LEN && !isspace(line[i]) && line[i] != '\0') /* Copying word until its end to *word */
     {
         word[i] = line[i];
         i++;
@@ -190,7 +190,7 @@ char *next_word(char *str)
     if (str == NULL)
         return NULL;
     while (!isspace(*str) && !end_of_line(str))
-        str++;              /* Skip rest of characters in the current token (until a space) */
+        str++;              /* Skip rest of characters in the current line (until a space) */
     str = skip_spaces(str); /* Skip spaces */
     if (end_of_line(str))
         return NULL;
@@ -520,15 +520,15 @@ unsigned int get_bits(unsigned int word, int start, int end){
     
 }
 
-char * next_operand(char *word, char * line){
+char * next_comma_word(char *word, char * line){
     char *tmp = word;
 
-    if(end_of_line){
+    line = skip_spaces(line);
+
+    if(end_of_line(line)){
         word[0] = '\0';
         return NULL;
     }
-
-    line = skip_spaces(line);
 
     if(*line == ','){
         line++;
