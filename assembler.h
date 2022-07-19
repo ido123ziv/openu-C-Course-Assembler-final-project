@@ -25,11 +25,12 @@ order to provide central place for all of the constants and functions declaratio
     ****************************************************
    ****************************************************
 */
-typedef enum {FALSE,TRUE}boolean;
-typedef enum {FILE_INPUT, FILE_MACRO, FILE_OBJECT,FILE_ENTRY,FILE_EXTERN }filetypes;
-typedef enum {DATA, STRING, STRUCT, ENTRY, EXTERN,UNKNOWN_TYPE}assm_directives;
-typedef enum {MOV, CMP, ADD, SUB, NOT, CLR, LEA, INC, DEC, JMP, BNE, RED, PRN, JSR, RTS, STOP, UNKNOWN_COMMAND}assm_commands;
-typedef enum {SYNTAX_ERR ,LABEL_ALREADY_EXISTS ,LABEL_TOO_LONG ,
+typedef enum boolean {FALSE,TRUE}boolean;
+enum filetypes {FILE_INPUT, FILE_MACRO, FILE_OBJECT,FILE_ENTRY,FILE_EXTERN };
+enum directives {DATA, STRING, STRUCT, ENTRY, EXTERN,UNKNOWN_TYPE};
+enum commands {MOV, CMP, ADD, SUB, NOT, CLR, LEA, INC, DEC, JMP, BNE, RED, PRN, JSR, RTS, STOP, UNKNOWN_COMMAND};
+enum methods {M_UNKNOWN, M_IMMEDIATE, M_DIRECT, M_STRUCT, M_REGISTER};
+enum errors {SYNTAX_ERR ,LABEL_ALREADY_EXISTS ,LABEL_TOO_LONG ,
     LABEL_INVALID_FIRST_CHAR ,LABEL_ONLY_ALPHANUMERIC ,LABEL_CANT_BE_COMMAND ,
     LABEL_ONLY ,LABEL_CANT_BE_REGISTER ,DIRECTIVE_NO_PARAMS ,
     DIRECTIVE_INVALID_NUM_PARAMS ,DATA_COMMAS_IN_A_ROW ,
@@ -39,8 +40,7 @@ typedef enum {SYNTAX_ERR ,LABEL_ALREADY_EXISTS ,LABEL_TOO_LONG ,
     STRUCT_TOO_MANY_OPERANDS ,EXTERN_NO_LABEL ,EXTERN_INVALID_LABEL ,EXTERN_TOO_MANY_OPERANDS ,
     COMMAND_NOT_FOUND ,COMMAND_UNEXPECTED_CHAR ,COMMAND_TOO_MANY_OPERANDS ,COMMAND_INVALID_METHOD ,
     COMMAND_INVALID_NUMBER_OF_OPERANDS ,COMMAND_INVALID_OPERANDS_METHODS ,ENTRY_LABEL_DOES_NOT_EXIST ,
-    ENTRY_CANT_BE_EXTERN ,COMMAND_LABEL_DOES_NOT_EXIST ,CANNOT_OPEN_FILE ,NOT_ENOUGH_ARGUMENTS }errors;
-
+    ENTRY_CANT_BE_EXTERN ,COMMAND_LABEL_DOES_NOT_EXIST ,CANNOT_OPEN_FILE ,NOT_ENOUGH_ARGUMENTS };
 /* ****************************************************
     ****************************************************
     ****************************************************
@@ -49,16 +49,19 @@ typedef enum {SYNTAX_ERR ,LABEL_ALREADY_EXISTS ,LABEL_TOO_LONG ,
    ****************************************************
 */
 
-
 extern const char base32[32];
 extern const char *commands[];
 extern const char *directives[];
-
+extern int error_code;
+extern boolean error_exists, has_entry, has_extern;
+extern int ic, dc;
 
 /* Length Constants */
 #define LINE_LEN 82  /* Line max size is 80 , extra 2 bits space for \n or \0 */
 #define LABEL_LEN 30
-
+#define CMD_LEN 16
+#define DIR_LEN 5
+#define MACHINE_RAM 2000
 /* ****************************************************
     ****************************************************
     ****************************************************
@@ -73,9 +76,6 @@ extern const char *directives[];
 #define MAX_EXTENSION_LENGTH 5
 #define ERROR 1
 #define NOT_FOUND -1
-#define CMD_LEN 16
-#define DIRECTIVE_LEN 5
-#define MACHINE_RAM 2000
 /* ****************************************************
     ****************************************************
     ****************************************************

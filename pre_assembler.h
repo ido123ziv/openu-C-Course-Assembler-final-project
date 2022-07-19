@@ -30,7 +30,7 @@ typedef struct structMacros {
 
 
 /*************** DECLARETIONS  ****************/
-void read_line(char *line, int line_num);
+void read_line(char *line);
 void pre_assembler(FILE *file, char *file_name);
 boolean is_label(char *word);
 void isMacro(char *word, char *line);
