@@ -519,3 +519,29 @@ unsigned int get_bits(unsigned int word, int start, int end){
     return temp;
     
 }
+
+char * next_operand(char *word, char * line){
+    char *tmp = word;
+
+    if(end_of_line){
+        word[0] = '\0';
+        return NULL;
+    }
+
+    line = skip_spaces(line);
+
+    if(*line == ','){
+        line++;
+        strcpy(word, ",");
+        return line;
+    }
+
+    while(!isspace(*line) && !end_of_line(line) && *line != ','){
+        *tmp = *line;
+        line++;
+        tmp++;
+    }
+    *tmp = '\0';
+
+    return line;
+}
