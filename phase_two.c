@@ -79,7 +79,6 @@ int read_line_ph2(char *line, int line_num)
     {
         line = next_word(line);
         cmd_ph2_binary(cmd, line);
-        /* TODO: handle command */
     }
 
     else if ((dir = find_directive(word)) != NOT_FOUND)
@@ -107,6 +106,11 @@ int cmd_ph2_binary(int cmd, char *line)
         src_method = get_bits(instructions[ic], SRC_START_POS, SRC_END_POS);
     if(is_dest)
         dest_method = get_bits(instructions[ic], DEST_START_POS, DEST_END_POS);
+
+    if(is_src || is_dest){
+        line = next_operand(op1, line);
+
+    }
 
 
     return 0;
