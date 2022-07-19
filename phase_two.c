@@ -95,6 +95,8 @@ int read_line_ph2(char *line, int line_num)
 /* Function will encode words in the command that could not be encode on phase 1 */
 int cmd_ph2_binary(int cmd, char *line)
 {
+    
+    /* Vars for encoding operands */
     char op1[LINE_LEN], op2[LINE_LEN]; /* First and second operands */
     char *src = op1, *dest = op2;
     boolean is_src = FALSE, is_dest = FALSE;
@@ -102,18 +104,28 @@ int cmd_ph2_binary(int cmd, char *line)
 
     check_operands(cmd, &is_src, &is_dest);
 
+    /* Get src and dest address method */
     if(is_src)
         src_method = get_bits(instructions[ic], SRC_START_POS, SRC_END_POS);
     if(is_dest)
         dest_method = get_bits(instructions[ic], DEST_START_POS, DEST_END_POS);
 
+    /* Fix pointers (src,dest) to point the correct ops based on check_operands */
     if(is_src || is_dest){
-        line = next_operand(op1, line);
-
+        line = next_comma_word(op1, line);
+        if(is_src && is_dest){ /* We have 2 ops to handle */
+            line = next_comma_word(op2, line);
+            next_comma_word(op2,line); /* store op2 */
+        }
+        else{ /* If we have only 1 op it would be dest op */
+            dest = op1; 
+            src = NULL;
+        }
     }
 
-
-    return 0;
+    ic ++;
+    return encode_extra_words(src, dest,is_src, is_dest, src_method, dest_method);
+    /*TODO: encode_extra_words */
 }
 
 /* check which operands exist in the current command */
