@@ -17,6 +17,7 @@ order to provide central place for all of the constants and functions declaratio
 #include <string.h>
 #include <ctype.h>
 #include <stdlib.h>
+#include <math.h>
 
 /* ****************************************************
     ****************************************************
