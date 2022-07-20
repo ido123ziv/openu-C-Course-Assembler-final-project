@@ -269,22 +269,18 @@ int handle_directive(int dir_type, char *line)
     {
     case DATA:
         /* Handle .data directive and insert values separated by ',' to the memory */
-        printf("handle data %d\n", DATA);
         return handle_data_directive(line);
 
     case STRING:
         /* Handle .string directive and insert to memory */
-        printf("handle string %d\n", STRING);
         return handle_string_directive(line);
 
     case STRUCT:
         /* Handle .struct directive and insert both number and string to memory */
-        printf("handle struct %d\n", STRUCT);
         return handle_struct_directive(line);
 
     case ENTRY:
         /* Only check for syntax of entry (should not contain more than one parameter) */
-        printf("handle ENTRY %d\n", ENTRY);
         if (!end_of_line(next_word(line))) /* If there's a next word (after the first one) */
         {
             return DIRECTIVE_INVALID_NUM_PARAMS;
@@ -310,9 +306,9 @@ int handle_data_directive(char *line)
     char copy[LINE_LEN];
     while (!end_of_line(line))
     {
-        copy_word(copy, line);
-        line = next_word(line);
-
+        line = next_comma_word(copy,line);
+       /* printf("next_comma_word: %s\n%s\n", line, copy);
+        printf(".....comma_word: %s\n%s\n", line, copy);*/
         if (strlen(copy) > 0)
         {
             if (!isnumber)
