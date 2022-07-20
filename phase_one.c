@@ -357,18 +357,22 @@ int handle_data_directive(char *line)
 int handle_string_directive(char *line)
 {
     int line_len = strlen(line);
-    char copy[LINE_LEN], c = copy;
+    char copy[LINE_LEN];
     printf("my line is: %s\n", line);
     copy_word(copy, line);
     if (end_of_line(line) || (line != '"' && line[line_len - 1] != '"'))
         return STRING_OPERAND_NOT_VALID;
-
+    printf("my copy is: %s\n", copy);
     line = skip_spaces(line);
-    if (end_of_line(line))
+    printf("my line is: %s\n", line);
+/*    printf("end of line: %d\n", end_of_line(line));*/
+    if (!end_of_line(line))
     {
-        copy[line_len - 1] = "\0";
-        c++;
-        write_string_to_data(c);
+        copy[strlen(copy) - 1] = "\0";
+        /*copy[0] = "\0";*/
+        printf("without \": %s\n", copy);
+        printf("with \": %s\n", copy + 1);
+        write_string_to_data(copy + 1);
     }
 
     return 0;
@@ -444,11 +448,11 @@ int handle_extern_directive(char *line)
  * @param line 
  */
 void write_string_to_data(char *line){
-    char c = line;
+    /*char c = line;*/
      while (!end_of_line(line))
         {
             data[dc++] = (unsigned int)*line; /* Inserting a character to data array */
-            c++;
+            line++;
         }
         data[dc++] = '\0';
 }
