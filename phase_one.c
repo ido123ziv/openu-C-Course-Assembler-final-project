@@ -408,17 +408,22 @@ int handle_struct_directive(char *line)
     if (end_of_line(copy) || !is_number(copy))
         return STRUCT_INVALID_NUM;
     data[dc++] = (unsigned int) atoi(copy);
-    line = next_word(line);
-    copy_word(copy, line);
+    line = next_comma_word(copy,line);
+    printf("after line:%s \t copy: %s\n", line, copy);
+    line = next_comma_word(copy,line);
+    printf("2x next_comma_word: %s \t copy: %s\n", line, copy);
+   /* copy_word(copy, line); */
     if (!end_of_line(line) && *copy == ','){
-        line = next_word(line);
-        if (end_of_line(line))
+        line = next_comma_word(copy,line); /* copy equvals string with "" */
+        printf("and now copy is: %s\n", copy);
+        if (end_of_line(copy))
             return STRUCT_EXPECTED_STRING;
         else{
-            if (line != '"' && line[line_len - 1] != '"')
+            printf("copy: %c, strlen: %c\n", copy[0], copy[strlen(copy) - 1]);
+            if (copy[0] != '"' && copy[strlen(copy) - 1] != '"')
                 return STRUCT_INVALID_STRING;
-            copy_word(copy, line);
-            copy[line_len - 1] = "\0";
+          /*  copy_word(copy, line); */
+            copy[line_len - 1] = '\0';
             write_string_to_data(copy + 1);
         }
     }
