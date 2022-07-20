@@ -25,4 +25,6 @@ unsigned int get_label_address(labelPtr h, char *name);
 labelPtr get_label(labelPtr label, char *name);
 void print_data(unsigned int *data);
 unsigned int get_bits(unsigned int word, int start, int end);
+char * next_comma_word(char *word, char * line);
+char * next_string_word(char *word, char * line);
 #endif

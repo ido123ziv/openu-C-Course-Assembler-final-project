@@ -137,6 +137,7 @@ int check_for_label(char *line, boolean COLON)
 {
     boolean has_digits = FALSE;
     int line_lentgh = strlen(line);
+    char word[LINE_LEN];
     int i;
 
     if (line == NULL || line_lentgh < (COLON ? MINIMUM_LABEL_LENGTH_WITH_COLON : MINIMUM_LABEL_LENGTH_WITHOUT_COLON))
@@ -183,8 +184,10 @@ int check_for_label(char *line, boolean COLON)
             return LABEL_CANT_BE_COMMAND;
     }
     /* printf("current REGS is: %s\n", line);*/
+     copy_word(word,line);
+     /*printf("current WORD is: %s\n", word);*/
     /* labels can't be registers */
-    if (is_register(line))
+    if (is_register(word))
     {
         return LABEL_CANT_BE_REGISTER;
     }
@@ -316,7 +319,7 @@ int handle_data_directive(char *line)
             {
                 if (!is_number(copy))
                 {
-                    return 12;
+                    return DATA_EXPECTED_NUM;
                 }
                 else
                 {
@@ -328,7 +331,7 @@ int handle_data_directive(char *line)
             else
             {
                 if (*copy != ',')
-                    return 13;
+                    return DATA_EXPECTED_COMMA_AFTER_NUM;
                 else
                 {
                     if (iscomma)
@@ -356,23 +359,38 @@ int handle_data_directive(char *line)
  */
 int handle_string_directive(char *line)
 {
-    int line_len = strlen(line);
-    char copy[LINE_LEN];
-    printf("my line is: %s\n", line);
-    copy_word(copy, line);
-    if (end_of_line(line) || (line != '"' && line[line_len - 1] != '"'))
+    int line_len;
+    char copy[LINE_LEN]; 
+ /*   printf("my line is %s\n", line); */
+     if (end_of_line(line)) /* || (line != '"' && line[line_len - 1] != '"'))*/
         return STRING_OPERAND_NOT_VALID;
-    printf("my copy is: %s\n", copy);
+    /*printf("im not empty: %s\n", line);*/
+   /* next_string_word(copy,line);*/
+    next_word(line);
+  /*  printf("after next word %s\n", line); */
+    if (line[0] != '\"')
+        return STRING_OPERAND_NOT_VALID;
+    line++;
+    line_len = strlen(line);
+  /*  printf("line++ %s\t strlen: %d, char: %c\n", line, line_len, line[line_len -2]);*/
+    if (line[line_len -2] != '\"')
+        return STRING_OPERAND_NOT_VALID;
+    
+    /*TODO: Copy entire line */
+    /*printf("my copy is: %s\n", copy);*/
+  /*  printf("my line is: %s\n", line); */
+ /*   printf("line: %c, end: %c\n", line[0],line[line_len - 2]); */
     line = skip_spaces(line);
-    printf("my line is: %s\n", line);
+    /*printf("my line is: %s\n", line);*/
 /*    printf("end of line: %d\n", end_of_line(line));*/
     if (!end_of_line(line))
     {
-        copy[strlen(copy) - 1] = "\0";
+      /*  copy[strlen(copy) - 1] = "\0";*/
+        line[line_len -2] = '\0';
         /*copy[0] = "\0";*/
-        printf("without \": %s\n", copy);
-        printf("with \": %s\n", copy + 1);
-        write_string_to_data(copy + 1);
+        /*printf("without \": %s\n", copy);
+        printf("with \": %s\n", copy + 1);*/
+       write_string_to_data(line);
     }
 
     return 0;
@@ -405,9 +423,7 @@ int handle_struct_directive(char *line)
                 return STRUCT_INVALID_STRING;
             copy_word(copy, line);
             copy[line_len - 1] = "\0";
-            c = copy;
-            c++;
-            write_string_to_data(c);
+            write_string_to_data(copy + 1);
         }
     }
     else{
@@ -448,7 +464,7 @@ int handle_extern_directive(char *line)
  * @param line 
  */
 void write_string_to_data(char *line){
-    /*char c = line;*/
+/*    printf("write_string_to_data: %s\n", line); */
      while (!end_of_line(line))
         {
             data[dc++] = (unsigned int)*line; /* Inserting a character to data array */
