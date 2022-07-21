@@ -1,8 +1,7 @@
 
 #ifndef PRE_ASSEMBLER_H
-
 #define PRE_ASSEMBLER_H
-
+#include "assembler.h"
 /* ******************* CONST *************** */
 /* We will assume this constants for maximum macro size as there are no details about this */
 # define MACRO_ROWS 10
@@ -24,7 +23,7 @@ We will assume that Max Macro name length is as Max Label length
 typedef struct structMacros * macroPtr;
 typedef struct structMacros {
 	char name[NAME_LEN]; /* Macro name */
-	char contents[MACRO_ROWS * LINE_LEN]; /* save the line contents of the macro */
+	char contents[MACRO_ROWS *LINE_LEN]; /* save the line contents of the macro */
 	macroPtr next; /* a pointer to the next label in the list */
 } Macros;
 

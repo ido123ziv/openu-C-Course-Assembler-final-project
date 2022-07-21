@@ -61,7 +61,7 @@ extern int ic, dc;
 /* Length Constants */
 #define LINE_LEN 82  /* Line max size is 80 , extra 2 bits space for \n or \0 */
 #define LABEL_LEN 30
-#define CMD_LEN 16
+#define CMD_LIST_LEN 16
 #define DIR_LEN 5
 #define MACHINE_RAM 2000
 /* ****************************************************
@@ -78,6 +78,7 @@ extern int ic, dc;
 #define MAX_EXTENSION_LENGTH 5
 #define ERROR 1
 #define NOT_FOUND -1
+#define MEM_START 100
 /* ****************************************************
     ****************************************************
     ****************************************************
@@ -86,14 +87,22 @@ extern int ic, dc;
    ****************************************************
 */
  
-/* extern macroPtr macro_table; */
+/* Linked list to store program labels */
 typedef struct structLabels * labelPtr;
 typedef struct  structLabels {
 	char name[LABEL_LEN]; /* Label name */
     unsigned int address;
-	labelPtr next; /* a pointer to the next label in the list */
+	labelPtr next; /* Pointer to the next label on list */
 } Labels;
 
+/* Double linked list to store program extern labels */
+typedef struct ext * extPtr;
+typedef struct ext {
+    char name[LABEL_LEN]; /* Extern label name */
+    unsigned int address; 
+    extPtr next; /* Pointer to the next label on list */
+    extPtr prev; /* Pointer to the previous label on list */
+} ext;
 
 extern int ic, dc;
 extern labelPtr symbols_table;

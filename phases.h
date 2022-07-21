@@ -10,6 +10,15 @@
 #define TWO_OPERANDS 5
 #define ONE_OPERANDS 14
 
+/* Defining a circular double-linked list to store each time the program uses an extern label, and a pointer to that list */
+typedef struct ext * extPtr;
+typedef struct ext {
+    char name[LABEL_LENGTH]; /* the name of the extern label */
+    unsigned int address; /* the address in memory where the external address should be replaced */
+    extPtr next; /* a pointer to the next extern in the list */
+    extPtr prev; /* a pointer to the previous extern in the list */
+} ext;
+
 /*************** DECLARETIONS  ****************/
 /*************** PHASE TWO *****************/
 void phase_two(FILE *file, char *file_name);

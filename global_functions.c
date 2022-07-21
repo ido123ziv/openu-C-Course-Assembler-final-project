@@ -433,9 +433,9 @@ void write_error_code(int error_code, int current_line)
 int find_command(char *word)
 {
     int word_len = strlen(word), i;
-    if (word_len > MAX_COMMAND_LENGTH || word_len < MIN_COMMAND_LENGTH)
+    if (word_len != CMD_LEN)
         return NOT_FOUND;
-    for (i = 0; i < CMD_LEN; i++){
+    for (i = 0; i < CMD_LIST_LEN; i++){
         if (strcmp(word, commands[i]) == 0)
             return i;
     }
