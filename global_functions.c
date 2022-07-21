@@ -570,3 +570,9 @@ char * next_string_word(char *word, char * line){
 
     return line;
 }
+
+/* Function inserts A/R/E bits into given word bit-sequence (the word is being shifted left) */
+unsigned int add_are(unsigned int word, int are)
+{
+    return (word << 2) | are; /* OR operand allows insertion of the 2 bits because 1 + 0 = 1 */
+}

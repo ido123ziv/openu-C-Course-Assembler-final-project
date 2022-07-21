@@ -27,4 +27,5 @@ void print_data(unsigned int *data);
 unsigned int get_bits(unsigned int word, int start, int end);
 char * next_comma_word(char *word, char * line);
 char * next_string_word(char *word, char * line);
+unsigned int add_are(unsigned int word, int are);
 #endif

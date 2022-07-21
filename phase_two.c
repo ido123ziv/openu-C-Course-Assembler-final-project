@@ -7,11 +7,12 @@ Project by Eran Cohen and Ido Ziv
 #include "phases.h"
 
 FILE *obFile, *entFile, *extFile;
+int line_count;
 
 void phase_two(FILE *file, char *file_name)
 {
     char line[LINE_LEN];
-    int line_count = 1;
+    line_count = 1;
     error_exists = FALSE;
 
     ic = 0;
@@ -93,7 +94,7 @@ int read_line_ph2(char *line, int line_num)
 }
 
 /* Function will encode words in the command that could not be encode on phase 1 */
-int cmd_ph2_binary(int cmd, char *line)
+void cmd_ph2_binary(int cmd, char *line)
 {
     
     /* Vars for encoding operands */
@@ -123,9 +124,17 @@ int cmd_ph2_binary(int cmd, char *line)
         }
     }
 
-    ic ++;
-    return encode_extra_words(src, dest,is_src, is_dest, src_method, dest_method);
-    /*TODO: encode_extra_words */
+    ic ++; /* First word already encoded in phase 1 */
+    if(is_src && is_dest && src_method == M_REGISTER && dest_method == M_REGISTER){
+        unsigned int word = build_reg(FALSE, src) | build_reg(TRUE, dest);
+        instructions[ic++] = word;
+    }
+    else{
+        if(is_src) 
+            encode_ph2_word(FALSE, src_method, src);
+        if(is_dest) 
+            encode_ph2_word(TRUE, dest_method, dest);
+    }
 }
 
 /* check which operands exist in the current command */
@@ -148,4 +157,42 @@ void check_operands(int cmd, boolean *is_src, boolean *is_dest)
         *is_src = FALSE;
         *is_dest = FALSE;
     }
+}
+
+/* Function builds the final word for a register op */
+unsigned int build_reg(boolean is_dest, char *reg)
+{
+    unsigned int word = (unsigned int) atoi(reg + 1); /* Register number */
+
+    if(!is_dest) /* TODO: might be 2 bits - need test */
+        word <<= 4;
+    word = add_are(word, ABSOLUTE);
+    return word;
+}
+
+void encode_ph2_word(boolean is_dest, int method, char * op){
+    char * temp;
+    unsigned int word = 0;
+
+    if(method == M_REGISTER){
+        word = build_reg(is_dest, op);
+        instructions[ic++] = word;
+    }
+    else if (method == M_IMMEDIATE){
+        word = (unsigned int) atoi(op+1);
+        word = add_are(word, ABSOLUTE);
+        instructions[ic++] = word;  
+    }
+    else if(method==M_DIRECT)
+        encode_label(op);
+    else{
+        /* TODO: complete this one */
+    }
+}
+
+/* Encode label to memory by it's name */
+void encode_label(char * label){
+    unsigned int word;
+
+    /* TODO: finish it
 }
