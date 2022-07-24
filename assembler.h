@@ -91,6 +91,8 @@ typedef struct structLabels * labelPtr;
 typedef struct  structLabels {
 	char name[LABEL_LEN]; /* Label name */
     unsigned int address;
+    boolean entry; /* store if label is entry */
+    boolean external; /* store if label is extern */
 	labelPtr next; /* Pointer to the next label on list */
 } Labels;
 

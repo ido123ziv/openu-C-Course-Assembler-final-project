@@ -96,7 +96,8 @@ int read_line_ph2(char *line, int line_num)
         if (dir == ENTRY)
         { /* only need to take care of entry */
             copy_word(word, line);
-            /* TODO: make entry */
+            create_entry(symbols_table, word); /* Add an entry for this symbol */
+            /* print error if needed? - need to check if needed */
         }
     }
 }
@@ -136,8 +137,9 @@ void cmd_ph2_binary(int cmd, char *line)
     }
 
     ic++; /* First word already encoded in phase 1 */
+
     if (is_src && is_dest && src_method == M_REGISTER && dest_method == M_REGISTER)
-    {
+    { /* Special case when 2 registers share same additional word */
         unsigned int word = build_reg(FALSE, src) | build_reg(TRUE, dest);
         instructions[ic++] = word;
     }
@@ -186,7 +188,7 @@ unsigned int build_reg(boolean is_dest, char *reg)
 
 void encode_ph2_word(boolean is_dest, int method, char *op)
 {
-    char *temp;
+    char *tmp;
     unsigned int word = 0;
 
     if (method == M_REGISTER)
@@ -203,8 +205,15 @@ void encode_ph2_word(boolean is_dest, int method, char *op)
     else if (method == M_DIRECT)
         encode_label(op);
     else
-    {
-        /* TODO: complete this one */
+    { /* if method = struct */
+    /* struct include label before '.' and a number after it */
+        tmp = strchr(op, '.');
+        *tmp = '\0';
+        *tmp++ = '.';
+        encode_label(op);
+        word = (unsigned int) atoi(tmp);
+        word = add_are(word, ABSOLUTE);
+        instructions[ic++] = word;
     }
 }
 
@@ -231,5 +240,9 @@ void encode_label(char *label)
         ic++;
         error_code = COMMAND_LABEL_DOES_NOT_EXIST;
     }
-    /* TODO: finish all sub functions!! */
+    /* TODO: finish all sub functions!!
+     * is_external...
+     * add_ext
+     * get_label... 
+     * is_label_exist */
 }
