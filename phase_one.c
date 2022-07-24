@@ -527,7 +527,10 @@ int handle_command(int type, char *line)
     }
     if (first == COMMAND_INVALID_METHOD || second == COMMAND_INVALID_METHOD)
         return COMMAND_INVALID_METHOD;
-    
+    if (!num_operation_fits_command(type,first_op,second_op))
+        return COMMAND_INVALID_NUMBER_OF_OPERANDS;
+    if (!method_fits_command(type,first,second))
+        return COMMAND_INVALID_OPERANDS_METHODS;
     return 0;
 }
 /**
@@ -563,4 +566,124 @@ int method_type(char *op){
             return M_STRUCT;
     }
     return COMMAND_INVALID_METHOD;
+}
+/**
+ * @brief 
+ * 
+ * @param command_type 
+ * @param first_op 
+ * @param second_op 
+ * @return boolean 
+ */
+boolean num_operation_fits_command(int command_type, boolean first_op, boolean second_op){
+    switch(command_type){
+        case MOV:
+            return first_op && second_op;
+        case CMP:
+            return first_op && second_op;
+        case ADD:
+            return first_op && second_op;
+        case SUB:
+            return first_op && second_op;
+        case LEA:
+            return first_op && second_op;
+        case NOT:
+            return first_op && !second_op;
+        case CLR:
+            return first_op && !second_op;
+        case INC:
+            return first_op && !second_op;
+        case DEC:
+            return first_op && !second_op;
+        case JMP:
+            return first_op && !second_op;
+        case BNE:
+            return first_op && !second_op;
+        case GET:
+            return first_op && !second_op;
+        case PRN:
+            return first_op && !second_op;
+        case JSR:
+            return first_op && !second_op;
+        case RTS:
+            return !first_op && !second_op;
+        case HLT:
+            return !first_op && !second_op;
+    } 
+    return FALSE;
+}
+/**
+ * @brief 
+ * 
+ * @param commant_type 
+ * @param first 
+ * @param second 
+ * @return boolean 
+ */
+boolean method_fits_command(int command_type,int first, int second){
+    switch(command_type){
+        case MOV:
+            return all_source_method(first) && non_immediate_method(second);
+        case CMP:
+            return all_source_method(first) && all_dest_method(second);
+        case ADD:
+            return all_source_method(first) && non_immediate_method(second);
+        case SUB:
+            return all_source_method(first) && non_immediate_method(second);
+        case LEA:
+            return (first == M_DIRECT || first == M_STRUCT ) && non_immediate_method(second);
+        case NOT:
+            return non_immediate_method(second);
+        case CLR:
+            return non_immediate_method(second);
+        case INC:
+            return non_immediate_method(second);
+        case DEC:
+            return non_immediate_method(second);
+        case JMP:
+            return non_immediate_method(second);
+        case BNE:
+            return non_immediate_method(second);
+        case GET:
+            return non_immediate_method(second);
+        case PRN:
+            return all_dest_method(second);
+        case JSR:
+            return non_immediate_method(second);
+        case RTS:
+            return !all_source_method(first) && !all_dest_method(second);
+        case HLT:
+            return !all_source_method(first) && !all_dest_method(second);
+    } 
+    return FALSE;
+}
+/**
+ * @brief 
+ * 
+ * @param method_type 
+ * @return boolean 
+ */
+boolean all_source_method(int method_type){
+    return  method_type == M_IMMEDIATE || method_type == M_DIRECT ||
+        method_type == M_STRUCT || method_type == M_REGISTER;
+}
+/**
+ * @brief 
+ * 
+ * @param method_type 
+ * @return boolean 
+ */
+boolean all_dest_method(int method_type){
+    return  method_type == M_IMMEDIATE || method_type == M_DIRECT ||
+        method_type == M_STRUCT || method_type == M_REGISTER;
+}
+/**
+ * @brief 
+ * 
+ * @param method_type 
+ * @return boolean 
+ */
+boolean non_immediate_method(int method_type){
+    return method_type == M_DIRECT ||
+        method_type == M_STRUCT || method_type == M_REGISTER;
 }
