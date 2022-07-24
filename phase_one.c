@@ -117,11 +117,13 @@ int read_line_am(char *line, int line_count)
         printf("Command found\t");
         if (label_count)
         {
+            new_label->address = ic;
             /* TODO: edit label struct*/
         }
         printf("command is: %s\n", commands[command_type]);
         line = next_word(line);
         /*TODO: add command to table*/
+        handle_command(command_type, line);
     }
 
     return 0;
@@ -184,8 +186,8 @@ int check_for_label(char *line, boolean COLON)
             return LABEL_CANT_BE_COMMAND;
     }
     /* printf("current REGS is: %s\n", line);*/
-     copy_word(word,line);
-     /*printf("current WORD is: %s\n", word);*/
+    copy_word(word, line);
+    /*printf("current WORD is: %s\n", word);*/
     /* labels can't be registers */
     if (is_register(word))
     {
@@ -306,9 +308,9 @@ int handle_data_directive(char *line)
     char copy[LINE_LEN];
     while (!end_of_line(line))
     {
-        line = next_comma_word(copy,line);
-       /* printf("next_comma_word: %s\n%s\n", line, copy);
-        printf(".....comma_word: %s\n%s\n", line, copy);*/
+        line = next_comma_word(copy, line);
+        /* printf("next_comma_word: %s\n%s\n", line, copy);
+         printf(".....comma_word: %s\n%s\n", line, copy);*/
         if (strlen(copy) > 0)
         {
             if (!isnumber)
@@ -356,46 +358,46 @@ int handle_data_directive(char *line)
 int handle_string_directive(char *line)
 {
     int line_len;
-    char copy[LINE_LEN]; 
- /*   printf("my line is %s\n", line); */
-     if (end_of_line(line)) /* || (line != '"' && line[line_len - 1] != '"'))*/
+    char copy[LINE_LEN];
+    /*   printf("my line is %s\n", line); */
+    if (end_of_line(line)) /* || (line != '"' && line[line_len - 1] != '"'))*/
         return STRING_OPERAND_NOT_VALID;
     /*printf("im not empty: %s\n", line);*/
-   /* next_string_word(copy,line);*/
+    /* next_string_word(copy,line);*/
     next_word(line);
-  /*  printf("after next word %s\n", line); */
+    /*  printf("after next word %s\n", line); */
     if (line[0] != '\"')
         return STRING_OPERAND_NOT_VALID;
     line++;
     line_len = strlen(line);
-  /*  printf("line++ %s\t strlen: %d, char: %c\n", line, line_len, line[line_len -2]);*/
-    if (line[line_len -2] != '\"')
+    /*  printf("line++ %s\t strlen: %d, char: %c\n", line, line_len, line[line_len -2]);*/
+    if (line[line_len - 2] != '\"')
         return STRING_OPERAND_NOT_VALID;
-    
+
     /*TODO: Copy entire line */
     /*printf("my copy is: %s\n", copy);*/
-  /*  printf("my line is: %s\n", line); */
- /*   printf("line: %c, end: %c\n", line[0],line[line_len - 2]); */
+    /*  printf("my line is: %s\n", line); */
+    /*   printf("line: %c, end: %c\n", line[0],line[line_len - 2]); */
     line = skip_spaces(line);
     /*printf("my line is: %s\n", line);*/
-/*    printf("end of line: %d\n", end_of_line(line));*/
+    /*    printf("end of line: %d\n", end_of_line(line));*/
     if (!end_of_line(line))
     {
-      /*  copy[strlen(copy) - 1] = "\0";*/
-        line[line_len -2] = '\0';
+        /*  copy[strlen(copy) - 1] = "\0";*/
+        line[line_len - 2] = '\0';
         /*copy[0] = "\0";*/
         /*printf("without \": %s\n", copy);
         printf("with \": %s\n", copy + 1);*/
-       write_string_to_data(line);
+        write_string_to_data(line);
     }
 
     return 0;
 }
 /**
- * @brief 
- * 
- * @param line 
- * @return int 
+ * @brief
+ *
+ * @param line
+ * @return int
  */
 int handle_struct_directive(char *line)
 {
@@ -407,27 +409,30 @@ int handle_struct_directive(char *line)
 
     if (end_of_line(copy) || !is_number(copy))
         return STRUCT_INVALID_NUM;
-    data[dc++] = (unsigned int) atoi(copy);
-    line = next_comma_word(copy,line);
+    data[dc++] = (unsigned int)atoi(copy);
+    line = next_comma_word(copy, line);
     printf("after line:%s \t copy: %s\n", line, copy);
-    line = next_comma_word(copy,line);
+    line = next_comma_word(copy, line);
     printf("2x next_comma_word: %s \t copy: %s\n", line, copy);
-   /* copy_word(copy, line); */
-    if (!end_of_line(line) && *copy == ','){
-        line = next_comma_word(copy,line); /* copy equvals string with "" */
+    /* copy_word(copy, line); */
+    if (!end_of_line(line) && *copy == ',')
+    {
+        line = next_comma_word(copy, line); /* copy equvals string with "" */
         printf("and now copy is: %s\n", copy);
         if (end_of_line(copy))
             return STRUCT_EXPECTED_STRING;
-        else{
+        else
+        {
             printf("copy: %c, strlen: %c\n", copy[0], copy[strlen(copy) - 1]);
             if (copy[0] != '"' && copy[strlen(copy) - 1] != '"')
                 return STRUCT_INVALID_STRING;
-          /*  copy_word(copy, line); */
+            /*  copy_word(copy, line); */
             copy[line_len - 1] = '\0';
             write_string_to_data(copy + 1);
         }
     }
-    else{
+    else
+    {
         return EXPECTED_COMMA_BETWEEN_OPERANDS;
     }
     line = next_word(line);
@@ -436,44 +441,249 @@ int handle_struct_directive(char *line)
     return 0;
 }
 /**
- * @brief 
- * 
- * @param line 
- * @return int 
+ * @brief
+ *
+ * @param line
+ * @return int
  */
 int handle_extern_directive(char *line)
 {
     labelPtr new_label = NULL;
     char copy[LABEL_LEN];
-    copy_word(copy,line);
+    copy_word(copy, line);
     if (end_of_line(copy))
         return EXTERN_NO_LABEL;
-    if (!check_for_label(copy,FALSE))
+    if (!check_for_label(copy, FALSE))
         return EXTERN_INVALID_LABEL;
     line = next_word(line);
     if (!end_of_line(line))
         return EXTERN_TOO_MANY_OPERANDS;
-    copy_word(copy,line);
+    copy_word(copy, line);
     new_label = add_label(&symbols_table, copy, 0);
     if (!new_label)
         return 1;
     return 0;
 }
 /**
+ * @brief
+ *
+ * @param line
+ */
+void write_string_to_data(char *line)
+{
+    /*    printf("write_string_to_data: %s\n", line); */
+    while (!end_of_line(line))
+    {
+        data[dc++] = (unsigned int)*line; /* Inserting a character to data array */
+        line++;
+    }
+    data[dc++] = '\0';
+}
+/**
  * @brief 
  * 
+ * @param type 
  * @param line 
+ * @return int 
  */
-void write_string_to_data(char *line){
-/*    printf("write_string_to_data: %s\n", line); */
-     while (!end_of_line(line))
-        {
-            data[dc++] = (unsigned int)*line; /* Inserting a character to data array */
-            line++;
+int handle_command(int type, char *line)
+{
+    boolean first_op = FALSE, second_op = FALSE;
+    int first, second;
+    char op1[20], op2[20];
+    printf("handle command\t %s\n", line);
+    line = next_comma_word(op1, line);
+   /* printf("next command\t %s\n", op1);*/
+    if (!end_of_line(op1))
+    {
+        first_op = TRUE;
+        line = next_comma_word(op2, line);
+        /*printf("next next command %s\n", op2);*/
+        if (!end_of_line(op2))
+        {   /* if not empty must be a , */
+            /*  printf("next next next command %s\n", op2);*/
+            if (op2[0] != ','){
+                return COMMAND_UNEXPECTED_CHAR;
+            }
+            line = next_comma_word(op2, line);
+            /*printf("next next next next command %s,line: %s\n", op2, line);*/
+            if (!end_of_line(line)){
+                return COMMAND_UNEXPECTED_CHAR;
+            }
+            second_op = TRUE;
         }
-        data[dc++] = '\0';
-}
-
-int handle_command(int type, char *line){
+    }
+    /*printf("here\n");*/
+    line = skip_spaces(line);
+   /* printf("handle spaces\t %s\n", line);*/
+    if (!end_of_line(line)) /* command a1, a2  a3 is not valid */
+        return COMMAND_TOO_MANY_OPERANDS;
+    printf("%d-%d\n", first_op, second_op);
+    if (first_op){
+       first = method_type(op1);
+    }
+    if (second_op){
+       second = method_type(op2);
+    }
+    if (first == COMMAND_INVALID_METHOD || second == COMMAND_INVALID_METHOD)
+        return COMMAND_INVALID_METHOD;
+    if (!num_operation_fits_command(type,first_op,second_op))
+        return COMMAND_INVALID_NUMBER_OF_OPERANDS;
+    if (!method_fits_command(type,first,second))
+        return COMMAND_INVALID_OPERANDS_METHODS;
     return 0;
+}
+/**
+ * @brief 
+ * 
+ * @param op 
+ * @return int 
+ */
+int method_type(char *op){
+    char *after_dot,*before_dot;
+    if (end_of_line(op)) return NOT_FOUND;
+    if (*op == '#'){
+        op++;
+        if (is_number(op))
+            return M_IMMEDIATE;
+    }
+     if (is_register(op)){
+        return M_REGISTER;
+     }
+
+     if (check_for_label(op,FALSE) == 1){
+        return M_DIRECT;
+     }
+
+     printf("this must be a struct!\n");
+     printf("op: %s\n", strtok(op,"."));
+     printf("new op: %s\n", strtok(NULL,"."));
+     before_dot =  strtok(op, ".");
+     after_dot = strtok(NULL, "."); 
+    if (check_for_label(before_dot, FALSE)) { /* Splitting by dot character */
+        if (strlen(after_dot) == 1 && (*after_dot == '1' || /* After the dot there should be '1' or '2' */
+                *after_dot == '2'))
+            return M_STRUCT;
+    }
+    return COMMAND_INVALID_METHOD;
+}
+/**
+ * @brief 
+ * 
+ * @param command_type 
+ * @param first_op 
+ * @param second_op 
+ * @return boolean 
+ */
+boolean num_operation_fits_command(int command_type, boolean first_op, boolean second_op){
+    switch(command_type){
+        case MOV:
+            return first_op && second_op;
+        case CMP:
+            return first_op && second_op;
+        case ADD:
+            return first_op && second_op;
+        case SUB:
+            return first_op && second_op;
+        case LEA:
+            return first_op && second_op;
+        case NOT:
+            return first_op && !second_op;
+        case CLR:
+            return first_op && !second_op;
+        case INC:
+            return first_op && !second_op;
+        case DEC:
+            return first_op && !second_op;
+        case JMP:
+            return first_op && !second_op;
+        case BNE:
+            return first_op && !second_op;
+        case GET:
+            return first_op && !second_op;
+        case PRN:
+            return first_op && !second_op;
+        case JSR:
+            return first_op && !second_op;
+        case RTS:
+            return !first_op && !second_op;
+        case HLT:
+            return !first_op && !second_op;
+    } 
+    return FALSE;
+}
+/**
+ * @brief 
+ * 
+ * @param commant_type 
+ * @param first 
+ * @param second 
+ * @return boolean 
+ */
+boolean method_fits_command(int command_type,int first, int second){
+    switch(command_type){
+        case MOV:
+            return all_source_method(first) && non_immediate_method(second);
+        case CMP:
+            return all_source_method(first) && all_dest_method(second);
+        case ADD:
+            return all_source_method(first) && non_immediate_method(second);
+        case SUB:
+            return all_source_method(first) && non_immediate_method(second);
+        case LEA:
+            return (first == M_DIRECT || first == M_STRUCT ) && non_immediate_method(second);
+        case NOT:
+            return non_immediate_method(second);
+        case CLR:
+            return non_immediate_method(second);
+        case INC:
+            return non_immediate_method(second);
+        case DEC:
+            return non_immediate_method(second);
+        case JMP:
+            return non_immediate_method(second);
+        case BNE:
+            return non_immediate_method(second);
+        case GET:
+            return non_immediate_method(second);
+        case PRN:
+            return all_dest_method(second);
+        case JSR:
+            return non_immediate_method(second);
+        case RTS:
+            return !all_source_method(first) && !all_dest_method(second);
+        case HLT:
+            return !all_source_method(first) && !all_dest_method(second);
+    } 
+    return FALSE;
+}
+/**
+ * @brief 
+ * 
+ * @param method_type 
+ * @return boolean 
+ */
+boolean all_source_method(int method_type){
+    return  method_type == M_IMMEDIATE || method_type == M_DIRECT ||
+        method_type == M_STRUCT || method_type == M_REGISTER;
+}
+/**
+ * @brief 
+ * 
+ * @param method_type 
+ * @return boolean 
+ */
+boolean all_dest_method(int method_type){
+    return  method_type == M_IMMEDIATE || method_type == M_DIRECT ||
+        method_type == M_STRUCT || method_type == M_REGISTER;
+}
+/**
+ * @brief 
+ * 
+ * @param method_type 
+ * @return boolean 
+ */
+boolean non_immediate_method(int method_type){
+    return method_type == M_DIRECT ||
+        method_type == M_STRUCT || method_type == M_REGISTER;
 }

@@ -13,3 +13,5 @@ int handle_string_directive(char * line);
 int handle_struct_directive(char * line);
 int handle_extern_directive(char * line);
 void write_string_to_data(char *line);
+int method_type(char *op);
+boolean num_operation_fits_command(int command_tye, boolean first_op, boolean second_op);
