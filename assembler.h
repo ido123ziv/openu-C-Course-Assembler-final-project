@@ -29,13 +29,8 @@ order to provide central place for all of the constants and functions declaratio
 typedef enum boolean {FALSE,TRUE}boolean;
 enum filetypes {FILE_INPUT, FILE_MACRO, FILE_OBJECT,FILE_ENTRY,FILE_EXTERN };
 enum directives {DATA, STRING, STRUCT, ENTRY, EXTERN,UNKNOWN_TYPE};
-<<<<<<< HEAD
 enum commands {MOV, CMP, ADD, SUB, NOT, CLR, LEA, INC, DEC, JMP, BNE, RED, PRN, JSR, RTS, STOP, UNKNOWN_COMMAND};
 enum methods {M_IMMEDIATE, M_DIRECT, M_STRUCT, M_REGISTER, M_UNKNOWN};
-=======
-enum commands {MOV, CMP, ADD, SUB, NOT, CLR, LEA, INC, DEC, JMP, BNE, GET, PRN, JSR, RTS, HLT, UNKNOWN_COMMAND};
-enum methods {M_UNKNOWN, M_IMMEDIATE, M_DIRECT, M_STRUCT, M_REGISTER};
->>>>>>> 86ea0b6e0409012b9a32aabd6c7b3c8aa742122c
 enum errors {SYNTAX_ERR ,LABEL_ALREADY_EXISTS ,LABEL_TOO_LONG ,
     LABEL_INVALID_FIRST_CHAR ,LABEL_ONLY_ALPHANUMERIC ,LABEL_CANT_BE_COMMAND ,
     LABEL_ONLY ,LABEL_CANT_BE_REGISTER ,DIRECTIVE_NO_PARAMS ,
@@ -78,8 +73,7 @@ extern int ic, dc;
 */
 #define MINIMUM_LABEL_LENGTH_WITH_COLON 2
 #define MINIMUM_LABEL_LENGTH_WITHOUT_COLON 1
-#define MAX_COMMAND_LENGTH 4 /* maximum number of characters in a command */
-#define MIN_COMMAND_LENGTH 3 /* minimum number of characters in a command */
+#define CMD_LEN 3 /* all commands length is 3 */
 #define MAX_EXTENSION_LENGTH 5
 #define ERROR 1
 #define NOT_FOUND -1
