@@ -28,42 +28,16 @@ void phase_two(FILE *file, char *file_name)
         if (!ignore(line))
             error_code = read_line_ph2(line, line_count);
         if (error_code)
+        {
             write_error_code(error_code, line_count);
-        /* TODO: add error_exists */
+            error_exists = TRUE;
+            error_code = 0;
+        }
 
         line_count++;
     }
     if (!error_exists)
         write_output_files(file_name);
-}
-
-void write_extern(FILE *file){
-    char *address;
-    extPtr node = ext_list;
-
-    /* TODO: complete later this and write_entry */
-}
-
-/* Function will write the output files that need to be create: .ob, (.ent, .ext if needed)*/
-void write_output_files(char *src)
-{
-    /* TODO: finish write_output functions */
-    FILE *file;
-
-    file = create_file(src, FILE_OBJECT);
-    write_output_ob(file);
-
-    if (has_entry)
-    {
-        file = create_file(src, FILE_ENTRY);
-        write_output_entry(file);
-    }
-
-    if (has_extern)
-    {
-        file = create_file(src, FILE_EXTERN);
-        write_output_extern(file);
-    }
 }
 
 int read_line_ph2(char *line, int line_num)
@@ -205,13 +179,13 @@ void encode_ph2_word(boolean is_dest, int method, char *op)
     else if (method == M_DIRECT)
         encode_label(op);
     else
-    { /* if method = struct */
-    /* struct include label before '.' and a number after it */
+    {   /* if method = struct */
+        /* struct include label before '.' and a number after it */
         tmp = strchr(op, '.');
         *tmp = '\0';
         *tmp++ = '.';
         encode_label(op);
-        word = (unsigned int) atoi(tmp);
+        word = (unsigned int)atoi(tmp);
         word = add_are(word, ABSOLUTE);
         instructions[ic++] = word;
     }
@@ -226,7 +200,8 @@ void encode_label(char *label)
     { /* Check if label existes, if it is get address of label */
         word = get_label_address(symbols_table, label);
 
-        if(is_external_label(symbols_table, label)){
+        if (is_external_label(symbols_table, label))
+        {
             add_ext(&ext_list, label, ic + MEM_START);
             word = add_are(word, EXTERNAL);
         }
@@ -243,6 +218,117 @@ void encode_label(char *label)
     /* TODO: finish all sub functions!!
      * is_external...
      * add_ext
-     * get_label... 
+     * get_label...
      * is_label_exist */
+}
+
+/* *********** Write to files functions *************** */
+void write_extern(FILE *file)
+{
+    char *address;
+    extPtr node = ext_list;
+
+    /* TODO: complete later this and write_entry */
+}
+
+/* Function will write the output files that need to be create: .ob, (.ent, .ext if needed)*/
+void write_output_files(char *src)
+{
+    /* TODO: finish write_output functions */
+    FILE *file;
+
+    file = create_file(src, FILE_OBJECT);
+    write_output_ob(file);
+
+    if (has_entry)
+    {
+        file = create_file(src, FILE_ENTRY);
+        write_output_entry(file);
+    }
+
+    if (has_extern)
+    {
+        file = create_file(src, FILE_EXTERN);
+        write_output_extern(file);
+    }
+}
+
+/* Write output for the .ob file 
+ * On first line is the size of instructions and data memory
+ * Other lines: left size is address, right side is the word in memory */
+void write_output_ob(FILE *file)
+{
+    unsigned int address = MEM_START;
+    char *param1 = to_base_32(ic), *param2 = to_base_32(dc);
+    int i;
+
+    fprintf(file, "%s\t%s\n\n", param1, param2);
+    free(param1);
+    free(param2);
+
+        for (i = 0; i < ic; address++, i++) /* Instructions memory */
+    {
+        param1 = to_base_32(address);
+        param2 = to_base_32(instructions[i]);
+
+        fprintf(file, "%s\t%s\n", param1, param2);
+
+        free(param1);
+        free(param2);
+    }
+
+    for (i = 0; i < dc; address++, i++) /* Data memory */
+    {
+        param1 = to_base_32(address);
+        param2 = to_base_32(data[i]);
+
+        fprintf(file, "%s\t%s\n", param1, param2);
+
+        free(param1);
+        free(param2);
+    }
+
+    fclose(file);
+}
+
+/* Writes the output of the .ent file.
+ * Left side: name of label.
+ * Right side: address of definition. */
+void write_output_entry(FILE *file)
+{
+    char *base32_address;
+
+    labelPtr ptr = symbols_table;
+    /* Go through symbols table and print only symbols that have an entry */
+    while(ptr)
+    {
+        if(ptr -> entry)
+        {
+            base32_address = to_base_32(ptr -> address);
+            fprintf(file, "%s\t%s\n", ptr -> name, base32_address);
+            free(base32_address);
+        }
+        ptr = ptr -> next;
+    }
+    fclose(file);
+}
+
+/* Writes the output of the .ext file.
+ * First column: label name.
+ * Second column: address where the external label should be replaced.
+ */
+void write_output_extern(FILE *fp)
+{
+    char *base32_address;
+    extPtr node = ext_list;
+
+    /* Going through external circular linked list and pulling out values */
+    do
+    {
+        base32_address = convert_to_base_32(node -> address);
+        fprintf(fp, "%s\t%s\n", node -> name, base32_address); /* Printing to file */
+        free(base32_address);
+        node = node -> next;
+    } while(node != ext_list);
+    fclose(fp);
 }
