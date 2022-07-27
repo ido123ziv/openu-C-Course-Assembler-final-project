@@ -96,7 +96,7 @@ void isMacro(char *word, char *line)
         line = next_word(line);
         copy_word(word, line);
         /* Check if macro name is legit and not directive or command name */
-        for (i = 0; i < CMD_LEN; i++)
+        for (i = 0; i < CMD_LIST_LEN; i++)
         {
             if (!strcmp(word, commands[i]))
             {
@@ -186,7 +186,7 @@ macroPtr checkMacro(macroPtr macroTable, char *word)
     /*
     if (!is_macro)
     {
-        for (i = 0; i < CMD_LEN; i++)
+        for (i = 0; i < CMD_LIST_LEN; i++)
         {
             if (!strcmp(word, commands[i]))
                 is_cmd = 1;

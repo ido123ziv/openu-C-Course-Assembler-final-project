@@ -603,3 +603,20 @@ unsigned int add_are(unsigned int word, int are)
 {
     return (word << 2) | are; /* OR operand allows insertion of the 2 bits because 1 + 0 = 1 */
 }
+
+/* Function will search if the label exist in the table and return TRUE if it is, else will return FALSE */
+int add_entry(labelPtr ptr, char *name){
+    labelPtr tmp = get_label(ptr, name);
+    if(tmp != NULL){
+        if(tmp -> external){
+            error_code = ENTRY_CANT_BE_EXTERN;
+            return FALSE;
+        }
+        tmp -> entry = TRUE;
+        has_entry = TRUE;
+        return TRUE;
+    }
+    else
+        error_code = ENTRY_LABEL_DOES_NOT_EXIST;
+    return FALSE;
+}

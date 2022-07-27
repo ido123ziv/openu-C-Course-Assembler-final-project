@@ -58,13 +58,6 @@ extern int error_code;
 extern boolean error_exists, has_entry, has_extern;
 extern int ic, dc;
 
-/* Length Constants */
-#define LINE_LEN 82  /* Line max size is 80 , extra 2 bits space for \n or \0 */
-#define LABEL_LEN 30
-#define CMD_LIST_LEN 16
-#define DIR_LEN 5
-#define MACHINE_RAM 2000
-
 #define BITS_IN_WORD 10
 #define BITS_IN_OPCODE 4
 #define BITS_IN_METHOD 2
@@ -75,10 +68,19 @@ extern int ic, dc;
 /* ****************************************************
     ****************************************************
     ****************************************************
-    ************          Defines                *******
+    ************          Constants                *******
     ****************************************************
    ****************************************************
 */
+
+/* Length Constants */
+#define LINE_LEN 82  /* Line max size is 80 , extra 2 bits space for \n or \0 */
+#define LABEL_LEN 30
+#define CMD_LIST_LEN 16
+#define DIR_LEN 5
+#define MACHINE_RAM 2000
+#define BASE32_SEQ_LEN 3 /* Base 32 sequence of word contain 2 digits and '\0' */
+
 #define MINIMUM_LABEL_LENGTH_WITH_COLON 2
 #define MINIMUM_LABEL_LENGTH_WITHOUT_COLON 1
 #define CMD_LEN 3 /* all commands length is 3 */
@@ -99,6 +101,8 @@ typedef struct structLabels * labelPtr;
 typedef struct  structLabels {
 	char name[LABEL_LEN]; /* Label name */
     unsigned int address;
+    boolean entry; /* store if label is entry */
+    boolean external; /* store if label is extern */
 	labelPtr next; /* Pointer to the next label on list */
 } Labels;
 
