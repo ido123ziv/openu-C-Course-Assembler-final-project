@@ -246,7 +246,12 @@ int end_of_line(char *line)
 {
     return line == NULL || *line == '\0' || *line == '\n';
 }
-
+/**
+ * @brief this method prints the error code to stdout
+ * 
+ * @param error_code error code from enum
+ * @param current_line line number of errer
+ */
 void write_error_code(int error_code, int current_line)
 {
     if (current_line != -1)
@@ -427,10 +432,10 @@ void write_error_code(int error_code, int current_line)
     }
 }
 /**
- * @brief
+ * @brief this function searches the commands array to find the input command
  *
- * @param line
- * @return int
+ * @param line current line (text)
+ * @return int  command from enum 
  */
 int find_command(char *word)
 {
@@ -444,10 +449,10 @@ int find_command(char *word)
     return NOT_FOUND;
 }
 /**
- * @brief
+ * @brief this function searches the directives array to find the input directive
  *
- * @param line
- * @return int
+ * @param line current line (text)
+ * @return int index of directive in enum
  */
 int find_directive(char *line)
 {
@@ -464,8 +469,8 @@ int find_directive(char *line)
 /**
  * @brief Get the label address object
  *
- * @param h
- * @param name
+ * @param h label to search
+ * @param name name of label
  * @return unsigned int
  */
 unsigned int get_label_address(labelPtr h, char *name)
@@ -478,8 +483,8 @@ unsigned int get_label_address(labelPtr h, char *name)
 /**
  * @brief Get the label object
  *
- * @param label
- * @param name
+ * @param label label to search
+ * @param name name of label
  * @return labelPtr
  */
 labelPtr get_label(labelPtr label, char *name)
@@ -492,7 +497,12 @@ labelPtr get_label(labelPtr label, char *name)
     }
     return NULL;
 }
-
+/**
+ * @brief prints the data and instruction array
+ * 
+ * @param data array in memory
+ * @param instructions array in memory
+ */
 void print_data(unsigned int *data, unsigned int *instructions)
 {
     int i;
@@ -526,10 +536,10 @@ unsigned int get_bits(unsigned int word, int start, int end){
     
 }*/
 /**
- * @brief 
+ * @brief this function returns the string after the nearest comma and copies the string into word
  * 
- * @param word 
- * @param line 
+ * @param word the string to copy to
+ * @param line current line (text)
  * @return char* 
  */
 
@@ -558,6 +568,13 @@ char * next_comma_word(char *word, char * line){
 
     return line;
 }
+/**
+ * @brief this function returns the string after the nearest " and copies the string into word
+ * 
+ * @param word the string to copy to
+ * @param line current line (text)
+ * @return char* 
+ */
 char * next_string_word(char *word, char * line){
     char *tmp = word;
     line = next_comma_word(word,line);
@@ -582,10 +599,10 @@ char * next_string_word(char *word, char * line){
     return line;
 }
 /**
- * @brief 
+ * @brief this function adds the bits according to the ARE type
  * 
- * @param info 
- * @param are 
+ * @param info the word in memory
+ * @param are ARE enum
  * @return unsigned int 
  */
 unsigned int insert_are(unsigned int info, int are)
