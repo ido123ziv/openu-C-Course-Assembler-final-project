@@ -620,3 +620,15 @@ int add_entry(labelPtr ptr, char *name){
         error_code = ENTRY_LABEL_DOES_NOT_EXIST;
     return FALSE;
 }
+
+char *to_base_32(unsigned int num)
+{
+    char *base32_seq = (char *) malloc(BASE32_SEQ_LEN);
+
+    /* To convert from binary to base 32 we can just take the 5 right binary digits and 5 left */
+    base32_seq[0] = base32[get_bits(num, 5, 9)];
+    base32_seq[1] = base32[get_bits(num, 0, 4)];
+    base32_seq[2] = '\0';
+
+    return base32_seq;
+}
