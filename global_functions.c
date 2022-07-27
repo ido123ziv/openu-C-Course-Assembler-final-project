@@ -521,20 +521,20 @@ void print_data(unsigned int *data, unsigned int *instructions)
     }
     printf("\n$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$\n");
 }
-/*
+
 unsigned int get_bits(unsigned int word, int start, int end){
     
     unsigned int temp;
     int len = end - start + 1; 
     unsigned int mask = (int) pow(2, len) - 1; /* create a mask of '11....11' by len  */
 
-   /*mask = mask << start;
+   mask = mask << start;
     temp = word & mask;
     temp = temp >> start;
 
     return temp;
     
-}*/
+}
 /**
  * @brief this function returns the string after the nearest comma and copies the string into word
  * 
