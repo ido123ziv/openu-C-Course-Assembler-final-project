@@ -2,16 +2,19 @@
 Project by Eran Cohen and Ido Ziv
 */
 #include "assembler.h"
+#include <math.h>
+
 #include "global_functions.h"
 /*
 This script will include all the global function that will be require for more than 1 script
 for example: ignore spaces and tabs on input etc.
 */
+/*
 const char *commands[] = {
     "mov", "cmp", "add", "sub", "not", "clr", "lea", "inc", "dec", "jmp", "bne",
     "get", "prn", "jsr", "rts", "hlt"};
 const char *directives[] = {
-    ".data", ".string", ".struct", ".entry", ".extern"};
+    ".data", ".string", ".struct", ".entry", ".extern"};*/
 /**
  * @brief
  * This function skippes the whitespaces from the begining of a given string by incrementing the first index
@@ -72,7 +75,7 @@ char *create_file(char *original, int type)
     char *modified = (char *)malloc(strlen(original) + MAX_EXTENSION_LENGTH); /* extends the string to max */
     if (modified == NULL)
     {
-        fprintf(stderr, "Dynamic allocation error."); /* catching errors */
+        fprintf(stdout, "Dynamic allocation error."); /* catching errors */
         exit(ERROR);
     }
 
@@ -122,13 +125,13 @@ boolean syntax_validator(char operand[], int line_num, char *file_name)
         {
             if (!is_number(operand + 1))
             {
-                fprintf(stderr, "<file %s, line %d> Illegal input, The operand after '#' must be a real number)\n", file_name, line_num);
+                fprintf(stdout, "<file %s, line %d> Illegal input, The operand after '#' must be a real number)\n", file_name, line_num);
                 return FALSE;
             }
         }
         else
         {
-            fprintf(stderr, "<file %s, line %d> Illegal input, There is no char after the '#' sign must be a real number\n", file_name, line_num);
+            fprintf(stdout, "<file %s, line %d> Illegal input, There is no char after the '#' sign must be a real number\n", file_name, line_num);
             return FALSE;
         }
     }
@@ -138,13 +141,13 @@ boolean syntax_validator(char operand[], int line_num, char *file_name)
         {
             if (operand[1] == ' ') /*whether there is a space after % */
             {
-                fprintf(stderr, "<file %s, line %d> Illegal space after the precent sign\n", file_name, line_num);
+                fprintf(stdout, "<file %s, line %d> Illegal space after the precent sign\n", file_name, line_num);
                 return FALSE;
             }
         }
         else
         {
-            fprintf(stderr, "<file %s, line %d> Illegal input, There is no char after the precent sign\n", file_name, line_num);
+            fprintf(stdout, "<file %s, line %d> Illegal input, There is no char after the precent sign\n", file_name, line_num);
             return FALSE;
         }
     }
@@ -160,7 +163,7 @@ boolean syntax_validator(char operand[], int line_num, char *file_name)
  */
 boolean is_register(char *word)
 {
-     return strlen(word) == REGISTER_LENGTH && word[0] == 'r' && word[1] >= '0' && word[1] <= '7';
+    return strlen(word) == REGISTER_LENGTH && word[0] == 'r' && word[1] >= '0' && word[1] <= '7';
 }
 
 /* Function will copy the next word (until a space or end of line) to a string */
@@ -170,7 +173,7 @@ void copy_word(char *word, char *line)
     if (word == NULL || line == NULL)
         return;
 
-    while (i < LINE_LEN && !isspace(line[i]) && line[i] != '\0') /* Copying token until its end to *dest */
+    while (i < LINE_LEN && !isspace(line[i]) && line[i] != '\0') /* Copying word until its end to *word */
     {
         word[i] = line[i];
         i++;
@@ -189,7 +192,7 @@ char *next_word(char *str)
     if (str == NULL)
         return NULL;
     while (!isspace(*str) && !end_of_line(str))
-        str++;              /* Skip rest of characters in the current token (until a space) */
+        str++;              /* Skip rest of characters in the current line (until a space) */
     str = skip_spaces(str); /* Skip spaces */
     if (end_of_line(str))
         return NULL;
@@ -239,226 +242,370 @@ void copy_line(char *from, char *to)
  */
 
 /* Checking for the end of line/given token in the character that char* points to */
-int end_of_line(char *line){
+int end_of_line(char *line)
+{
     return line == NULL || *line == '\0' || *line == '\n';
 }
-
-void write_error_code(int error_code,int current_line){
+/**
+ * @brief this method prints the error code to stdout
+ * 
+ * @param error_code error code from enum
+ * @param current_line line number of errer
+ */
+void write_error_code(int error_code, int current_line)
+{
     if (current_line != -1)
-        fprintf(stderr, "ERROR (line %d): ", current_line);
+        fprintf(stdout, "ERROR (line %d): ", current_line);
     switch (error_code)
     {
-    case 1:
-        fprintf(stderr, "first non-blank character must be a letter or a dot.\n");
+    case SYNTAX_ERR:
+        fprintf(stdout, "first non-blank character must be a letter or a dot.\n");
 
         break;
 
-    case 2:
-        fprintf(stderr, "label already exists.\n");
+    case LABEL_ALREADY_EXISTS:
+        fprintf(stdout, "label already exists.\n");
 
         break;
 
-    case 3:
-        fprintf(stderr, "label is too long (LABEL_MAX_LENGTH: %d).\n", LABEL_LEN);
+    case LABEL_TOO_LONG:
+        fprintf(stdout, "label is too long (LABEL_MAX_LENGTH: %d).\n", LABEL_LEN);
 
         break;
 
-    case 4:
-        fprintf(stderr, "label must start with an alphanumeric character.\n");
+    case LABEL_INVALID_FIRST_CHAR:
+        fprintf(stdout, "label must start with an alphanumeric character.\n");
 
         break;
 
-    case 5:
-        fprintf(stderr, "label must only contain alphanumeric characters.\n");
+    case LABEL_ONLY_ALPHANUMERIC:
+        fprintf(stdout, "label must only contain alphanumeric characters.\n");
 
         break;
 
-    case 6:
-        fprintf(stderr, "label can't have the same name as a command.\n");
+    case LABEL_CANT_BE_COMMAND:
+        fprintf(stdout, "label can't have the same name as a command.\n");
 
         break;
 
-    case 7:
-        fprintf(stderr, "label must be followed by a command or a directive.\n");
+    case LABEL_ONLY:
+        fprintf(stdout, "label must be followed by a command or a directive.\n");
         break;
 
-    case 8:
-        fprintf(stderr, "label can't have the same name as a register.\n");
+    case LABEL_CANT_BE_REGISTER:
+        fprintf(stdout, "label can't have the same name as a register.\n");
         break;
 
-    case 9:
-        fprintf(stderr, "directive must have parameters.\n");
-
-        break;
-
-    case 10:
-        fprintf(stderr, "illegal number of parameters for a directive.\n");
+    case DIRECTIVE_NO_PARAMS:
+        fprintf(stdout, "directive must have parameters.\n");
 
         break;
 
-    case 11:
-        fprintf(stderr, "incorrect usage of commas in a .data directive.\n");
+    case DIRECTIVE_INVALID_NUM_PARAMS:
+        fprintf(stdout, "illegal number of parameters for a directive.\n");
 
         break;
 
-    case 12:
-        fprintf(stderr, ".data expected a numeric parameter.\n");
+    case DATA_COMMAS_IN_A_ROW:
+        fprintf(stdout, "incorrect usage of commas in a .data directive.\n");
 
         break;
 
-    case 13:
-        fprintf(stderr, ".data expected a comma after a numeric parameter.\n");
+    case DATA_EXPECTED_NUM:
+        fprintf(stdout, ".data expected a numeric parameter.\n");
 
         break;
 
-    case 14:
-        fprintf(stderr, ".data got an unexpected comma after the last number.\n");
+    case DATA_EXPECTED_COMMA_AFTER_NUM:
+        fprintf(stdout, ".data expected a comma after a numeric parameter.\n");
 
         break;
 
-    case 15:
-        fprintf(stderr, ".string must contain exactly one parameter.\n");
+    case DATA_UNEXPECTED_COMMA:
+        fprintf(stdout, ".data got an unexpected comma after the last number.\n");
 
         break;
 
-    case 16:
-        fprintf(stderr, ".string operand is invalid.\n");
+    case STRING_TOO_MANY_OPERANDS:
+        fprintf(stdout, ".string must contain exactly one parameter.\n");
 
         break;
 
-    case 17:
-        fprintf(stderr, ".struct first parameter must be a number.\n");
+    case STRING_OPERAND_NOT_VALID:
+        fprintf(stdout, ".string operand is invalid.\n");
 
         break;
 
-    case 18:
-        fprintf(stderr, ".struct must have 2 parameters.\n");
+    case STRUCT_EXPECTED_STRING:
+        fprintf(stdout, ".struct first parameter must be a number.\n");
 
         break;
 
-    case 19:
-        fprintf(stderr, ".struct second parameter is not a string.\n");
+    case STRUCT_INVALID_STRING:
+        fprintf(stdout, ".struct must have 2 parameters.\n");
 
         break;
 
-    case 20:
-        fprintf(stderr, ".struct must not have more than 2 operands.\n");
+    case EXPECTED_COMMA_BETWEEN_OPERANDS:
+        fprintf(stdout, ".struct second parameter is not a string.\n");
 
         break;
 
-    case 21:
-        fprintf(stderr, ".struct must have 2 operands with a comma between them.\n");
+    case STRUCT_INVALID_NUM:
+        fprintf(stdout, ".struct must not have more than 2 operands.\n");
 
         break;
 
-    case 22:
-        fprintf(stderr, ".extern directive must be followed by a label.\n");
+    case STRUCT_TOO_MANY_OPERANDS:
+        fprintf(stdout, ".struct must have 2 operands with a comma between them.\n");
 
         break;
 
-    case 23:
-        fprintf(stderr, ".extern directive received an invalid label.\n");
+    case EXTERN_NO_LABEL:
+        fprintf(stdout, ".extern directive must be followed by a label.\n");
 
         break;
 
-    case 24:
-        fprintf(stderr, ".extern must only have one operand that is a label.\n");
+    case EXTERN_INVALID_LABEL:
+        fprintf(stdout, ".extern directive received an invalid label.\n");
 
         break;
 
-    case 25:
-        fprintf(stderr, "invalid command or directive.\n");
+    case EXTERN_TOO_MANY_OPERANDS:
+        fprintf(stdout, ".extern must only have one operand that is a label.\n");
 
         break;
 
-    case 26:
-        fprintf(stderr, "invalid syntax of a command.\n");
+    case COMMAND_NOT_FOUND:
+        fprintf(stdout, "invalid command or directive.\n");
 
         break;
 
-    case 27:
-        fprintf(stderr, "command can't have more than 2 operands.\n");
+    case COMMAND_UNEXPECTED_CHAR:
+        fprintf(stdout, "invalid syntax of a command.\n");
 
         break;
 
-    case 28:
-        fprintf(stderr, "operand has invalid addressing method.\n");
+    case COMMAND_TOO_MANY_OPERANDS:
+        fprintf(stdout, "command can't have more than 2 operands.\n");
 
         break;
 
-    case 29:
-        fprintf(stderr, "number of operands does not match command requirements.\n");
+    case COMMAND_INVALID_METHOD:
+        fprintf(stdout, "operand has invalid addressing method.\n");
 
         break;
 
-    case 30:
-        fprintf(stderr, "operands' addressing methods do not match command requirements.\n");
+    case COMMAND_INVALID_NUMBER_OF_OPERANDS:
+        fprintf(stdout, "number of operands does not match command requirements.\n");
 
         break;
 
-    case 31:
-        fprintf(stderr, ".entry directive must be followed by an existing label.\n");
+    case COMMAND_INVALID_OPERANDS_METHODS:
+        fprintf(stdout, "operands' addressing methods do not match command requirements.\n");
 
         break;
 
-    case 32:
-        fprintf(stderr, ".entry can't apply to a label that was defined as external.\n");
+    case ENTRY_LABEL_DOES_NOT_EXIST:
+        fprintf(stdout, ".entry directive must be followed by an existing label.\n");
 
         break;
 
-    case 33:
-        fprintf(stderr, "label does not exist.\n");
+    case ENTRY_CANT_BE_EXTERN:
+        fprintf(stdout, ".entry can't apply to a label that was defined as external.\n");
 
         break;
 
-    case 34:
-        fprintf(stderr, "there was an error while trying to open the requested file.\n");
+    case COMMAND_LABEL_DOES_NOT_EXIST:
+        fprintf(stdout, "label does not exist.\n");
+
         break;
 
-    case 35:
-        fprintf(stderr, "Not enough arguments,\ncommand line should be like this: ./assembler file1 file2 .. \n");
+    case CANNOT_OPEN_FILE:
+        fprintf(stdout, "there was an error while trying to open the requested file.\n");
         break;
+
+    case NOT_ENOUGH_ARGUMENTS:
+        fprintf(stdout, "Not enough arguments,\ncommand line should be like this: ./assembler file1 file2 .. \n");
+        break;
+
     }
 }
 /**
- * @brief whether this is the end of the line
+ * @brief this function searches the commands array to find the input command
  *
- * @param line line working on
- * @return int
+ * @param line current line (text)
+ * @return int  command from enum 
  */
-
-/**
- * @brief
- *
- * @param line
- * @return int
- */
-int find_command(char *line)
+int find_command(char *word)
 {
-    int line_len = strlen(line), i;
-    int size = CMD_LEN;
-    if (line_len > MAX_COMMAND_LENGTH || line_len < MIN_COMMAND_LENGTH)
+    int word_len = strlen(word), i;
+    if (word_len > MAX_COMMAND_LENGTH || word_len < MIN_COMMAND_LENGTH)
         return NOT_FOUND;
-    for (i = 0; i < size; i++){
-        if (strcmp(line, commands[i]) == 0)
+    for (i = 0; i < CMD_LEN; i++){
+        if (strcmp(word, commands[i]) == 0)
             return i;
     }
     return NOT_FOUND;
 }
 /**
- * @brief
+ * @brief this function searches the directives array to find the input directive
  *
- * @param line
- * @return int
+ * @param line current line (text)
+ * @return int index of directive in enum
  */
 int find_directive(char *line)
 {
-    int i, size = DIRECTIVE_LEN;
+    int i, size = DIR_LEN;
     if (line == NULL || *line != '.')
         return NOT_FOUND;
-    for (i = 0; i < size; i++){
+    for (i = 0; i < size; i++)
+    {
         if (strcmp(line, directives[i]) == 0)
             return i;
     }
     return NOT_FOUND;
+}
+/**
+ * @brief Get the label address object
+ *
+ * @param h label to search
+ * @param name name of label
+ * @return unsigned int
+ */
+unsigned int get_label_address(labelPtr h, char *name)
+{
+    labelPtr label = get_label(h, name);
+    if (label != NULL)
+        return label->address;
+    return FALSE;
+}
+/**
+ * @brief Get the label object
+ *
+ * @param label label to search
+ * @param name name of label
+ * @return labelPtr
+ */
+labelPtr get_label(labelPtr label, char *name)
+{
+    while (label)
+    {
+        if (strcmp(label->name, name) == 0)
+            return label;
+        label = label->next;
+    }
+    return NULL;
+}
+/**
+ * @brief prints the data and instruction array
+ * 
+ * @param data array in memory
+ * @param instructions array in memory
+ */
+void print_data(unsigned int *data, unsigned int *instructions)
+{
+    int i;
+    printf("$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$\nMe Printing Data ah?\n");
+    printf("dc %d\n", dc);
+    for (i = 0; i < (sizeof(data)); i++)
+    {
+        printf(":%u::-", data[i]);
+    }
+    printf("\n$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$\n");
+    printf("$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$\nMe Printing Instructions ah?\n");
+    printf("ic %d\n", ic);
+    for (i = 0; i < (sizeof(instructions)); i++)
+    {
+        printf(":%u::-", instructions[i]);
+    }
+    printf("\n$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$\n");
+}
+/*
+unsigned int get_bits(unsigned int word, int start, int end){
+    
+    unsigned int temp;
+    int len = end - start + 1; 
+    unsigned int mask = (int) pow(2, len) - 1; /* create a mask of '11....11' by len  */
+
+   /*mask = mask << start;
+    temp = word & mask;
+    temp = temp >> start;
+
+    return temp;
+    
+}*/
+/**
+ * @brief this function returns the string after the nearest comma and copies the string into word
+ * 
+ * @param word the string to copy to
+ * @param line current line (text)
+ * @return char* 
+ */
+
+char * next_comma_word(char *word, char * line){
+    char *tmp = word;
+
+    line = skip_spaces(line);
+
+    if(end_of_line(line)){
+        word[0] = '\0';
+        return NULL;
+    }
+
+    if(*line == ','){
+        line++;
+        strcpy(word, ",");
+        return line;
+    }
+
+    while(!isspace(*line) && !end_of_line(line) && *line != ','){
+        *tmp = *line;
+        line++;
+        tmp++;
+    }
+    *tmp = '\0';
+
+    return line;
+}
+/**
+ * @brief this function returns the string after the nearest " and copies the string into word
+ * 
+ * @param word the string to copy to
+ * @param line current line (text)
+ * @return char* 
+ */
+char * next_string_word(char *word, char * line){
+    char *tmp = word;
+    line = next_comma_word(word,line);
+    printf("next_comma_word %s\n", word);
+    if(end_of_line(line)){
+        word[0] = '\0';
+        return NULL;
+    }
+
+    if(*word != '"'){
+        return line;
+    }
+    word++;
+    line++;
+    while(!end_of_line(line) && *line != '"'){
+        *tmp = *line;
+        line++;
+        tmp++;
+    }
+    *tmp = '\0';
+
+    return line;
+}
+/**
+ * @brief this function adds the bits according to the ARE type
+ * 
+ * @param info the word in memory
+ * @param are ARE enum
+ * @return unsigned int 
+ */
+unsigned int insert_are(unsigned int info, int are)
+{
+    return (info << BITS_IN_ARE) | are;
 }
