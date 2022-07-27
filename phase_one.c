@@ -80,7 +80,6 @@ int read_line_am(char *line, int line_count)
                 return LABEL_ONLY;
             }
             printf("One label found\t");
-            /*TODO: add label to table*/
         }
     }
     /* else
@@ -122,7 +121,6 @@ int read_line_am(char *line, int line_count)
         }
         printf("command is: %s\n", commands[command_type]);
         line = next_word(line);
-        /*TODO: add command to table*/
         handle_command(command_type, line);
     }
 
@@ -217,7 +215,6 @@ labelPtr add_label(labelPtr *table, char *name, unsigned int address)
         exit(1);
     }
 
-    /* TODO: check if exists */
     strcpy(temp->name, name);
     temp->address = address;
     temp->next = NULL;
@@ -373,14 +370,7 @@ int handle_string_directive(char *line)
     /*  printf("line++ %s\t strlen: %d, char: %c\n", line, line_len, line[line_len -2]);*/
     if (line[line_len - 2] != '\"')
         return STRING_OPERAND_NOT_VALID;
-
-    /*TODO: Copy entire line */
-    /*printf("my copy is: %s\n", copy);*/
-    /*  printf("my line is: %s\n", line); */
-    /*   printf("line: %c, end: %c\n", line[0],line[line_len - 2]); */
     line = skip_spaces(line);
-    /*printf("my line is: %s\n", line);*/
-    /*    printf("end of line: %d\n", end_of_line(line));*/
     if (!end_of_line(line))
     {
         /*  copy[strlen(copy) - 1] = "\0";*/
