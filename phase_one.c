@@ -4,7 +4,6 @@ Project by Eran Cohen and Ido Ziv
 #include "assembler.h"
 #include "global_functions.h"
 #include "phases.h"
-#include "phase_one.h"
 
 /**
  * @brief
