@@ -10,13 +10,16 @@
 #define TWO_OPERANDS 5
 #define ONE_OPERANDS 14
 
+
 /*************** DECLARETIONS  ****************/
 /*************** PHASE TWO *****************/
 void phase_two(FILE *file, char *file_name);
 void write_output_files(char *src);
 int read_line_ph2(char * line, int line_num);
-int cmd_ph2_binary(int cmd, char *line);
+void cmd_ph2_binary(int cmd, char *line);
 void check_operands(int cmd, boolean *is_src, boolean *is_dest);
+unsigned int build_reg(boolean is_dest, char *reg);
+void encode_ph2_word(boolean is_dest, int method, char * op);
 
 /* ************** PHASE ONE ************** */
 int read_line_am(char *line, int line_count);

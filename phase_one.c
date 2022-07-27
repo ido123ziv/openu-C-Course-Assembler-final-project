@@ -774,6 +774,6 @@ unsigned int word_to_bits(int method_type, boolean first_op, boolean second_op, 
     else if (first_op){
         word_in_bits |= first;
     }
-    word_in_bits = insert_are(word_in_bits,ABSOLUTE);
+    word_in_bits = add_are(word_in_bits,ABSOLUTE);
     return word_in_bits;
 }

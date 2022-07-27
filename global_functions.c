@@ -440,9 +440,9 @@ void write_error_code(int error_code, int current_line)
 int find_command(char *word)
 {
     int word_len = strlen(word), i;
-    if (word_len > MAX_COMMAND_LENGTH || word_len < MIN_COMMAND_LENGTH)
+    if (word_len != CMD_LEN)
         return NOT_FOUND;
-    for (i = 0; i < CMD_LEN; i++){
+    for (i = 0; i < CMD_LIST_LEN; i++){
         if (strcmp(word, commands[i]) == 0)
             return i;
     }
@@ -542,7 +542,6 @@ unsigned int get_bits(unsigned int word, int start, int end){
  * @param line current line (text)
  * @return char* 
  */
-
 char * next_comma_word(char *word, char * line){
     char *tmp = word;
 
@@ -598,14 +597,9 @@ char * next_string_word(char *word, char * line){
 
     return line;
 }
-/**
- * @brief this function adds the bits according to the ARE type
- * 
- * @param info the word in memory
- * @param are ARE enum
- * @return unsigned int 
- */
-unsigned int insert_are(unsigned int info, int are)
+
+/* Function inserts A/R/E bits into given word bit-sequence (the word is being shifted left) */
+unsigned int add_are(unsigned int word, int are)
 {
-    return (info << BITS_IN_ARE) | are;
+    return (word << 2) | are; /* OR operand allows insertion of the 2 bits because 1 + 0 = 1 */
 }

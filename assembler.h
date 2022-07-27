@@ -31,7 +31,7 @@ enum ARE {ABSOLUTE, RELOCATABLE ,EXTERNAL};
 enum filetypes {FILE_INPUT, FILE_MACRO, FILE_OBJECT,FILE_ENTRY,FILE_EXTERN };
 enum directives {DATA, STRING, STRUCT, ENTRY, EXTERN,UNKNOWN_TYPE};
 enum commands {MOV, CMP, ADD, SUB, NOT, CLR, LEA, INC, DEC, JMP, BNE, GET, PRN, JSR, RTS, HLT, UNKNOWN_COMMAND};
-enum methods {M_UNKNOWN, M_IMMEDIATE, M_DIRECT, M_STRUCT, M_REGISTER};
+enum methods {M_IMMEDIATE, M_DIRECT, M_STRUCT, M_REGISTER, M_UNKNOWN};
 enum errors {SYNTAX_ERR ,LABEL_ALREADY_EXISTS ,LABEL_TOO_LONG ,
     LABEL_INVALID_FIRST_CHAR ,LABEL_ONLY_ALPHANUMERIC ,LABEL_CANT_BE_COMMAND ,
     LABEL_ONLY ,LABEL_CANT_BE_REGISTER ,DIRECTIVE_NO_PARAMS ,
@@ -43,6 +43,7 @@ enum errors {SYNTAX_ERR ,LABEL_ALREADY_EXISTS ,LABEL_TOO_LONG ,
     COMMAND_NOT_FOUND ,COMMAND_UNEXPECTED_CHAR ,COMMAND_TOO_MANY_OPERANDS ,COMMAND_INVALID_METHOD ,
     COMMAND_INVALID_NUMBER_OF_OPERANDS ,COMMAND_INVALID_OPERANDS_METHODS ,ENTRY_LABEL_DOES_NOT_EXIST ,
     ENTRY_CANT_BE_EXTERN ,COMMAND_LABEL_DOES_NOT_EXIST ,CANNOT_OPEN_FILE ,NOT_ENOUGH_ARGUMENTS };
+enum ARE {ABSOLUTE, EXTERNAL, RELOCATABLE};
 /* ****************************************************
     ****************************************************
     ****************************************************
@@ -61,7 +62,7 @@ extern int ic, dc;
 /* Length Constants */
 #define LINE_LEN 82  /* Line max size is 80 , extra 2 bits space for \n or \0 */
 #define LABEL_LEN 30
-#define CMD_LEN 16
+#define CMD_LIST_LEN 16
 #define DIR_LEN 5
 #define MACHINE_RAM 2000
 
@@ -81,11 +82,11 @@ extern int ic, dc;
 */
 #define MINIMUM_LABEL_LENGTH_WITH_COLON 2
 #define MINIMUM_LABEL_LENGTH_WITHOUT_COLON 1
-#define MAX_COMMAND_LENGTH 4 /* maximum number of characters in a command */
-#define MIN_COMMAND_LENGTH 3 /* minimum number of characters in a command */
+#define CMD_LEN 3 /* all commands length is 3 */
 #define MAX_EXTENSION_LENGTH 5
 #define ERROR 1
 #define NOT_FOUND -1
+#define MEM_START 100
 /* ****************************************************
     ****************************************************
     ****************************************************
@@ -94,14 +95,22 @@ extern int ic, dc;
    ****************************************************
 */
  
-/* extern macroPtr macro_table; */
+/* Linked list to store program labels */
 typedef struct structLabels * labelPtr;
 typedef struct  structLabels {
 	char name[LABEL_LEN]; /* Label name */
     unsigned int address;
-	labelPtr next; /* a pointer to the next label in the list */
+	labelPtr next; /* Pointer to the next label on list */
 } Labels;
 
+/* Double linked list to store program extern labels */
+typedef struct ext * extPtr;
+typedef struct ext {
+    char name[LABEL_LEN]; /* Extern label name */
+    unsigned int address; 
+    extPtr next; /* Pointer to the next label on list */
+    extPtr prev; /* Pointer to the previous label on list */
+} ext;
 
 extern int ic, dc;
 extern labelPtr symbols_table;
