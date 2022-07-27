@@ -50,7 +50,7 @@ int main (int argc, char *argv[])
     char *get_filename;
     FILE *fp;
 
-    print_data(data);
+    print_data(data, instructions);
     if(argc > 1) /* check if there's atleast one file that is sent with the command */
     {
         for (i=1; i < argc; i++){
@@ -83,7 +83,7 @@ int main (int argc, char *argv[])
     else{
         write_error_code(NOT_ENOUGH_ARGUMENTS,-1);
     }
-    print_data(data);
+    print_data(data, instructions);
     return 0;
 }
 

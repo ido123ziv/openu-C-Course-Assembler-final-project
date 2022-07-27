@@ -480,34 +480,37 @@ void write_string_to_data(char *line)
     data[dc++] = '\0';
 }
 /**
- * @brief 
- * 
- * @param type 
- * @param line 
- * @return int 
+ * @brief
+ *
+ * @param type
+ * @param line
+ * @return int
  */
 int handle_command(int type, char *line)
 {
     boolean first_op = FALSE, second_op = FALSE;
     int first, second;
+    unsigned int word;
     char op1[20], op2[20];
     printf("handle command\t %s\n", line);
     line = next_comma_word(op1, line);
-   /* printf("next command\t %s\n", op1);*/
+    /* printf("next command\t %s\n", op1);*/
     if (!end_of_line(op1))
     {
         first_op = TRUE;
         line = next_comma_word(op2, line);
         /*printf("next next command %s\n", op2);*/
         if (!end_of_line(op2))
-        {   /* if not empty must be a , */
+        { /* if not empty must be a , */
             /*  printf("next next next command %s\n", op2);*/
-            if (op2[0] != ','){
+            if (op2[0] != ',')
+            {
                 return COMMAND_UNEXPECTED_CHAR;
             }
             line = next_comma_word(op2, line);
             /*printf("next next next next command %s,line: %s\n", op2, line);*/
-            if (!end_of_line(line)){
+            if (!end_of_line(line))
+            {
                 return COMMAND_UNEXPECTED_CHAR;
             }
             second_op = TRUE;
@@ -515,175 +518,275 @@ int handle_command(int type, char *line)
     }
     /*printf("here\n");*/
     line = skip_spaces(line);
-   /* printf("handle spaces\t %s\n", line);*/
+    /* printf("handle spaces\t %s\n", line);*/
     if (!end_of_line(line)) /* command a1, a2  a3 is not valid */
         return COMMAND_TOO_MANY_OPERANDS;
-    printf("%d-%d\n", first_op, second_op);
-    if (first_op){
-       first = method_type(op1);
+  /*  printf("%d-%d\n", first_op, second_op); */
+    if (first_op)
+    {
+/*        printf("first_op here\n"); */
+        first = method_type(op1);
     }
-    if (second_op){
-       second = method_type(op2);
+ /*   printf("in between here\n"); */
+    if (second_op)
+    {
+        second = method_type(op2);
     }
+ /*   printf("second_op here\n"); */
+    /* check for input errors */
     if (first == COMMAND_INVALID_METHOD || second == COMMAND_INVALID_METHOD)
         return COMMAND_INVALID_METHOD;
-    if (!num_operation_fits_command(type,first_op,second_op))
+    if (!num_operation_fits_command(type, first_op, second_op))
         return COMMAND_INVALID_NUMBER_OF_OPERANDS;
-    if (!method_fits_command(type,first,second))
+    if (!method_fits_command(type, first, second))
         return COMMAND_INVALID_OPERANDS_METHODS;
+    /* done checking, adding to data */
+  /*  printf("done checking\n");*/
+    word = word_to_bits(type,first_op,second_op,first,second);
+ /*   printf("word id now: %u|%x|%d\n",word,word,word);*/
+    write_command_to_instructions(word);
+ /*   printf("writing to memory\n"); */
+    ic += word_count_by_command(first_op,second_op,first,second);
+ /*   printf("FINISH\n"); */
     return 0;
 }
 /**
- * @brief 
- * 
- * @param op 
- * @return int 
+ * @brief
+ *
+ * @param op
+ * @return int
  */
-int method_type(char *op){
-    char *after_dot,*before_dot;
-    if (end_of_line(op)) return NOT_FOUND;
-    if (*op == '#'){
+int method_type(char *op)
+{
+    char *after_dot, *before_dot;
+   /* printf("op is: %s\n", op);*/
+    if (end_of_line(op))
+        return NOT_FOUND;
+    if (*op == '#')
+    {
         op++;
         if (is_number(op))
             return M_IMMEDIATE;
     }
-     if (is_register(op)){
+    if (is_register(op))
+    {
         return M_REGISTER;
-     }
+    }
 
-     if (check_for_label(op,FALSE) == 1){
+    if (check_for_label(op, FALSE) == 1)
+    {
         return M_DIRECT;
-     }
+    }
 
-     printf("this must be a struct!\n");
-     printf("op: %s\n", strtok(op,"."));
-     printf("new op: %s\n", strtok(NULL,"."));
-     before_dot =  strtok(op, ".");
-     after_dot = strtok(NULL, "."); 
-    if (check_for_label(before_dot, FALSE)) { /* Splitting by dot character */
+    printf("this must be a struct!\n");
+   /* printf("op was: %s\n", strtok(op, "."));
+    printf("new op: %s\n", strtok(NULL, "."));*/
+    before_dot = strtok(op, ".");
+    printf("op was:: %s\n",before_dot);
+    after_dot = strtok(NULL, ".");
+    printf("new op: %s\n", after_dot);
+    if (check_for_label(before_dot, FALSE))
+    {                                                       /* Splitting by dot character */
         if (strlen(after_dot) == 1 && (*after_dot == '1' || /* After the dot there should be '1' or '2' */
-                *after_dot == '2'))
+                                       *after_dot == '2'))
             return M_STRUCT;
     }
     return COMMAND_INVALID_METHOD;
 }
 /**
+ * @brief
+ *
+ * @param command_type
+ * @param first_op
+ * @param second_op
+ * @return boolean
+ */
+boolean num_operation_fits_command(int command_type, boolean first_op, boolean second_op)
+{
+    switch (command_type)
+    {
+    case MOV:
+        return first_op && second_op;
+    case CMP:
+        return first_op && second_op;
+    case ADD:
+        return first_op && second_op;
+    case SUB:
+        return first_op && second_op;
+    case LEA:
+        return first_op && second_op;
+    case NOT:
+        return first_op && !second_op;
+    case CLR:
+        return first_op && !second_op;
+    case INC:
+        return first_op && !second_op;
+    case DEC:
+        return first_op && !second_op;
+    case JMP:
+        return first_op && !second_op;
+    case BNE:
+        return first_op && !second_op;
+    case GET:
+        return first_op && !second_op;
+    case PRN:
+        return first_op && !second_op;
+    case JSR:
+        return first_op && !second_op;
+    case RTS:
+        return !first_op && !second_op;
+    case HLT:
+        return !first_op && !second_op;
+    }
+    return FALSE;
+}
+/**
+ * @brief
+ *
+ * @param commant_type
+ * @param first
+ * @param second
+ * @return boolean
+ */
+boolean method_fits_command(int command_type, int first, int second)
+{
+    switch (command_type)
+    {
+    case MOV:
+        return all_source_method(first) && non_immediate_method(second);
+    case CMP:
+        return all_source_method(first) && all_dest_method(second);
+    case ADD:
+        return all_source_method(first) && non_immediate_method(second);
+    case SUB:
+        return all_source_method(first) && non_immediate_method(second);
+    case LEA:
+        return (first == M_DIRECT || first == M_STRUCT) && non_immediate_method(second);
+    case NOT:
+        return non_immediate_method(second);
+    case CLR:
+        return non_immediate_method(second);
+    case INC:
+        return non_immediate_method(second);
+    case DEC:
+        return non_immediate_method(second);
+    case JMP:
+        return non_immediate_method(second);
+    case BNE:
+        return non_immediate_method(second);
+    case GET:
+        return non_immediate_method(second);
+    case PRN:
+        return all_dest_method(second);
+    case JSR:
+        return non_immediate_method(second);
+    case RTS:
+        return !all_source_method(first) && !all_dest_method(second);
+    case HLT:
+        return !all_source_method(first) && !all_dest_method(second);
+    }
+    return FALSE;
+}
+/**
+ * @brief
+ *
+ * @param method_type
+ * @return boolean
+ */
+boolean all_source_method(int method_type)
+{
+    return method_type == M_IMMEDIATE || method_type == M_DIRECT ||
+           method_type == M_STRUCT || method_type == M_REGISTER;
+}
+/**
+ * @brief
+ *
+ * @param method_type
+ * @return boolean
+ */
+boolean all_dest_method(int method_type)
+{
+    return method_type == M_IMMEDIATE || method_type == M_DIRECT ||
+           method_type == M_STRUCT || method_type == M_REGISTER;
+}
+/**
+ * @brief
+ *
+ * @param method_type
+ * @return boolean
+ */
+boolean non_immediate_method(int method_type)
+{
+    return method_type == M_DIRECT ||
+           method_type == M_STRUCT || method_type == M_REGISTER;
+}
+/**
+ * @brief
+ *
+ * @param method_type
+ * @return int
+ */
+int words_count_by_method(int method_type)
+{
+    if (method_type == M_STRUCT)
+        return 2;
+    return 1;
+}
+/**
  * @brief 
  * 
- * @param command_type 
  * @param first_op 
  * @param second_op 
- * @return boolean 
- */
-boolean num_operation_fits_command(int command_type, boolean first_op, boolean second_op){
-    switch(command_type){
-        case MOV:
-            return first_op && second_op;
-        case CMP:
-            return first_op && second_op;
-        case ADD:
-            return first_op && second_op;
-        case SUB:
-            return first_op && second_op;
-        case LEA:
-            return first_op && second_op;
-        case NOT:
-            return first_op && !second_op;
-        case CLR:
-            return first_op && !second_op;
-        case INC:
-            return first_op && !second_op;
-        case DEC:
-            return first_op && !second_op;
-        case JMP:
-            return first_op && !second_op;
-        case BNE:
-            return first_op && !second_op;
-        case GET:
-            return first_op && !second_op;
-        case PRN:
-            return first_op && !second_op;
-        case JSR:
-            return first_op && !second_op;
-        case RTS:
-            return !first_op && !second_op;
-        case HLT:
-            return !first_op && !second_op;
-    } 
-    return FALSE;
-}
-/**
- * @brief 
- * 
- * @param commant_type 
  * @param first 
  * @param second 
- * @return boolean 
+ * @return int 
  */
-boolean method_fits_command(int command_type,int first, int second){
-    switch(command_type){
-        case MOV:
-            return all_source_method(first) && non_immediate_method(second);
-        case CMP:
-            return all_source_method(first) && all_dest_method(second);
-        case ADD:
-            return all_source_method(first) && non_immediate_method(second);
-        case SUB:
-            return all_source_method(first) && non_immediate_method(second);
-        case LEA:
-            return (first == M_DIRECT || first == M_STRUCT ) && non_immediate_method(second);
-        case NOT:
-            return non_immediate_method(second);
-        case CLR:
-            return non_immediate_method(second);
-        case INC:
-            return non_immediate_method(second);
-        case DEC:
-            return non_immediate_method(second);
-        case JMP:
-            return non_immediate_method(second);
-        case BNE:
-            return non_immediate_method(second);
-        case GET:
-            return non_immediate_method(second);
-        case PRN:
-            return all_dest_method(second);
-        case JSR:
-            return non_immediate_method(second);
-        case RTS:
-            return !all_source_method(first) && !all_dest_method(second);
-        case HLT:
-            return !all_source_method(first) && !all_dest_method(second);
-    } 
-    return FALSE;
+int word_count_by_command(boolean first_op, boolean second_op, int first, int second)
+{
+    int word_count = 0;
+    if (first_op)
+        word_count += words_count_by_method(first);
+    if (second_op)
+        word_count += words_count_by_method(second);
+
+    if (first_op && second_op && first == M_REGISTER && second == M_REGISTER)
+    {
+        word_count--;
+    }
+    return word_count;
+}
+/**
+ * @brief 
+ * 
+ * @param word 
+ */
+void write_command_to_instructions(unsigned int word){
+    instructions[ic++] = word;
 }
 /**
  * @brief 
  * 
  * @param method_type 
- * @return boolean 
+ * @param first_op 
+ * @param second_op 
+ * @param first 
+ * @param second 
+ * @return unsigned int 
  */
-boolean all_source_method(int method_type){
-    return  method_type == M_IMMEDIATE || method_type == M_DIRECT ||
-        method_type == M_STRUCT || method_type == M_REGISTER;
-}
-/**
- * @brief 
- * 
- * @param method_type 
- * @return boolean 
- */
-boolean all_dest_method(int method_type){
-    return  method_type == M_IMMEDIATE || method_type == M_DIRECT ||
-        method_type == M_STRUCT || method_type == M_REGISTER;
-}
-/**
- * @brief 
- * 
- * @param method_type 
- * @return boolean 
- */
-boolean non_immediate_method(int method_type){
-    return method_type == M_DIRECT ||
-        method_type == M_STRUCT || method_type == M_REGISTER;
+unsigned int word_to_bits(int method_type, boolean first_op, boolean second_op, int first, int second){
+    unsigned int word_in_bits = method_type;
+  /*  printf("method_type: %d,first_op: %d,second_op: %d,first: %d,second: %d\n",method_type,first_op,second_op,first,second); */
+    
+    word_in_bits <<= BITS_IN_METHOD; /* add space for method*/
+
+    if (first_op && second_op){
+        word_in_bits |= first;
+        word_in_bits <<= BITS_IN_METHOD;
+        word_in_bits |= second;
+    }
+    else if (first_op){
+        word_in_bits |= first;
+    }
+    word_in_bits = insert_are(word_in_bits,ABSOLUTE);
+    return word_in_bits;
 }

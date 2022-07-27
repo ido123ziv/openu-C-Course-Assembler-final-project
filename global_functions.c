@@ -2,6 +2,8 @@
 Project by Eran Cohen and Ido Ziv
 */
 #include "assembler.h"
+#include <math.h>
+
 #include "global_functions.h"
 /*
 This script will include all the global function that will be require for more than 1 script
@@ -491,7 +493,7 @@ labelPtr get_label(labelPtr label, char *name)
     return NULL;
 }
 
-void print_data(unsigned int *data)
+void print_data(unsigned int *data, unsigned int *instructions)
 {
     int i;
     printf("$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$\nMe Printing Data ah?\n");
@@ -501,15 +503,22 @@ void print_data(unsigned int *data)
         printf(":%u::-", data[i]);
     }
     printf("\n$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$\n");
+    printf("$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$\nMe Printing Instructions ah?\n");
+    printf("ic %d\n", ic);
+    for (i = 0; i < (sizeof(instructions)); i++)
+    {
+        printf(":%u::-", instructions[i]);
+    }
+    printf("\n$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$\n");
 }
-
-/*unsigned int get_bits(unsigned int word, int start, int end){
+/*
+unsigned int get_bits(unsigned int word, int start, int end){
     
     unsigned int temp;
     int len = end - start + 1; 
     unsigned int mask = (int) pow(2, len) - 1; /* create a mask of '11....11' by len  */
 
-   /* mask = mask << start;
+   /*mask = mask << start;
     temp = word & mask;
     temp = temp >> start;
 
@@ -571,4 +580,15 @@ char * next_string_word(char *word, char * line){
     *tmp = '\0';
 
     return line;
+}
+/**
+ * @brief 
+ * 
+ * @param info 
+ * @param are 
+ * @return unsigned int 
+ */
+unsigned int insert_are(unsigned int info, int are)
+{
+    return (info << BITS_IN_ARE) | are;
 }

@@ -27,6 +27,7 @@ order to provide central place for all of the constants and functions declaratio
    ****************************************************
 */
 typedef enum boolean {FALSE,TRUE}boolean;
+enum ARE {ABSOLUTE, RELOCATABLE ,EXTERNAL};
 enum filetypes {FILE_INPUT, FILE_MACRO, FILE_OBJECT,FILE_ENTRY,FILE_EXTERN };
 enum directives {DATA, STRING, STRUCT, ENTRY, EXTERN,UNKNOWN_TYPE};
 enum commands {MOV, CMP, ADD, SUB, NOT, CLR, LEA, INC, DEC, JMP, BNE, GET, PRN, JSR, RTS, HLT, UNKNOWN_COMMAND};
@@ -63,6 +64,14 @@ extern int ic, dc;
 #define CMD_LEN 16
 #define DIR_LEN 5
 #define MACHINE_RAM 2000
+
+#define BITS_IN_WORD 10
+#define BITS_IN_OPCODE 4
+#define BITS_IN_METHOD 2
+#define BITS_IN_ARE 2
+#define BITS_IN_REGISTER 4
+#define BITS_IN_ADDRESS 8
+
 /* ****************************************************
     ****************************************************
     ****************************************************
