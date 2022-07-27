@@ -6,10 +6,10 @@ Project by Eran Cohen and Ido Ziv
 #include "phases.h"
 
 /**
- * @brief
+ * @brief this methods handles the algorithm of phase one -> encoding to memory the program
  *
- * @param fp
- * @param file_name
+ * @param fp local file path
+ * @param file_name name of the file to open
  */
 void phase_one(FILE *fp, char *file_name)
 {
@@ -33,11 +33,11 @@ void phase_one(FILE *fp, char *file_name)
     printf("Didn't find errors yet! \n");
 }
 /**
- * @brief
+ * @brief this function reads line by line from the file
  *
- * @param line
- * @param line_count
- * @return int
+ * @param line current line (text)
+ * @param line_count current line (index)
+ * @return int - error code if exists
  */
 int read_line_am(char *line, int line_count)
 {
@@ -48,7 +48,6 @@ int read_line_am(char *line, int line_count)
     int label_count, is_error;
     printf("######################################################\n");
     printf("current line is: %s\n", line);
-    /* printf("######################################################\n"); */
     line = skip_spaces(line);
     if (end_of_line(line))
         return 0;
@@ -126,11 +125,11 @@ int read_line_am(char *line, int line_count)
     return 0;
 }
 /**
- * @brief
+ * @brief this function searches the input for a label from the format - label:
  *
- * @param line
- * @param COLON
- * @return int
+ * @param line current line (text)
+ * @param COLON if the line contains a semicolon ':'
+ * @return int 1 if a label is found, 0 if not or error code
  */
 int check_for_label(char *line, boolean COLON)
 {
@@ -194,13 +193,12 @@ int check_for_label(char *line, boolean COLON)
     return 1;
 }
 /**
- * @brief
+ * @brief adds the new label to memort
  *
- * @param table
- * @param name
- * @param address
- * @param line_count
- * @return labelPtr
+ * @param table label table point
+ * @param name name of the new label
+ * @param address address to assign the new label in the memory
+ * @return labelPtr a new label
  */
 labelPtr add_label(labelPtr *table, char *name, unsigned int address)
 {
@@ -233,11 +231,11 @@ labelPtr add_label(labelPtr *table, char *name, unsigned int address)
     return temp;
 }
 /**
- * @brief
+ * @brief checks if a label is already in memory
  *
- * @param label
- * @param name
- * @return boolean
+ * @param label label struct to check
+ * @param name label name 
+ * @return boolean whether or not the label exists
  */
 boolean existing_label(labelPtr label, char *name)
 {
@@ -250,11 +248,11 @@ boolean existing_label(labelPtr label, char *name)
     return FALSE;
 }
 /**
- * @brief
+ * @brief this method calls the right method to handle directives
  *
- * @param dir_type
- * @param line
- * @return int
+ * @param dir_type directive index in enum
+ * @param line current line (text)
+ * @return int (error code or 0 for success)
  */
 int handle_directive(int dir_type, char *line)
 {
@@ -293,10 +291,10 @@ int handle_directive(int dir_type, char *line)
     return 0;
 }
 /**
- * @brief
+ * @brief this method checks if a data directive is valid and adds to memory
  *
- * @param line
- * @return int
+ * @param line current line (text)
+ * @return int (error code or 0 for success)
  */
 int handle_data_directive(char *line)
 {
@@ -346,10 +344,10 @@ int handle_data_directive(char *line)
     return 0;
 }
 /**
- * @brief
+ * @brief this method checks if a string directive is valid and adds to memory
  *
- * @param line
- * @return int
+ * @param line current line (text)
+ * @return int (error code or 0 for success)
  */
 int handle_string_directive(char *line)
 {
@@ -383,10 +381,10 @@ int handle_string_directive(char *line)
     return 0;
 }
 /**
- * @brief
+ * @brief this method checks if a struct directive is valid and adds to memory
  *
- * @param line
- * @return int
+ * @param line current line (text)
+ * @return int (error code or 0 for success)
  */
 int handle_struct_directive(char *line)
 {
@@ -430,10 +428,10 @@ int handle_struct_directive(char *line)
     return 0;
 }
 /**
- * @brief
+ * @brief this method checks if a extern directive is valid and adds to memory
  *
- * @param line
- * @return int
+ * @param line current line (text)
+ * @return int (error code or 0 for success)
  */
 int handle_extern_directive(char *line)
 {
@@ -454,9 +452,9 @@ int handle_extern_directive(char *line)
     return 0;
 }
 /**
- * @brief
+ * @brief this methods writes text memory
  *
- * @param line
+ * @param line current line (text)
  */
 void write_string_to_data(char *line)
 {
@@ -469,11 +467,11 @@ void write_string_to_data(char *line)
     data[dc++] = '\0';
 }
 /**
- * @brief
+ * @brief this method calls the right method to handle command
  *
- * @param type
- * @param line
- * @return int
+ * @param type command type from enum 
+ * @param line current line (text)
+ * @return int (error code or 0 for success)
  */
 int handle_command(int type, char *line)
 {
@@ -540,10 +538,10 @@ int handle_command(int type, char *line)
     return 0;
 }
 /**
- * @brief
+ * @brief this method checks with type (register, immediate, direct, struct)
  *
- * @param op
- * @return int
+ * @param op operator to check on
+ * @return int (index in methods enum)
  */
 int method_type(char *op)
 {
@@ -583,11 +581,11 @@ int method_type(char *op)
     return COMMAND_INVALID_METHOD;
 }
 /**
- * @brief
+ * @brief this command validates that the command mathces the number of operators
  *
- * @param command_type
- * @param first_op
- * @param second_op
+ * @param command_type  command type from enum 
+ * @param first_op first operator in command
+ * @param second_op second operator in command
  * @return boolean
  */
 boolean num_operation_fits_command(int command_type, boolean first_op, boolean second_op)
@@ -630,11 +628,11 @@ boolean num_operation_fits_command(int command_type, boolean first_op, boolean s
     return FALSE;
 }
 /**
- * @brief
+ * @brief this function validates that the command matches the method type
  *
- * @param commant_type
- * @param first
- * @param second
+ * @param commant_type  command type from enum 
+ * @param first first operator type
+ * @param second second operator type
  * @return boolean
  */
 boolean method_fits_command(int command_type, int first, int second)
@@ -677,9 +675,9 @@ boolean method_fits_command(int command_type, int first, int second)
     return FALSE;
 }
 /**
- * @brief
+ * @brief this functions checks that the method type will match all avaliable types for source
  *
- * @param method_type
+ * @param method_type  command type from enum 
  * @return boolean
  */
 boolean all_source_method(int method_type)
@@ -688,9 +686,9 @@ boolean all_source_method(int method_type)
            method_type == M_STRUCT || method_type == M_REGISTER;
 }
 /**
- * @brief
+ * @brief this functions checks that the method type will match all avaliable types for destination
  *
- * @param method_type
+ * @param method_type  command type from enum 
  * @return boolean
  */
 boolean all_dest_method(int method_type)
@@ -699,9 +697,9 @@ boolean all_dest_method(int method_type)
            method_type == M_STRUCT || method_type == M_REGISTER;
 }
 /**
- * @brief
+ * @brief this functions checks that the method type will non immediate type for destination
  *
- * @param method_type
+ * @param method_type  command type from enum 
  * @return boolean
  */
 boolean non_immediate_method(int method_type)
@@ -710,9 +708,9 @@ boolean non_immediate_method(int method_type)
            method_type == M_STRUCT || method_type == M_REGISTER;
 }
 /**
- * @brief
- *
- * @param method_type
+ * @brief this function checks if a method is struct and returns the word count accordingly
+ * 2 for struct 1 for other
+ * @param method_type  command type from enum 
  * @return int
  */
 int words_count_by_method(int method_type)
@@ -722,12 +720,12 @@ int words_count_by_method(int method_type)
     return 1;
 }
 /**
- * @brief 
+ * @brief this command calculates the word count to insert to memory according to operators and types
  * 
- * @param first_op 
- * @param second_op 
- * @param first 
- * @param second 
+ * @param first_op if first operator exists
+ * @param second_op if second operator exists
+ * @param first first method type from enum
+ * @param second second method type from enum
  * @return int 
  */
 int word_count_by_command(boolean first_op, boolean second_op, int first, int second)
@@ -745,21 +743,21 @@ int word_count_by_command(boolean first_op, boolean second_op, int first, int se
     return word_count;
 }
 /**
- * @brief 
+ * @brief this command writes the command to memory
  * 
- * @param word 
+ * @param word word to write
  */
 void write_command_to_instructions(unsigned int word){
     instructions[ic++] = word;
 }
 /**
- * @brief 
+ * @brief this function creates an unsigned int from command to insert to memory
  * 
- * @param method_type 
- * @param first_op 
- * @param second_op 
- * @param first 
- * @param second 
+ * @param method_type  command type from enum 
+ * @param first_op if first operator exists
+ * @param second_op if second operator exists
+ * @param first first method type from enum
+ * @param second second method type from enum
  * @return unsigned int 
  */
 unsigned int word_to_bits(int method_type, boolean first_op, boolean second_op, int first, int second){
