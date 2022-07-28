@@ -2,6 +2,7 @@
 
 #define FUNCS_H
 #include "assembler.h"
+
 /*************** DECLARETIONS  ****************/
 int skip_whitespaces_at_begining(char c[], int start);
 int skip_whitespaces_at_end(char c[], int end);
@@ -23,7 +24,7 @@ int find_command(char *line);
 int find_directive(char *line);
 unsigned int get_label_address(labelPtr h, char *name);
 labelPtr get_label(labelPtr label, char *name);
-void print_data(unsigned int *data);
+void print_data(unsigned int *data,unsigned int *instructions);
 unsigned int get_bits(unsigned int word, int start, int end);
 char * next_comma_word(char *word, char * line);
 char * next_string_word(char *word, char * line);

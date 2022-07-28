@@ -27,9 +27,10 @@ order to provide central place for all of the constants and functions declaratio
    ****************************************************
 */
 typedef enum boolean {FALSE,TRUE}boolean;
+enum ARE {ABSOLUTE, RELOCATABLE ,EXTERNAL};
 enum filetypes {FILE_INPUT, FILE_MACRO, FILE_OBJECT,FILE_ENTRY,FILE_EXTERN };
 enum directives {DATA, STRING, STRUCT, ENTRY, EXTERN,UNKNOWN_TYPE};
-enum commands {MOV, CMP, ADD, SUB, NOT, CLR, LEA, INC, DEC, JMP, BNE, RED, PRN, JSR, RTS, STOP, UNKNOWN_COMMAND};
+enum commands {MOV, CMP, ADD, SUB, NOT, CLR, LEA, INC, DEC, JMP, BNE, GET, PRN, JSR, RTS, HLT, UNKNOWN_COMMAND};
 enum methods {M_IMMEDIATE, M_DIRECT, M_STRUCT, M_REGISTER, M_UNKNOWN};
 enum errors {SYNTAX_ERR ,LABEL_ALREADY_EXISTS ,LABEL_TOO_LONG ,
     LABEL_INVALID_FIRST_CHAR ,LABEL_ONLY_ALPHANUMERIC ,LABEL_CANT_BE_COMMAND ,
@@ -42,7 +43,6 @@ enum errors {SYNTAX_ERR ,LABEL_ALREADY_EXISTS ,LABEL_TOO_LONG ,
     COMMAND_NOT_FOUND ,COMMAND_UNEXPECTED_CHAR ,COMMAND_TOO_MANY_OPERANDS ,COMMAND_INVALID_METHOD ,
     COMMAND_INVALID_NUMBER_OF_OPERANDS ,COMMAND_INVALID_OPERANDS_METHODS ,ENTRY_LABEL_DOES_NOT_EXIST ,
     ENTRY_CANT_BE_EXTERN ,COMMAND_LABEL_DOES_NOT_EXIST ,CANNOT_OPEN_FILE ,NOT_ENOUGH_ARGUMENTS };
-enum ARE {ABSOLUTE, EXTERNAL, RELOCATABLE};
 /* ****************************************************
     ****************************************************
     ****************************************************
@@ -57,6 +57,13 @@ extern const char *directives[];
 extern int error_code;
 extern boolean error_exists, has_entry, has_extern;
 extern int ic, dc;
+
+#define BITS_IN_WORD 10
+#define BITS_IN_OPCODE 4
+#define BITS_IN_METHOD 2
+#define BITS_IN_ARE 2
+#define BITS_IN_REGISTER 4
+#define BITS_IN_ADDRESS 8
 
 /* ****************************************************
     ****************************************************

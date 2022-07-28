@@ -2,6 +2,8 @@
 Project by Eran Cohen and Ido Ziv
 */
 #include "assembler.h"
+#include <math.h>
+
 #include "global_functions.h"
 /*
 This script will include all the global function that will be require for more than 1 script
@@ -244,7 +246,12 @@ int end_of_line(char *line)
 {
     return line == NULL || *line == '\0' || *line == '\n';
 }
-
+/**
+ * @brief this method prints the error code to stdout
+ * 
+ * @param error_code error code from enum
+ * @param current_line line number of errer
+ */
 void write_error_code(int error_code, int current_line)
 {
     if (current_line != -1)
@@ -425,10 +432,10 @@ void write_error_code(int error_code, int current_line)
     }
 }
 /**
- * @brief
+ * @brief this function searches the commands array to find the input command
  *
- * @param line
- * @return int
+ * @param line current line (text)
+ * @return int  command from enum 
  */
 int find_command(char *word)
 {
@@ -442,10 +449,10 @@ int find_command(char *word)
     return NOT_FOUND;
 }
 /**
- * @brief
+ * @brief this function searches the directives array to find the input directive
  *
- * @param line
- * @return int
+ * @param line current line (text)
+ * @return int index of directive in enum
  */
 int find_directive(char *line)
 {
@@ -462,8 +469,8 @@ int find_directive(char *line)
 /**
  * @brief Get the label address object
  *
- * @param h
- * @param name
+ * @param h label to search
+ * @param name name of label
  * @return unsigned int
  */
 unsigned int get_label_address(labelPtr h, char *name)
@@ -476,8 +483,8 @@ unsigned int get_label_address(labelPtr h, char *name)
 /**
  * @brief Get the label object
  *
- * @param label
- * @param name
+ * @param label label to search
+ * @param name name of label
  * @return labelPtr
  */
 labelPtr get_label(labelPtr label, char *name)
@@ -490,8 +497,13 @@ labelPtr get_label(labelPtr label, char *name)
     }
     return NULL;
 }
-
-void print_data(unsigned int *data)
+/**
+ * @brief prints the data and instruction array
+ * 
+ * @param data array in memory
+ * @param instructions array in memory
+ */
+void print_data(unsigned int *data, unsigned int *instructions)
 {
     int i;
     printf("$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$\nMe Printing Data ah?\n");
@@ -501,26 +513,33 @@ void print_data(unsigned int *data)
         printf(":%u::-", data[i]);
     }
     printf("\n$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$\n");
+    printf("$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$\nMe Printing Instructions ah?\n");
+    printf("ic %d\n", ic);
+    for (i = 0; i < (sizeof(instructions)); i++)
+    {
+        printf(":%u::-", instructions[i]);
+    }
+    printf("\n$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$\n");
 }
 
-/*unsigned int get_bits(unsigned int word, int start, int end){
+unsigned int get_bits(unsigned int word, int start, int end){
     
     unsigned int temp;
     int len = end - start + 1; 
     unsigned int mask = (int) pow(2, len) - 1; /* create a mask of '11....11' by len  */
 
-   /* mask = mask << start;
+   mask = mask << start;
     temp = word & mask;
     temp = temp >> start;
 
     return temp;
     
-}*/
+}
 /**
- * @brief 
+ * @brief this function returns the string after the nearest comma and copies the string into word
  * 
- * @param word 
- * @param line 
+ * @param word the string to copy to
+ * @param line current line (text)
  * @return char* 
  */
 char * next_comma_word(char *word, char * line){
@@ -548,6 +567,13 @@ char * next_comma_word(char *word, char * line){
 
     return line;
 }
+/**
+ * @brief this function returns the string after the nearest " and copies the string into word
+ * 
+ * @param word the string to copy to
+ * @param line current line (text)
+ * @return char* 
+ */
 char * next_string_word(char *word, char * line){
     char *tmp = word;
     line = next_comma_word(word,line);
