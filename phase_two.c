@@ -37,7 +37,10 @@ void phase_two(FILE *file, char *file_name)
         line_count++;
     }
     if (!error_exists)
-        write_output_files(file_name);
+        write_files(file_name);
+
+    free_labels(&symbols_table);
+    free_ext(&ext_list);
 }
 
 int read_line_ph2(char *line, int line_num)
@@ -223,40 +226,33 @@ void encode_label(char *label)
 }
 
 /* *********** Write to files functions *************** */
-void write_extern(FILE *file)
-{
-    char *address;
-    extPtr node = ext_list;
-
-    /* TODO: complete later this and write_entry */
-}
 
 /* Function will write the output files that need to be create: .ob, (.ent, .ext if needed)*/
-void write_output_files(char *src)
+void write_files(char *src)
 {
     /* TODO: finish write_output functions */
     FILE *file;
 
     file = create_file(src, FILE_OBJECT);
-    write_output_ob(file);
+    write_ob(file);
 
     if (has_entry)
     {
         file = create_file(src, FILE_ENTRY);
-        write_output_entry(file);
+        write_entry(file);
     }
 
     if (has_extern)
     {
         file = create_file(src, FILE_EXTERN);
-        write_output_extern(file);
+        write_extern(file);
     }
 }
 
 /* Write output for the .ob file 
  * On first line is the size of instructions and data memory
  * Other lines: left size is address, right side is the word in memory */
-void write_output_ob(FILE *file)
+void write_ob(FILE *file)
 {
     unsigned int address = MEM_START;
     char *param1 = to_base_32(ic), *param2 = to_base_32(dc);
@@ -294,7 +290,7 @@ void write_output_ob(FILE *file)
 /* Writes the output of the .ent file.
  * Left side: name of label.
  * Right side: address of definition. */
-void write_output_entry(FILE *file)
+void write_entry(FILE *file)
 {
     char *base32_address;
 
@@ -314,21 +310,21 @@ void write_output_entry(FILE *file)
 }
 
 /* Writes the output of the .ext file.
- * First column: label name.
- * Second column: address where the external label should be replaced.
+ * Left side: name of label.
+ * Right side: address where the external label should be replaced.
  */
-void write_output_extern(FILE *fp)
+void write_extern(FILE *file)
 {
-    char *base32_address;
+    char * base32_address;
     extPtr node = ext_list;
 
-    /* Going through external circular linked list and pulling out values */
+    /* Go through external linked list and pulling values */
     do
     {
-        base32_address = convert_to_base_32(node -> address);
-        fprintf(fp, "%s\t%s\n", node -> name, base32_address); /* Printing to file */
+        base32_address = to_base_32(node -> address);
+        fprintf(file, "%s\t%s\n", node -> name, base32_address); /* Printing to file */
         free(base32_address);
         node = node -> next;
     } while(node != ext_list);
-    fclose(fp);
+    fclose(file);
 }
