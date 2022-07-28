@@ -36,6 +36,6 @@ void isMacro(char *word, char *line);
 void addMacro(macroPtr * macroTable, char * macroName);
 void addLine (char * line, char * word);
 macroPtr checkMacro(macroPtr macroTable ,char * word);
-void freelist(macroPtr * macroTable);
+void free_macros(macroPtr * macroTable);
 
 #endif

@@ -6,7 +6,6 @@ Project by Eran Cohen and Ido Ziv
 #include "global_functions.h"
 #include "phases.h"
 
-FILE *obFile, *entFile, *extFile;
 int line_count;
 extPtr ext_list;
 
@@ -26,7 +25,7 @@ void phase_two(FILE *file, char *file_name)
     {
         error_code = 0;
         if (!ignore(line))
-            error_code = read_line_ph2(line, line_count);
+            read_line_ph2(line, line_count);
         if (error_code)
         {
             write_error_code(error_code, line_count);
@@ -203,7 +202,7 @@ void encode_label(char *label)
     { /* Check if label existes, if it is get address of label */
         word = get_label_address(symbols_table, label);
 
-        if (is_external_label(symbols_table, label))
+        if (is_label_external(symbols_table, label))
         {
             add_ext(&ext_list, label, ic + MEM_START);
             word = add_are(word, EXTERNAL);
@@ -218,11 +217,6 @@ void encode_label(char *label)
         ic++;
         error_code = COMMAND_LABEL_DOES_NOT_EXIST;
     }
-    /* TODO: finish all sub functions!!
-     * is_external...
-     * add_ext
-     * get_label...
-     * is_label_exist */
 }
 
 /* *********** Write to files functions *************** */
@@ -233,18 +227,18 @@ void write_files(char *src)
     /* TODO: finish write_output functions */
     FILE *file;
 
-    file = create_file(src, FILE_OBJECT);
+    file = new_file(src, FILE_OBJECT);
     write_ob(file);
 
     if (has_entry)
     {
-        file = create_file(src, FILE_ENTRY);
+        file = new_file(src, FILE_ENTRY);
         write_entry(file);
     }
 
     if (has_extern)
     {
-        file = create_file(src, FILE_EXTERN);
+        file = new_file(src, FILE_EXTERN);
         write_extern(file);
     }
 }
@@ -327,4 +321,21 @@ void write_extern(FILE *file)
         node = node -> next;
     } while(node != ext_list);
     fclose(file);
+}
+
+/* Function create a file with write permissions, get the original name and add the relevant externsion (.ob, .ent etc.)*/
+FILE *new_file(char *filename, int type)
+{
+    FILE *file;
+    filename = create_file(filename, type); /* Creating filename with extension */
+
+    file = fopen(filename, "w"); /* Opening file with permissions */
+    free(filename); /* Allocated modified filename is no longer needed */
+
+    if(file == NULL)
+    {
+        error_code = CANNOT_OPEN_FILE;
+        return NULL;
+    }
+    return file;
 }

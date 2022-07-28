@@ -23,6 +23,7 @@ void write_ob(FILE *file);
 void write_files(char *src);
 void write_entry(FILE *file);
 void write_extern(FILE *file);
+FILE *new_file(char *filename, int type);
 
 /* ************** PHASE ONE ************** */
 int read_line_am(char *line, int line_count);

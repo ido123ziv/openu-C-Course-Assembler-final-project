@@ -632,3 +632,69 @@ char *to_base_32(unsigned int num)
 
     return base32_seq;
 }
+
+/* Free the memory we allocated for the labels list */
+void free_labels(labelPtr *labelTable)
+{
+
+    labelPtr p;
+    while (*labelTable)
+    {
+        p = *labelTable;
+        *labelTable = (*labelTable)->next;
+        free(p);
+    }
+}
+
+/* Free the memory we allocated for the extern list */
+void free_ext(extPtr *extTable)
+{
+    unsigned int last_ref;
+    unsigned int ref = 0;
+    extPtr p = *extTable;
+    if(p){ /* Free extern list by free each node */
+        last_ref = ((*extTable)->prev)->address;
+        do{
+            p = *extTable;
+            ref = p->address;
+            *extTable = (*extTable)->next;
+            free(p);
+        } while (ref != last_ref);
+    }
+}
+
+
+/******************** labels table methods **************/
+/* Function will return the address of a given label and FALSE if not exist */
+unsigned int get_label_address(labelPtr p, char *name)
+{
+    labelPtr label = get_label(p, name);
+    if(label != NULL) return label -> address;
+    return FALSE;
+}
+
+/* Function checks if a given label name is in the list */
+labelPtr get_label(labelPtr p, char *name)
+{
+	while(p)
+	{
+        if(strcmp(p->name,name)==0) /* we found a label with the name given */
+			return p;
+		p=p->next;
+	}
+	return NULL;
+}
+
+/* Check if a given name is a name of a label on list */
+boolean is_label_exist(labelPtr p, char *name)
+{
+    return get_label(p, name) != NULL;
+}
+
+/* Function check if label on the array and also check if this label is external */
+boolean is_label_external(labelPtr p, char *name)
+{
+    labelPtr label = get_label(p, name);
+    if(label != NULL) return label -> external;
+    return FALSE;
+}

@@ -36,7 +36,7 @@ void pre_assembler(FILE *file, char *file_name)
         line_count++;
     }
 
-    freelist(&macro_node);
+    free_macros(&macro_node);
     fclose(macroFile);
 }
 
@@ -211,7 +211,7 @@ macroPtr checkMacro(macroPtr macroTable, char *word)
 }
 
 /* Free the memory we allocated for the macro list */
-void freelist(macroPtr *macroTable)
+void free_macros(macroPtr *macroTable)
 {
 
     macroPtr p;
