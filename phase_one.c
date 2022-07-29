@@ -28,7 +28,6 @@ void phase_one(FILE *fp, char *file_name)
             write_error_code(error_code, line_count);
             error_exists = TRUE;
         }
-        /* TODO: add WAS_ERROR */
         line_count++;
     }
     if (!error_exists)
@@ -38,6 +37,9 @@ void phase_one(FILE *fp, char *file_name)
         printf("Fount Errors!\nExiting!\n");
         exit(1);
     }
+    /* writing to data the addresses*/
+    assign_addresses(symbols_table,100,FALSE);
+    assign_addresses(symbols_table,ic+100,TRUE);
 }
 /**
  * @brief this function reads line by line from the file
@@ -105,6 +107,7 @@ int read_line_am(char *line, int line_count)
             if (dir_type == EXTERN || dir_type == ENTRY)
             {
                 /*TODO: Remove from table*/
+                delete_label(&symbols_table,new_label->name);
                 label_count = 0;
             }
             else
@@ -122,6 +125,7 @@ int read_line_am(char *line, int line_count)
         if (label_count)
         {
             new_label->address = ic;
+            new_label->action = TRUE;
             /* TODO: edit label struct*/
         }
         printf("command is: %s\n", commands[command_type]);
@@ -221,6 +225,9 @@ labelPtr add_label(labelPtr *table, char *name, unsigned int address)
 
     strcpy(temp->name, name);
     temp->address = address;
+    temp->action = FALSE;
+    temp->entry = FALSE;
+    temp->external = FALSE;
     temp->next = NULL;
     if (!(*table))
     {
@@ -254,6 +261,56 @@ boolean existing_label(labelPtr label, char *name)
     }
     return FALSE;
 }
+
+/**
+ * @brief 
+ * 
+ * @param table 
+ * @param name 
+ * @return boolean 
+ */
+boolean delete_label(labelPtr *table, char *name){
+    labelPtr temp, table_pointer = *table;
+    while (table_pointer)
+    {
+        if(strcmp(table_pointer->name,name) ==0){ /* found it */
+            if (strcmp(temp->name, (*table)->name) == 0){ /* first index is the deleted one */
+                *table=(*table)->next;
+                free(table_pointer);
+            }
+            else {
+                temp->next = table_pointer-> next;
+                free(table_pointer);
+            }
+            return TRUE;
+        }
+        temp = table_pointer;
+        table_pointer = table_pointer->next;
+    }
+    return FALSE;
+    
+}
+/**
+ * @brief add label addresses to memory
+ * 
+ * @param label 
+ * @param address 
+ * @param is_data_label 
+ */
+void assign_addresses(labelPtr label, int address, boolean is_data_label){
+    boolean is_external = FALSE, is_action = FALSE;
+    while (label)
+    {
+        is_external = label->external;
+        is_action = label->action;
+        if (!is_external && (is_data_label ^ is_action)){
+            label->address += address;
+        }
+        label = label->next;
+    }
+    
+}
+
 /**
  * @brief this method calls the right method to handle directives
  *

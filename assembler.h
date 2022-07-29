@@ -103,6 +103,7 @@ typedef struct  structLabels {
     unsigned int address;
     boolean entry; /* store if label is entry */
     boolean external; /* store if label is extern */
+    boolean action; /* store if label is part of an action */
 	labelPtr next; /* Pointer to the next label on list */
 } Labels;
 
