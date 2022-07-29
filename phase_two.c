@@ -10,7 +10,7 @@ FILE *obFile, *entFile, *extFile;
 int line_count;
 extPtr ext_list;
 /**
- * @brief this methods handles the algorithm of phase one -> encoding to memory the program
+ * @brief this methods handles the algorithm of phase two -> complete the translation 
  * 
  * @param file local file path
  * @param file_name name of the file to open
