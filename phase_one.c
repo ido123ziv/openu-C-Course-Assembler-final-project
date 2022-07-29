@@ -81,7 +81,7 @@ int read_line_am(char *line, int line_count)
         else
         {
             new_label = add_label(&symbols_table, current_word, 0);
-            print_label(new_label);
+         /*   print_label(new_label); */
             if (!new_label)
                 return LABEL_ALREADY_EXISTS;
             line = next_word(line);
@@ -310,6 +310,7 @@ void print_label(labelPtr h)
         printf(", is in action statement: %d -> ", h->action);
     else
         printf(" -> ");
+    printf("\n");
 }
 
 /**
@@ -479,25 +480,26 @@ int handle_struct_directive(char *line)
 
     char copy[LINE_LEN], c = copy;
     printf("my line is: %s\n", line);
-    copy_word(copy, line);
+    line = next_comma_word(copy, line);
+    printf("line: %s\nmy copy is: %s\nend_of_line: %d\nis_number: %d\n",line, copy,end_of_line(copy),is_number(copy));
 
     if (end_of_line(copy) || !is_number(copy))
         return STRUCT_INVALID_NUM;
     data[dc++] = (unsigned int)atoi(copy);
     line = next_comma_word(copy, line);
     printf("after line:%s \t copy: %s\n", line, copy);
-    line = next_comma_word(copy, line);
-    printf("2x next_comma_word: %s \t copy: %s\n", line, copy);
+  /*  line = next_comma_word(copy, line); 
+    printf("2x next_comma_word: %s \t copy: %s\n", line, copy); 
     /* copy_word(copy, line); */
     if (!end_of_line(line) && *copy == ',')
     {
         line = next_comma_word(copy, line); /* copy equvals string with "" */
-        printf("and now copy is: %s\n", copy);
+        /*printf("and now copy is: %s\n", copy);*/
         if (end_of_line(copy))
             return STRUCT_EXPECTED_STRING;
         else
         {
-            printf("copy: %c, strlen: %c\n", copy[0], copy[strlen(copy) - 1]);
+         /*   printf("copy: %c, strlen: %c\n", copy[0], copy[strlen(copy) - 1]); */
             if (copy[0] != '"' && copy[strlen(copy) - 1] != '"')
                 return STRUCT_INVALID_STRING;
             /*  copy_word(copy, line); */
