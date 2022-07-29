@@ -24,7 +24,8 @@ void phase_one(FILE *fp, char *file_name)
         error_code = 0;
         if (!ignore(current_line))
             error_code = read_line_am(current_line, line_count);
-        if (error_code){
+        if (error_code)
+        {
             write_error_code(error_code, line_count);
             error_exists = TRUE;
         }
@@ -38,8 +39,8 @@ void phase_one(FILE *fp, char *file_name)
         exit(1);
     }
     /* writing to data the addresses*/
-    assign_addresses(symbols_table,100,FALSE);
-    assign_addresses(symbols_table,ic+100,TRUE);
+    assign_addresses(symbols_table, 100, FALSE);
+    assign_addresses(symbols_table, ic + 100, TRUE);
 }
 /**
  * @brief this function reads line by line from the file
@@ -59,14 +60,15 @@ int read_line_am(char *line, int line_count)
     printf("current line is: %s\n", line);
     line = skip_spaces(line);
     if (end_of_line(line))
+    {
         return 0;
-
+    }
     if (!isalpha(*line) && *line != '.')
+    {
         /* first non-blank character must be a letter or a dot */
-        return 1;
-
+        return SYNTAX_ERR;
+    }
     line_copy = line;
-
     copy_word(current_word, line);
     label_count = check_for_label(current_word, TRUE);
     if (label_count)
@@ -79,6 +81,7 @@ int read_line_am(char *line, int line_count)
         else
         {
             new_label = add_label(&symbols_table, current_word, 0);
+            print_label(new_label);
             if (!new_label)
                 return LABEL_ALREADY_EXISTS;
             line = next_word(line);
@@ -107,7 +110,7 @@ int read_line_am(char *line, int line_count)
             if (dir_type == EXTERN || dir_type == ENTRY)
             {
                 /*TODO: Remove from table*/
-                delete_label(&symbols_table,new_label->name);
+                delete_label(&symbols_table, new_label->name);
                 label_count = 0;
             }
             else
@@ -130,7 +133,9 @@ int read_line_am(char *line, int line_count)
         }
         printf("command is: %s\n", commands[command_type]);
         line = next_word(line);
-        handle_command(command_type, line);
+        is_error = handle_command(command_type, line);
+        if (is_error)
+            return is_error;
     }
 
     return 0;
@@ -248,7 +253,7 @@ labelPtr add_label(labelPtr *table, char *name, unsigned int address)
  * @brief checks if a label is already in memory
  *
  * @param label label struct to check
- * @param name label name 
+ * @param name label name
  * @return boolean whether or not the label exists
  */
 boolean existing_label(labelPtr label, char *name)
@@ -263,23 +268,27 @@ boolean existing_label(labelPtr label, char *name)
 }
 
 /**
- * @brief 
- * 
- * @param table 
- * @param name 
- * @return boolean 
+ * @brief
+ *
+ * @param table
+ * @param name
+ * @return boolean
  */
-boolean delete_label(labelPtr *table, char *name){
+boolean delete_label(labelPtr *table, char *name)
+{
     labelPtr temp, table_pointer = *table;
     while (table_pointer)
     {
-        if(strcmp(table_pointer->name,name) ==0){ /* found it */
-            if (strcmp(temp->name, (*table)->name) == 0){ /* first index is the deleted one */
-                *table=(*table)->next;
+        if (strcmp(table_pointer->name, name) == 0)
+        { /* found it */
+            if (strcmp(temp->name, (*table)->name) == 0)
+            { /* first index is the deleted one */
+                *table = (*table)->next;
                 free(table_pointer);
             }
-            else {
-                temp->next = table_pointer-> next;
+            else
+            {
+                temp->next = table_pointer->next;
                 free(table_pointer);
             }
             return TRUE;
@@ -288,27 +297,41 @@ boolean delete_label(labelPtr *table, char *name){
         table_pointer = table_pointer->next;
     }
     return FALSE;
-    
 }
 /**
- * @brief add label addresses to memory
- * 
- * @param label 
- * @param address 
- * @param is_data_label 
+ * @brief
+ *
+ * @param h
  */
-void assign_addresses(labelPtr label, int address, boolean is_data_label){
+void print_label(labelPtr h)
+{
+    printf("\nname: %s, address: %d, external: %d", h->name, h->address, h->external);
+    if (h->external == 0)
+        printf(", is in action statement: %d -> ", h->action);
+    else
+        printf(" -> ");
+}
+
+/**
+ * @brief add label addresses to memory
+ *
+ * @param label
+ * @param address
+ * @param is_data_label
+ */
+void assign_addresses(labelPtr label, int address, boolean is_data_label)
+{
     boolean is_external = FALSE, is_action = FALSE;
     while (label)
     {
         is_external = label->external;
         is_action = label->action;
-        if (!is_external && (is_data_label ^ is_action)){
+        if (!is_external && (is_data_label ^ is_action))
+        {
             label->address += address;
         }
         label = label->next;
     }
-    
 }
 
 /**
@@ -513,6 +536,7 @@ int handle_extern_directive(char *line)
     new_label = add_label(&symbols_table, copy, 0);
     if (!new_label)
         return 1;
+    new_label->external = TRUE;
     return 0;
 }
 /**
@@ -533,7 +557,7 @@ void write_string_to_data(char *line)
 /**
  * @brief this method calls the right method to handle command
  *
- * @param type command type from enum 
+ * @param type command type from enum
  * @param line current line (text)
  * @return int (error code or 0 for success)
  */
@@ -545,7 +569,10 @@ int handle_command(int type, char *line)
     char op1[20], op2[20];
     printf("handle command\t %s\n", line);
     line = next_comma_word(op1, line);
-    /* printf("next command\t %s\n", op1);*/
+    printf("next op:\t %s\n", op1);
+    printf("next_comma_word\t %s\n", line);
+    /*    if (end_of_line(op1)) /* || (line == "") || (*line == '\0')) */
+    /*  printf("TRUE\n"); */
     if (!end_of_line(op1))
     {
         first_op = TRUE;
@@ -572,33 +599,34 @@ int handle_command(int type, char *line)
     /* printf("handle spaces\t %s\n", line);*/
     if (!end_of_line(line)) /* command a1, a2  a3 is not valid */
         return COMMAND_TOO_MANY_OPERANDS;
-  /*  printf("%d-%d\n", first_op, second_op); */
+    /*  printf("%d-%d\n", first_op, second_op); */
     if (first_op)
     {
-/*        printf("first_op here\n"); */
+        /*        printf("first_op here\n"); */
         first = method_type(op1);
     }
- /*   printf("in between here\n"); */
+    /*   printf("in between here\n"); */
     if (second_op)
     {
         second = method_type(op2);
     }
- /*   printf("second_op here\n"); */
+    /*   printf("second_op here\n"); */
     /* check for input errors */
     if (first == COMMAND_INVALID_METHOD || second == COMMAND_INVALID_METHOD)
         return COMMAND_INVALID_METHOD;
+    printf("type: %d, first_op: %d, second_op: %d\n", type, first_op, second_op);
     if (!num_operation_fits_command(type, first_op, second_op))
+    {
         return COMMAND_INVALID_NUMBER_OF_OPERANDS;
+    }
     if (!method_fits_command(type, first, second))
+    {
         return COMMAND_INVALID_OPERANDS_METHODS;
+    }
     /* done checking, adding to data */
-  /*  printf("done checking\n");*/
-    word = word_to_bits(type,first_op,second_op,first,second);
- /*   printf("word id now: %u|%x|%d\n",word,word,word);*/
+    word = word_to_bits(type, first_op, second_op, first, second);
     write_command_to_instructions(word);
- /*   printf("writing to memory\n"); */
-    ic += word_count_by_command(first_op,second_op,first,second);
- /*   printf("FINISH\n"); */
+    ic += word_count_by_command(first_op, second_op, first, second);
     return 0;
 }
 /**
@@ -610,7 +638,7 @@ int handle_command(int type, char *line)
 int method_type(char *op)
 {
     char *after_dot, *before_dot;
-   /* printf("op is: %s\n", op);*/
+    /* printf("op is: %s\n", op);*/
     if (end_of_line(op))
         return NOT_FOUND;
     if (*op == '#')
@@ -630,10 +658,10 @@ int method_type(char *op)
     }
 
     printf("this must be a struct!\n");
-   /* printf("op was: %s\n", strtok(op, "."));
-    printf("new op: %s\n", strtok(NULL, "."));*/
+    /* printf("op was: %s\n", strtok(op, "."));
+     printf("new op: %s\n", strtok(NULL, "."));*/
     before_dot = strtok(op, ".");
-    printf("op was:: %s\n",before_dot);
+    printf("op was:: %s\n", before_dot);
     after_dot = strtok(NULL, ".");
     printf("new op: %s\n", after_dot);
     if (check_for_label(before_dot, FALSE))
@@ -647,7 +675,7 @@ int method_type(char *op)
 /**
  * @brief this command validates that the command mathces the number of operators
  *
- * @param command_type  command type from enum 
+ * @param command_type  command type from enum
  * @param first_op first operator in command
  * @param second_op second operator in command
  * @return boolean
@@ -694,7 +722,7 @@ boolean num_operation_fits_command(int command_type, boolean first_op, boolean s
 /**
  * @brief this function validates that the command matches the method type
  *
- * @param commant_type  command type from enum 
+ * @param commant_type  command type from enum
  * @param first first operator type
  * @param second second operator type
  * @return boolean
@@ -741,7 +769,7 @@ boolean method_fits_command(int command_type, int first, int second)
 /**
  * @brief this functions checks that the method type will match all avaliable types for source
  *
- * @param method_type  command type from enum 
+ * @param method_type  command type from enum
  * @return boolean
  */
 boolean all_source_method(int method_type)
@@ -752,7 +780,7 @@ boolean all_source_method(int method_type)
 /**
  * @brief this functions checks that the method type will match all avaliable types for destination
  *
- * @param method_type  command type from enum 
+ * @param method_type  command type from enum
  * @return boolean
  */
 boolean all_dest_method(int method_type)
@@ -763,7 +791,7 @@ boolean all_dest_method(int method_type)
 /**
  * @brief this functions checks that the method type will non immediate type for destination
  *
- * @param method_type  command type from enum 
+ * @param method_type  command type from enum
  * @return boolean
  */
 boolean non_immediate_method(int method_type)
@@ -774,7 +802,7 @@ boolean non_immediate_method(int method_type)
 /**
  * @brief this function checks if a method is struct and returns the word count accordingly
  * 2 for struct 1 for other
- * @param method_type  command type from enum 
+ * @param method_type  command type from enum
  * @return int
  */
 int words_count_by_method(int method_type)
@@ -785,12 +813,12 @@ int words_count_by_method(int method_type)
 }
 /**
  * @brief this command calculates the word count to insert to memory according to operators and types
- * 
+ *
  * @param first_op if first operator exists
  * @param second_op if second operator exists
  * @param first first method type from enum
  * @param second second method type from enum
- * @return int 
+ * @return int
  */
 int word_count_by_command(boolean first_op, boolean second_op, int first, int second)
 {
@@ -808,36 +836,40 @@ int word_count_by_command(boolean first_op, boolean second_op, int first, int se
 }
 /**
  * @brief this command writes the command to memory
- * 
+ *
  * @param word word to write
  */
-void write_command_to_instructions(unsigned int word){
+void write_command_to_instructions(unsigned int word)
+{
     instructions[ic++] = word;
 }
 /**
  * @brief this function creates an unsigned int from command to insert to memory
- * 
- * @param method_type  command type from enum 
+ *
+ * @param method_type  command type from enum
  * @param first_op if first operator exists
  * @param second_op if second operator exists
  * @param first first method type from enum
  * @param second second method type from enum
- * @return unsigned int 
+ * @return unsigned int
  */
-unsigned int word_to_bits(int method_type, boolean first_op, boolean second_op, int first, int second){
+unsigned int word_to_bits(int method_type, boolean first_op, boolean second_op, int first, int second)
+{
     unsigned int word_in_bits = method_type;
-  /*  printf("method_type: %d,first_op: %d,second_op: %d,first: %d,second: %d\n",method_type,first_op,second_op,first,second); */
-    
+    /*  printf("method_type: %d,first_op: %d,second_op: %d,first: %d,second: %d\n",method_type,first_op,second_op,first,second); */
+
     word_in_bits <<= BITS_IN_METHOD; /* add space for method*/
 
-    if (first_op && second_op){
+    if (first_op && second_op)
+    {
         word_in_bits |= first;
         word_in_bits <<= BITS_IN_METHOD;
         word_in_bits |= second;
     }
-    else if (first_op){
+    else if (first_op)
+    {
         word_in_bits |= first;
     }
-    word_in_bits = add_are(word_in_bits,ABSOLUTE);
+    word_in_bits = add_are(word_in_bits, ABSOLUTE);
     return word_in_bits;
 }
