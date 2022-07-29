@@ -14,13 +14,15 @@
 /*************** DECLARETIONS  ****************/
 /*************** PHASE TWO *****************/
 void phase_two(FILE *file, char *file_name);
-void write_output_files(char *src);
 int read_line_ph2(char * line, int line_num);
 void cmd_ph2_binary(int cmd, char *line);
 void check_operands(int cmd, boolean *is_src, boolean *is_dest);
 unsigned int build_reg(boolean is_dest, char *reg);
 void encode_ph2_word(boolean is_dest, int method, char * op);
-void write_output_ob(FILE *file);
+void write_ob(FILE *file);
+void write_files(char *src);
+void write_entry(FILE *file);
+void write_extern(FILE *file);
 
 /* ************** PHASE ONE ************** */
 int read_line_am(char *line, int line_count);
