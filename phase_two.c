@@ -9,7 +9,12 @@ Project by Eran Cohen and Ido Ziv
 FILE *obFile, *entFile, *extFile;
 int line_count;
 extPtr ext_list;
-
+/**
+ * @brief this methods handles the algorithm of phase one -> encoding to memory the program
+ * 
+ * @param file local file path
+ * @param file_name name of the file to open
+ */
 void phase_two(FILE *file, char *file_name)
 {
     char line[LINE_LEN];
@@ -42,7 +47,13 @@ void phase_two(FILE *file, char *file_name)
     free_labels(&symbols_table);
     free_ext(&ext_list);
 }
-
+/**
+ * @brief this function reads line by line from the file
+ * 
+ * @param line current line (text)
+ * @param line_num current line (index)
+ * @return int 
+ */
 int read_line_ph2(char *line, int line_num)
 {
     char word[LINE_LEN];
@@ -162,7 +173,13 @@ unsigned int build_reg(boolean is_dest, char *reg)
     word = add_are(word, ABSOLUTE);
     return word;
 }
-
+/**
+ * @brief This methods encondes given word to memory
+ * 
+ * @param is_dest whether or not the operator is destination operator
+ * @param method  method type from enum
+ * @param op operator
+ */
 void encode_ph2_word(boolean is_dest, int method, char *op)
 {
     char *tmp;
