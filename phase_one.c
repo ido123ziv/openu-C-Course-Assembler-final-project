@@ -24,13 +24,20 @@ void phase_one(FILE *fp, char *file_name)
         error_code = 0;
         if (!ignore(current_line))
             error_code = read_line_am(current_line, line_count);
-        if (error_code)
+        if (error_code){
             write_error_code(error_code, line_count);
+            error_exists = TRUE;
+        }
         /* TODO: add WAS_ERROR */
-
         line_count++;
     }
-    printf("Didn't find errors yet! \n");
+    if (!error_exists)
+        printf("Didn't find errors yet! \n");
+    else
+    {
+        printf("Fount Errors!\nExiting!\n");
+        exit(1);
+    }
 }
 /**
  * @brief this function reads line by line from the file
