@@ -10,13 +10,20 @@
 #define TWO_OPERANDS 5
 #define ONE_OPERANDS 14
 
+
 /*************** DECLARETIONS  ****************/
 /*************** PHASE TWO *****************/
 void phase_two(FILE *file, char *file_name);
-void write_output_files(char *src);
 int read_line_ph2(char * line, int line_num);
-int cmd_ph2_binary(int cmd, char *line);
+void cmd_ph2_binary(int cmd, char *line);
 void check_operands(int cmd, boolean *is_src, boolean *is_dest);
+unsigned int build_reg(boolean is_dest, char *reg);
+void encode_ph2_word(boolean is_dest, int method, char * op);
+void write_ob(FILE *file);
+void write_files(char *src);
+void write_entry(FILE *file);
+void write_extern(FILE *file);
+FILE *new_file(char *filename, int type);
 
 /* ************** PHASE ONE ************** */
 int read_line_am(char *line, int line_count);
@@ -25,6 +32,9 @@ int check_for_label(char *line, boolean COLON);
 void phase_one(FILE *fp, char *file_name);
 
 labelPtr add_label(labelPtr *table, char *name, unsigned int address);
+boolean delete_label(labelPtr *table, char *name);
+void assign_addresses(labelPtr label, int address, boolean is_data_label);
+void print_label(labelPtr h);
 boolean existing_label(labelPtr label, char *name);
 int handle_directive(int dir_type, char* line);
 int handle_data_directive(char * line);

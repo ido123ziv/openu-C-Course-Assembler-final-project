@@ -28,5 +28,10 @@ void print_data(unsigned int *data,unsigned int *instructions);
 unsigned int get_bits(unsigned int word, int start, int end);
 char * next_comma_word(char *word, char * line);
 char * next_string_word(char *word, char * line);
-unsigned int insert_are(unsigned int info, int are);
+unsigned int add_are(unsigned int word, int are);
+int add_entry(labelPtr ptr, char *name); 
+char *to_base_32(unsigned int num);
+void free_labels(labelPtr *labelTable);
+void free_ext(extPtr *extTable);
+extPtr add_ext(extPtr *ptr, char *name, unsigned int ref);
 #endif

@@ -6,12 +6,18 @@ Project by Eran Cohen and Ido Ziv
 #include "global_functions.h"
 #include "phases.h"
 
-FILE *obFile, *entFile, *extFile;
-
+int line_count;
+extPtr ext_list;
+/**
+ * @brief this methods handles the algorithm of phase two -> complete the translation 
+ * 
+ * @param file local file path
+ * @param file_name name of the file to open
+ */
 void phase_two(FILE *file, char *file_name)
 {
     char line[LINE_LEN];
-    int line_count = 1;
+    line_count = 1;
     error_exists = FALSE;
 
     ic = 0;
@@ -24,39 +30,29 @@ void phase_two(FILE *file, char *file_name)
     {
         error_code = 0;
         if (!ignore(line))
-            error_code = read_line_ph2(line, line_count);
+            read_line_ph2(line, line_count);
         if (error_code)
+        {
             write_error_code(error_code, line_count);
-        /* TODO: add error_exists */
+            error_exists = TRUE;
+            error_code = 0;
+        }
 
         line_count++;
     }
     if (!error_exists)
-        write_output_files(file_name);
+        write_files(file_name);
+
+    free_labels(&symbols_table);
+    free_ext(&ext_list);
 }
-
-/* Function will write the output files that need to be create: .ob, (.ent, .ext if needed)*/
-void write_output_files(char *src)
-{
-    /* TODO: finish write_output functions */
-    FILE *file;
-
-    file = create_file(src, FILE_OBJECT);
-    write_output_ob(file);
-
-    if (has_entry)
-    {
-        file = create_file(src, FILE_ENTRY);
-        write_output_entry(file);
-    }
-
-    if (has_extern)
-    {
-        file = create_file(src, FILE_EXTERN);
-        write_output_extern(file);
-    }
-}
-
+/**
+ * @brief this function reads line by line from the file
+ * 
+ * @param line current line (text)
+ * @param line_num current line (index)
+ * @return int 
+ */
 int read_line_ph2(char *line, int line_num)
 {
     char word[LINE_LEN];
@@ -87,15 +83,16 @@ int read_line_ph2(char *line, int line_num)
         if (dir == ENTRY)
         { /* only need to take care of entry */
             copy_word(word, line);
-            /* TODO: make entry */
+            add_entry(symbols_table, word); /* Add an entry for this symbol */
+            /* print error if needed? - need to check if needed */
         }
     }
 }
 
 /* Function will encode words in the command that could not be encode on phase 1 */
-int cmd_ph2_binary(int cmd, char *line)
+void cmd_ph2_binary(int cmd, char *line)
 {
-    
+
     /* Vars for encoding operands */
     char op1[LINE_LEN], op2[LINE_LEN]; /* First and second operands */
     char *src = op1, *dest = op2;
@@ -105,35 +102,49 @@ int cmd_ph2_binary(int cmd, char *line)
     check_operands(cmd, &is_src, &is_dest);
 
     /* Get src and dest address method */
-    if(is_src)
+    if (is_src)
         src_method = get_bits(instructions[ic], SRC_START_POS, SRC_END_POS);
-    if(is_dest)
+    if (is_dest)
         dest_method = get_bits(instructions[ic], DEST_START_POS, DEST_END_POS);
 
     /* Fix pointers (src,dest) to point the correct ops based on check_operands */
-    if(is_src || is_dest){
+    if (is_src || is_dest)
+    {
         line = next_comma_word(op1, line);
-        if(is_src && is_dest){ /* We have 2 ops to handle */
+        if (is_src && is_dest)
+        { /* We have 2 ops to handle */
             line = next_comma_word(op2, line);
-            next_comma_word(op2,line); /* store op2 */
+            next_comma_word(op2, line); /* store op2 */
         }
-        else{ /* If we have only 1 op it would be dest op */
-            dest = op1; 
+        else
+        { /* If we have only 1 op it would be dest op */
+            dest = op1;
             src = NULL;
         }
     }
 
-    ic ++;
-    return encode_extra_words(src, dest,is_src, is_dest, src_method, dest_method);
-    /*TODO: encode_extra_words */
+    ic++; /* First word already encoded in phase 1 */
+
+    if (is_src && is_dest && src_method == M_REGISTER && dest_method == M_REGISTER)
+    { /* Special case when 2 registers share same additional word */
+        unsigned int word = build_reg(FALSE, src) | build_reg(TRUE, dest);
+        instructions[ic++] = word;
+    }
+    else
+    {
+        if (is_src)
+            encode_ph2_word(FALSE, src_method, src);
+        if (is_dest)
+            encode_ph2_word(TRUE, dest_method, dest);
+    }
 }
 
 /* check which operands exist in the current command */
 void check_operands(int cmd, boolean *is_src, boolean *is_dest)
 {
-    /* cmd is a int this int it's the location of cmd on commands[cmd] 
-    *  we sore commands[] so all the commands required 2 ops will be 0-4 in the array
-    *  1 op will be 5 - 13 and no op are the last 2 */
+    /* cmd is a int this int it's the location of cmd on commands[cmd]
+     *  we sore commands[] so all the commands required 2 ops will be 0-4 in the array
+     *  1 op will be 5 - 13 and no op are the last 2 */
     if (cmd < TWO_OPERANDS)
     {
         *is_src = TRUE;
@@ -144,8 +155,205 @@ void check_operands(int cmd, boolean *is_src, boolean *is_dest)
         *is_src = FALSE;
         *is_dest = TRUE;
     }
-    else{ /* no operands */
+    else
+    { /* no operands */
         *is_src = FALSE;
         *is_dest = FALSE;
     }
 }
+
+/* Function builds the final word for a register op */
+unsigned int build_reg(boolean is_dest, char *reg)
+{
+    unsigned int word = (unsigned int)atoi(reg + 1); /* Register number */
+
+    if (!is_dest) /* TODO: might be 2 bits - need test */
+        word <<= 4;
+    word = add_are(word, ABSOLUTE);
+    return word;
+}
+/**
+ * @brief This methods encondes given word to memory
+ * 
+ * @param is_dest whether or not the operator is destination operator
+ * @param method  method type from enum
+ * @param op operator
+ */
+void encode_ph2_word(boolean is_dest, int method, char *op)
+{
+    char *tmp;
+    unsigned int word = 0;
+
+    if (method == M_REGISTER)
+    {
+        word = build_reg(is_dest, op);
+        instructions[ic++] = word;
+    }
+    else if (method == M_IMMEDIATE)
+    {
+        word = (unsigned int)atoi(op + 1);
+        word = add_are(word, ABSOLUTE);
+        instructions[ic++] = word;
+    }
+    else if (method == M_DIRECT)
+        encode_label(op);
+    else
+    {   /* if method = struct */
+        /* struct include label before '.' and a number after it */
+        tmp = strchr(op, '.');
+        *tmp = '\0';
+        *tmp++ = '.';
+        encode_label(op);
+        word = (unsigned int)atoi(tmp);
+        word = add_are(word, ABSOLUTE);
+        instructions[ic++] = word;
+    }
+}
+
+/* Encode label to memory by it's name */
+void encode_label(char *label)
+{
+    unsigned int word;
+
+    if (is_label_exist(symbols_table, label))
+    { /* Check if label existes, if it is get address of label */
+        word = get_label_address(symbols_table, label);
+
+        if (is_label_external(symbols_table, label))
+        {
+            add_ext(&ext_list, label, ic + MEM_START);
+            word = add_are(word, EXTERNAL);
+        }
+        else
+            word = add_are(word, RELOCATABLE);
+
+        instructions[ic++] = word;
+    }
+    else
+    {
+        ic++;
+        error_code = COMMAND_LABEL_DOES_NOT_EXIST;
+    }
+}
+
+/* *********** Write to files functions *************** */
+
+/* Function will write the output files that need to be create: .ob, (.ent, .ext if needed)*/
+void write_files(char *src)
+{
+    /* TODO: finish write_output functions */
+    FILE *file;
+
+    file = new_file(src, FILE_OBJECT);
+    write_ob(file);
+
+    if (has_entry)
+    {
+        file = new_file(src, FILE_ENTRY);
+        write_entry(file);
+    }
+
+    if (has_extern)
+    {
+        file = new_file(src, FILE_EXTERN);
+        write_extern(file);
+    }
+}
+
+/* Write output for the .ob file 
+ * On first line is the size of instructions and data memory
+ * Other lines: left size is address, right side is the word in memory */
+void write_ob(FILE *file)
+{
+    unsigned int address = MEM_START;
+    char *param1 = to_base_32(ic), *param2 = to_base_32(dc);
+    int i;
+
+    fprintf(file, "%s\t%s\n\n", param1, param2);
+    free(param1);
+    free(param2);
+
+        for (i = 0; i < ic; address++, i++) /* Instructions memory */
+    {
+        param1 = to_base_32(address);
+        param2 = to_base_32(instructions[i]);
+
+        fprintf(file, "%s\t%s\n", param1, param2);
+
+        free(param1);
+        free(param2);
+    }
+
+    for (i = 0; i < dc; address++, i++) /* Data memory */
+    {
+        param1 = to_base_32(address);
+        param2 = to_base_32(data[i]);
+
+        fprintf(file, "%s\t%s\n", param1, param2);
+
+        free(param1);
+        free(param2);
+    }
+
+    fclose(file);
+}
+
+/* Writes the output of the .ent file.
+ * Left side: name of label.
+ * Right side: address of definition. */
+void write_entry(FILE *file)
+{
+    char *base32_address;
+
+    labelPtr ptr = symbols_table;
+    /* Go through symbols table and print only symbols that have an entry */
+    while(ptr)
+    {
+        if(ptr -> entry)
+        {
+            base32_address = to_base_32(ptr -> address);
+            fprintf(file, "%s\t%s\n", ptr -> name, base32_address);
+            free(base32_address);
+        }
+        ptr = ptr -> next;
+    }
+    fclose(file);
+}
+
+/* Writes the output of the .ext file.
+ * Left side: name of label.
+ * Right side: address where the external label should be replaced.
+ */
+void write_extern(FILE *file)
+{
+    char * base32_address;
+    extPtr node = ext_list;
+
+    /* Go through external linked list and pulling values */
+    do
+    {
+        base32_address = to_base_32(node -> address);
+        fprintf(file, "%s\t%s\n", node -> name, base32_address); /* Printing to file */
+        free(base32_address);
+        node = node -> next;
+    } while(node != ext_list);
+    fclose(file);
+}
+
+/* Function create a file with write permissions, get the original name and add the relevant externsion (.ob, .ent etc.)*/
+FILE *new_file(char *filename, int type)
+{
+    FILE *file;
+    filename = create_file(filename, type); /* Creating filename with extension */
+
+    file = fopen(filename, "w"); /* Opening file with permissions */
+    free(filename); /* Allocated modified filename is no longer needed */
+
+    if(file == NULL)
+    {
+        error_code = CANNOT_OPEN_FILE;
+        return NULL;
+    }
+    return file;
+}
+

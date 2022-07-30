@@ -30,9 +30,9 @@ typedef enum boolean {FALSE,TRUE}boolean;
 enum ARE {ABSOLUTE, RELOCATABLE ,EXTERNAL};
 enum filetypes {FILE_INPUT, FILE_MACRO, FILE_OBJECT,FILE_ENTRY,FILE_EXTERN };
 enum directives {DATA, STRING, STRUCT, ENTRY, EXTERN,UNKNOWN_TYPE};
-enum commands {MOV, CMP, ADD, SUB, NOT, CLR, LEA, INC, DEC, JMP, BNE, GET, PRN, JSR, RTS, HLT, UNKNOWN_COMMAND};
-enum methods {M_UNKNOWN, M_IMMEDIATE, M_DIRECT, M_STRUCT, M_REGISTER};
-enum errors {SYNTAX_ERR ,LABEL_ALREADY_EXISTS ,LABEL_TOO_LONG ,
+enum commands {MOV, CMP, ADD, SUB, LEA, NOT, CLR,  INC, DEC, JMP, BNE, GET, PRN, JSR, RTS, HLT, UNKNOWN_COMMAND};
+enum methods {M_IMMEDIATE, M_DIRECT, M_STRUCT, M_REGISTER, M_UNKNOWN};
+enum errors {SYNTAX_ERR = 1,LABEL_ALREADY_EXISTS ,LABEL_TOO_LONG ,
     LABEL_INVALID_FIRST_CHAR ,LABEL_ONLY_ALPHANUMERIC ,LABEL_CANT_BE_COMMAND ,
     LABEL_ONLY ,LABEL_CANT_BE_REGISTER ,DIRECTIVE_NO_PARAMS ,
     DIRECTIVE_INVALID_NUM_PARAMS ,DATA_COMMAS_IN_A_ROW ,
@@ -58,13 +58,6 @@ extern int error_code;
 extern boolean error_exists, has_entry, has_extern;
 extern int ic, dc;
 
-/* Length Constants */
-#define LINE_LEN 82  /* Line max size is 80 , extra 2 bits space for \n or \0 */
-#define LABEL_LEN 30
-#define CMD_LEN 16
-#define DIR_LEN 5
-#define MACHINE_RAM 2000
-
 #define BITS_IN_WORD 10
 #define BITS_IN_OPCODE 4
 #define BITS_IN_METHOD 2
@@ -75,17 +68,26 @@ extern int ic, dc;
 /* ****************************************************
     ****************************************************
     ****************************************************
-    ************          Defines                *******
+    ************          Constants                *******
     ****************************************************
    ****************************************************
 */
+
+/* Length Constants */
+#define LINE_LEN 82  /* Line max size is 80 , extra 2 bits space for \n or \0 */
+#define LABEL_LEN 30
+#define CMD_LIST_LEN 16
+#define DIR_LEN 5
+#define MACHINE_RAM 2000
+#define BASE32_SEQ_LEN 3 /* Base 32 sequence of word contain 2 digits and '\0' */
+
 #define MINIMUM_LABEL_LENGTH_WITH_COLON 2
 #define MINIMUM_LABEL_LENGTH_WITHOUT_COLON 1
-#define MAX_COMMAND_LENGTH 4 /* maximum number of characters in a command */
-#define MIN_COMMAND_LENGTH 3 /* minimum number of characters in a command */
+#define CMD_LEN 3 /* all commands length is 3 */
 #define MAX_EXTENSION_LENGTH 5
 #define ERROR 1
 #define NOT_FOUND -1
+#define MEM_START 100
 /* ****************************************************
     ****************************************************
     ****************************************************
@@ -94,14 +96,25 @@ extern int ic, dc;
    ****************************************************
 */
  
-/* extern macroPtr macro_table; */
+/* Linked list to store program labels */
 typedef struct structLabels * labelPtr;
 typedef struct  structLabels {
 	char name[LABEL_LEN]; /* Label name */
     unsigned int address;
-	labelPtr next; /* a pointer to the next label in the list */
+    boolean entry; /* store if label is entry */
+    boolean external; /* store if label is extern */
+    boolean action; /* store if label is part of an action */
+	labelPtr next; /* Pointer to the next label on list */
 } Labels;
 
+/* Double linked list to store program extern labels */
+typedef struct ext * extPtr;
+typedef struct ext {
+    char name[LABEL_LEN]; /* Extern label name */
+    unsigned int address; 
+    extPtr next; /* Pointer to the next label on list */
+    extPtr prev; /* Pointer to the previous label on list */
+} ext;
 
 extern int ic, dc;
 extern labelPtr symbols_table;

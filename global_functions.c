@@ -440,9 +440,9 @@ void write_error_code(int error_code, int current_line)
 int find_command(char *word)
 {
     int word_len = strlen(word), i;
-    if (word_len > MAX_COMMAND_LENGTH || word_len < MIN_COMMAND_LENGTH)
+    if (word_len != CMD_LEN)
         return NOT_FOUND;
-    for (i = 0; i < CMD_LEN; i++){
+    for (i = 0; i < CMD_LIST_LEN; i++){
         if (strcmp(word, commands[i]) == 0)
             return i;
     }
@@ -466,37 +466,7 @@ int find_directive(char *line)
     }
     return NOT_FOUND;
 }
-/**
- * @brief Get the label address object
- *
- * @param h label to search
- * @param name name of label
- * @return unsigned int
- */
-unsigned int get_label_address(labelPtr h, char *name)
-{
-    labelPtr label = get_label(h, name);
-    if (label != NULL)
-        return label->address;
-    return FALSE;
-}
-/**
- * @brief Get the label object
- *
- * @param label label to search
- * @param name name of label
- * @return labelPtr
- */
-labelPtr get_label(labelPtr label, char *name)
-{
-    while (label)
-    {
-        if (strcmp(label->name, name) == 0)
-            return label;
-        label = label->next;
-    }
-    return NULL;
-}
+
 /**
  * @brief prints the data and instruction array
  * 
@@ -521,20 +491,27 @@ void print_data(unsigned int *data, unsigned int *instructions)
     }
     printf("\n$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$\n");
 }
-/*
+/**
+ * @brief Get the bits object
+ * 
+ * @param word unsigned int we want to parse
+ * @param start 
+ * @param end 
+ * @return unsigned int 
+ */
 unsigned int get_bits(unsigned int word, int start, int end){
     
     unsigned int temp;
     int len = end - start + 1; 
     unsigned int mask = (int) pow(2, len) - 1; /* create a mask of '11....11' by len  */
 
-   /*mask = mask << start;
+   mask = mask << start;
     temp = word & mask;
     temp = temp >> start;
 
     return temp;
     
-}*/
+}
 /**
  * @brief this function returns the string after the nearest comma and copies the string into word
  * 
@@ -542,7 +519,6 @@ unsigned int get_bits(unsigned int word, int start, int end){
  * @param line current line (text)
  * @return char* 
  */
-
 char * next_comma_word(char *word, char * line){
     char *tmp = word;
 
@@ -598,14 +574,155 @@ char * next_string_word(char *word, char * line){
 
     return line;
 }
-/**
- * @brief this function adds the bits according to the ARE type
- * 
- * @param info the word in memory
- * @param are ARE enum
- * @return unsigned int 
- */
-unsigned int insert_are(unsigned int info, int are)
+
+/* Function inserts A/R/E bits into given word bit-sequence (the word is being shifted left) */
+unsigned int add_are(unsigned int word, int are)
 {
-    return (info << BITS_IN_ARE) | are;
+    return (word << 2) | are; /* OR operand allows insertion of the 2 bits because 1 + 0 = 1 */
+}
+
+/* Function will search if the label exist in the table and return TRUE if it is, else will return FALSE */
+int add_entry(labelPtr ptr, char *name){
+    labelPtr tmp = get_label(ptr, name);
+    if(tmp != NULL){
+        if(tmp -> external){
+            error_code = ENTRY_CANT_BE_EXTERN;
+            return FALSE;
+        }
+        tmp -> entry = TRUE;
+        has_entry = TRUE;
+        return TRUE;
+    }
+    else
+        error_code = ENTRY_LABEL_DOES_NOT_EXIST;
+    return FALSE;
+}
+/**
+ * @brief translates unsigned int to base32 represented by a string
+ * 
+ * @param num number to translate
+ * @return char* 
+ */
+char *to_base_32(unsigned int num)
+{
+    char *base32_seq = (char *) malloc(BASE32_SEQ_LEN);
+
+    /* To convert from binary to base 32 we can just take the 5 right binary digits and 5 left */
+    base32_seq[0] = base32[get_bits(num, 5, 9)];
+    base32_seq[1] = base32[get_bits(num, 0, 4)];
+    base32_seq[2] = '\0';
+
+    return base32_seq;
+}
+
+/* Free the memory we allocated for the labels list */
+void free_labels(labelPtr *labelTable)
+{
+
+    labelPtr p;
+    while (*labelTable)
+    {
+        p = *labelTable;
+        *labelTable = (*labelTable)->next;
+        free(p);
+    }
+}
+
+/* Free the memory we allocated for the extern list */
+void free_ext(extPtr *extTable)
+{
+    unsigned int last_ref;
+    unsigned int ref = 0;
+    extPtr p = *extTable;
+    if(p){ /* Free extern list by free each node */
+        last_ref = ((*extTable)->prev)->address;
+        do{
+            p = *extTable;
+            ref = p->address;
+            *extTable = (*extTable)->next;
+            free(p);
+        } while (ref != last_ref);
+    }
+}
+
+/* Add a node to the end of the external list */
+extPtr add_ext(extPtr *ptr, char *name, unsigned int ref)
+{
+    extPtr t=*ptr;
+    extPtr tmp;
+
+    tmp=(extPtr) malloc(sizeof(ext));
+    if(!tmp)
+    {
+        printf("\nerror, cannot allocate memory\n");
+        exit(1);
+    }
+
+    tmp -> address = ref;
+    strcpy(tmp->name, name);
+
+    if(!(*ptr)) /* If the list is empty */
+    {
+        *ptr = tmp;
+        tmp -> next = tmp;
+        tmp -> prev = tmp;
+        return tmp;
+    }
+
+
+    ((*ptr)->prev)->next = tmp;
+    tmp->next = t;
+    tmp->prev = t->prev;
+    (*ptr)->prev = tmp;
+
+    return tmp;
+}
+
+/******************** labels table methods **************/
+/* Function will return the address of a given label and FALSE if not exist */
+/**
+ * @brief Get the label address object
+ *
+ * @param h label to search
+ * @param name name of label
+ * @return unsigned int
+ */
+unsigned int get_label_address(labelPtr p, char *name)
+{
+    labelPtr label = get_label(p, name);
+    if(label != NULL) return label -> address;
+    return FALSE;
+}
+
+/* Function checks if a given label name is in the list */
+/**
+ * @brief Get the label object
+ *
+ * @param label label to search
+ * @param name name of label
+ * @return labelPtr
+ */
+labelPtr get_label(labelPtr p, char *name)
+{
+	while(p)
+	{
+        if(strcmp(p->name,name)==0) /* we found a label with the name given */
+			return p;
+		p=p->next;
+	}
+	return NULL;
+}
+
+/* Check if a given name is a name of a label on list */
+boolean is_label_exist(labelPtr p, char *name)
+{
+    return get_label(p, name) != NULL;
+}
+
+/* Function check if label on the array and also check if this label is external */
+boolean is_label_external(labelPtr p, char *name)
+{
+    labelPtr label = get_label(p, name);
+    if(label != NULL) return label -> external;
+    return FALSE;
 }

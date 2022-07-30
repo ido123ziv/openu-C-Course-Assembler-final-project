@@ -18,7 +18,12 @@ macroPtr pointer;
 FILE *macroFile;
 int line_count;
 char *new_filename;
-
+/**
+ * @brief  this methods handles the algorithm of pre assembler -> spread macros
+ * 
+ * @param file local file path
+ * @param file_name name of the file to open
+ */
 void pre_assembler(FILE *file, char *file_name)
 {
     char line[LINE_LEN];
@@ -36,12 +41,16 @@ void pre_assembler(FILE *file, char *file_name)
         line_count++;
     }
 
-    freelist(&macro_node);
+    free_macros(&macro_node);
     fclose(macroFile);
 }
 
 /* TODO: added line_num to indicate the line error happen */
-
+/**
+ * @brief this function reads and handles a line in the file
+ * 
+ * @param line current line (text)
+ */
 void read_line(char *line)
 {
 
@@ -76,7 +85,12 @@ void read_line(char *line)
         }
     }
 }
-
+/**
+ * @brief whether or not the current word is a label
+ * 
+ * @param word current word (text)
+ * @return boolean 
+ */
 boolean is_label(char *word)
 {
     int word_len = strlen(word);
@@ -85,7 +99,12 @@ boolean is_label(char *word)
     else
         return FALSE;
 }
-
+/**
+ * @brief whether or not the a word is a macro
+ * 
+ * @param word current word (text)
+ * @param line current line (text)
+ */
 void isMacro(char *word, char *line)
 {
     if (!strcmp(word, "macro"))
@@ -96,7 +115,7 @@ void isMacro(char *word, char *line)
         line = next_word(line);
         copy_word(word, line);
         /* Check if macro name is legit and not directive or command name */
-        for (i = 0; i < CMD_LEN; i++)
+        for (i = 0; i < CMD_LIST_LEN; i++)
         {
             if (!strcmp(word, commands[i]))
             {
@@ -168,7 +187,13 @@ void addLine(char *line, char *word)
         }
     }
 }
-
+/**
+ * @brief the function checkes if the macro already exists
+ * 
+ * @param macroTable macro table to check against
+ * @param word current macro
+ * @return macroPtr 
+ */
 macroPtr checkMacro(macroPtr macroTable, char *word)
 {
     /*
@@ -186,7 +211,7 @@ macroPtr checkMacro(macroPtr macroTable, char *word)
     /*
     if (!is_macro)
     {
-        for (i = 0; i < CMD_LEN; i++)
+        for (i = 0; i < CMD_LIST_LEN; i++)
         {
             if (!strcmp(word, commands[i]))
                 is_cmd = 1;
@@ -211,7 +236,7 @@ macroPtr checkMacro(macroPtr macroTable, char *word)
 }
 
 /* Free the memory we allocated for the macro list */
-void freelist(macroPtr *macroTable)
+void free_macros(macroPtr *macroTable)
 {
 
     macroPtr p;
