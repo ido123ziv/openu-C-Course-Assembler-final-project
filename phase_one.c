@@ -35,7 +35,7 @@ void phase_one(FILE *fp, char *file_name)
         printf("Didn't find errors yet! \n");
     else
     {
-        printf("Fount Errors!\nExiting!\n");
+        printf("Found Errors!\nExiting!\n");
         exit(1);
     }
     /* writing to data the addresses*/
@@ -89,7 +89,7 @@ int read_line_am(char *line, int line_count)
             { /* line can't be just a label */
                 return LABEL_ONLY;
             }
-            printf("One label found\t");
+            printf("One label found\n");
         }
     }
     /* else
@@ -103,7 +103,7 @@ int read_line_am(char *line, int line_count)
 
     if (dir_type != NOT_FOUND)
     {
-        printf("Directive found\t");
+        printf("Directive found\n");
         printf("directive is: %s\n", directives[dir_type]);
         if (label_count)
         {
@@ -124,7 +124,7 @@ int read_line_am(char *line, int line_count)
 
     if (command_type != NOT_FOUND)
     {
-        printf("Command found\t");
+        printf("Command found\n");
         if (label_count)
         {
             new_label->address = ic;
@@ -569,7 +569,7 @@ int handle_command(int type, char *line)
     int first, second;
     unsigned int word;
     char op1[20], op2[20];
-    printf("handle command\t %s\n", line);
+    printf("handle command operators\t %s\n", line);
     line = next_comma_word(op1, line);
     printf("next op:\t %s\n", op1);
     printf("next_comma_word\t %s\n", line);
