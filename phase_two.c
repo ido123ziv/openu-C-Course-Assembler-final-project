@@ -87,6 +87,7 @@ int read_line_ph2(char *line, int line_num)
 
     else if ((dir = find_directive(word)) != NOT_FOUND)
     {
+        printf("Dir line is: %s", line);
         line = next_word(line);
         if (dir == ENTRY)
         { /* only need to take care of entry */
@@ -234,6 +235,7 @@ void encode_label(char *label)
 
         if (is_label_external(symbols_table, label))
         {
+            printf("External label: %s\n", label);
             add_ext(&ext_list, label, ic + MEM_START);
             word = add_are(word, EXTERNAL);
         }
