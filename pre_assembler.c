@@ -18,7 +18,12 @@ macroPtr pointer;
 FILE *macroFile;
 int line_count;
 char *new_filename;
-
+/**
+ * @brief  this methods handles the algorithm of pre assembler -> spread macros
+ * 
+ * @param file local file path
+ * @param file_name name of the file to open
+ */
 void pre_assembler(FILE *file, char *file_name)
 {
     char line[LINE_LEN];
@@ -41,7 +46,11 @@ void pre_assembler(FILE *file, char *file_name)
 }
 
 /* TODO: added line_num to indicate the line error happen */
-
+/**
+ * @brief this function reads and handles a line in the file
+ * 
+ * @param line current line (text)
+ */
 void read_line(char *line)
 {
 
@@ -76,7 +85,12 @@ void read_line(char *line)
         }
     }
 }
-
+/**
+ * @brief whether or not the current word is a label
+ * 
+ * @param word current word (text)
+ * @return boolean 
+ */
 boolean is_label(char *word)
 {
     int word_len = strlen(word);
@@ -85,7 +99,12 @@ boolean is_label(char *word)
     else
         return FALSE;
 }
-
+/**
+ * @brief whether or not the a word is a macro
+ * 
+ * @param word current word (text)
+ * @param line current line (text)
+ */
 void isMacro(char *word, char *line)
 {
     if (!strcmp(word, "macro"))
@@ -168,7 +187,13 @@ void addLine(char *line, char *word)
         }
     }
 }
-
+/**
+ * @brief the function checkes if the macro already exists
+ * 
+ * @param macroTable macro table to check against
+ * @param word current macro
+ * @return macroPtr 
+ */
 macroPtr checkMacro(macroPtr macroTable, char *word)
 {
     /*

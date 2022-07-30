@@ -521,7 +521,14 @@ void print_data(unsigned int *data, unsigned int *instructions)
     }
     printf("\n$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$\n");
 }
-
+/**
+ * @brief Get the bits object
+ * 
+ * @param word unsigned int we want to parse
+ * @param start 
+ * @param end 
+ * @return unsigned int 
+ */
 unsigned int get_bits(unsigned int word, int start, int end){
     
     unsigned int temp;
@@ -620,7 +627,12 @@ int add_entry(labelPtr ptr, char *name){
         error_code = ENTRY_LABEL_DOES_NOT_EXIST;
     return FALSE;
 }
-
+/**
+ * @brief translates unsigned int to base32 represented by a string
+ * 
+ * @param num number to translate
+ * @return char* 
+ */
 char *to_base_32(unsigned int num)
 {
     char *base32_seq = (char *) malloc(BASE32_SEQ_LEN);

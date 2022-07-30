@@ -32,6 +32,9 @@ int check_for_label(char *line, boolean COLON);
 void phase_one(FILE *fp, char *file_name);
 
 labelPtr add_label(labelPtr *table, char *name, unsigned int address);
+boolean delete_label(labelPtr *table, char *name);
+void assign_addresses(labelPtr label, int address, boolean is_data_label);
+void print_label(labelPtr h);
 boolean existing_label(labelPtr label, char *name);
 int handle_directive(int dir_type, char* line);
 int handle_data_directive(char * line);
