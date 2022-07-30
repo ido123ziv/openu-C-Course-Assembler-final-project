@@ -621,6 +621,8 @@ int handle_command(int type, char *line)
         temp = op_src;
         op_src = op_dest;
         op_dest = temp;
+        is_src_op = FALSE;
+        is_dest_op = TRUE;
     }
     /*   printf("is_dest_op here\n"); */
     /* check for input errors */
