@@ -9,8 +9,8 @@ Project by Eran Cohen and Ido Ziv
 int line_count;
 extPtr ext_list;
 /**
- * @brief this methods handles the algorithm of phase two -> complete the translation 
- * 
+ * @brief this methods handles the algorithm of phase two -> complete the translation
+ *
  * @param file local file path
  * @param file_name name of the file to open
  */
@@ -48,13 +48,14 @@ void phase_two(FILE *file, char *file_name)
 }
 /**
  * @brief this function reads line by line from the file
- * 
+ *
  * @param line current line (text)
  * @param line_num current line (index)
- * @return int 
+ * @return int
  */
 int read_line_ph2(char *line, int line_num)
 {
+    int label_count;
     char word[LINE_LEN];
     int cmd, dir; /* we need to check if it's directive or command */
 
@@ -63,10 +64,17 @@ int read_line_ph2(char *line, int line_num)
     if (end_of_line(line))
         return;
     copy_word(word, line);
-    if (check_for_label(word, TRUE))
+    label_count = check_for_label(word, TRUE);
+    if (label_count)
     { /* If label we skip to next word */
-        line = next_word(line);
-        copy_word(word, line);
+        if (label_count > 1)
+            return label_count;
+        else
+        {
+            printf("This is a label: %s\n", word);
+            line = next_word(line);
+            copy_word(word, line);
+        }
     }
 
     /* Encoding the rest of a command from first pass */
@@ -99,22 +107,26 @@ void cmd_ph2_binary(int cmd, char *line)
     boolean is_src = FALSE, is_dest = FALSE;
     int src_method = M_UNKNOWN, dest_method = M_UNKNOWN;
 
+    printf("ic = %d\n", ic);
     check_operands(cmd, &is_src, &is_dest);
-
+    printf("op1 = %d , op2 = %d\n", is_src, is_dest);
+    printf("instruction is: %u\n", instructions[ic]);
     /* Get src and dest address method */
     if (is_src)
         src_method = get_bits(instructions[ic], SRC_START_POS, SRC_END_POS);
     if (is_dest)
         dest_method = get_bits(instructions[ic], DEST_START_POS, DEST_END_POS);
-
+    printf("src method = %u , dst method = %u\n", src_method, dest_method);
     /* Fix pointers (src,dest) to point the correct ops based on check_operands */
     if (is_src || is_dest)
     {
         line = next_comma_word(op1, line);
+        printf("op1 = %s ", op1);
         if (is_src && is_dest)
         { /* We have 2 ops to handle */
             line = next_comma_word(op2, line);
             next_comma_word(op2, line); /* store op2 */
+            printf("op2 = %s\n", op2);
         }
         else
         { /* If we have only 1 op it would be dest op */
@@ -174,7 +186,7 @@ unsigned int build_reg(boolean is_dest, char *reg)
 }
 /**
  * @brief This methods encondes given word to memory
- * 
+ *
  * @param is_dest whether or not the operator is destination operator
  * @param method  method type from enum
  * @param op operator
@@ -183,6 +195,7 @@ void encode_ph2_word(boolean is_dest, int method, char *op)
 {
     char *tmp;
     unsigned int word = 0;
+    printf("is_dest = %d, method = %d , op1 = %s\n", is_dest, method, op);
 
     if (method == M_REGISTER)
     {
@@ -198,12 +211,12 @@ void encode_ph2_word(boolean is_dest, int method, char *op)
     else if (method == M_DIRECT)
         encode_label(op);
     else
-    {   /* if method = struct */
+    { /* if method = struct */
         /* struct include label before '.' and a number after it */
         tmp = strchr(op, '.');
         *tmp = '\0';
-        *tmp++ = '.';
         encode_label(op);
+        *tmp++ = '.';
         word = (unsigned int)atoi(tmp);
         word = add_are(word, ABSOLUTE);
         instructions[ic++] = word;
@@ -241,7 +254,6 @@ void encode_label(char *label)
 /* Function will write the output files that need to be create: .ob, (.ent, .ext if needed)*/
 void write_files(char *src)
 {
-    /* TODO: finish write_output functions */
     FILE *file;
 
     file = new_file(src, FILE_OBJECT);
@@ -260,7 +272,7 @@ void write_files(char *src)
     }
 }
 
-/* Write output for the .ob file 
+/* Write output for the .ob file
  * On first line is the size of instructions and data memory
  * Other lines: left size is address, right side is the word in memory */
 void write_ob(FILE *file)
@@ -273,7 +285,7 @@ void write_ob(FILE *file)
     free(param1);
     free(param2);
 
-        for (i = 0; i < ic; address++, i++) /* Instructions memory */
+    for (i = 0; i < ic; address++, i++) /* Instructions memory */
     {
         param1 = to_base_32(address);
         param2 = to_base_32(instructions[i]);
@@ -307,15 +319,15 @@ void write_entry(FILE *file)
 
     labelPtr ptr = symbols_table;
     /* Go through symbols table and print only symbols that have an entry */
-    while(ptr)
+    while (ptr)
     {
-        if(ptr -> entry)
+        if (ptr->entry)
         {
-            base32_address = to_base_32(ptr -> address);
-            fprintf(file, "%s\t%s\n", ptr -> name, base32_address);
+            base32_address = to_base_32(ptr->address);
+            fprintf(file, "%s\t%s\n", ptr->name, base32_address);
             free(base32_address);
         }
-        ptr = ptr -> next;
+        ptr = ptr->next;
     }
     fclose(file);
 }
@@ -326,17 +338,18 @@ void write_entry(FILE *file)
  */
 void write_extern(FILE *file)
 {
-    char * base32_address;
+    
+    char *base32_address;
     extPtr node = ext_list;
-
+    printf("GOT HEREWEEEEEE\n");
     /* Go through external linked list and pulling values */
     do
     {
-        base32_address = to_base_32(node -> address);
-        fprintf(file, "%s\t%s\n", node -> name, base32_address); /* Printing to file */
+        base32_address = to_base_32(node->address);
+        fprintf(file, "%s\t%s\n", node->name, base32_address); /* Printing to file */
         free(base32_address);
-        node = node -> next;
-    } while(node != ext_list);
+        node = node->next;
+    } while (node != ext_list);
     fclose(file);
 }
 
@@ -347,13 +360,12 @@ FILE *new_file(char *filename, int type)
     filename = create_file(filename, type); /* Creating filename with extension */
 
     file = fopen(filename, "w"); /* Opening file with permissions */
-    free(filename); /* Allocated modified filename is no longer needed */
+    free(filename);              /* Allocated modified filename is no longer needed */
 
-    if(file == NULL)
+    if (file == NULL)
     {
         error_code = CANNOT_OPEN_FILE;
         return NULL;
     }
     return file;
 }
-
