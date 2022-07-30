@@ -639,6 +639,7 @@ int handle_command(int type, char *line)
     printf("if you are here you will write to memory!\n");
     /* done checking, adding to data */
     word = word_to_bits(type, is_src_op, is_dest_op, op_src, op_dest);
+    printf("word is: %u", word);
     write_command_to_instructions(word);
     ic += word_count_by_command(is_src_op, is_dest_op, op_src, op_dest);
     return 0;
@@ -882,7 +883,7 @@ unsigned int word_to_bits(int method_type, boolean is_src_op, boolean is_dest_op
     }
     else if (is_src_op)
     {
-        word_in_bits |= op_src;
+        word_in_bits |= op_dest;
     }
     word_in_bits = add_are(word_in_bits, ABSOLUTE);
     return word_in_bits;

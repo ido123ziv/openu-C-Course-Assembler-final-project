@@ -1,0 +1,276 @@
+$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$
+Me Printing Data ah?
+dc 0
+:0::-:0::-:0::-:0::-:0::-:0::-:0::-:0::-
+$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$
+$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$
+Me Printing Instructions ah?
+ic 0
+:0::-:0::-:0::-:0::-:0::-:0::-:0::-:0::-
+$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$
+Start assemble the file: Tests/example.as
+Starting phase one on file: Tests/example.am
+---------------------------------------------------------
+let's do this shit Tests/example.am
+---------------------------------------------------------
+######################################################
+current line is: .entry LOOP
+
+Directive found
+directive is: .entry
+######################################################
+current line is: .entry LENGTH
+
+Directive found
+directive is: .entry
+######################################################
+current line is: .extern L3
+
+Directive found
+directive is: .extern
+handle extern 4
+######################################################
+current line is: .extern W
+
+Directive found
+directive is: .extern
+handle extern 4
+######################################################
+current line is: MAIN: mov S1.1, W
+
+One label found
+Command found
+command is: mov
+handle command operators	 S1.1, W
+
+next op:	 S1.1
+next_comma_word	  W
+
+this must be a struct!
+op was: S1
+new op: 1
+type: mov, is_src_op: 1, is_dest_op: 1
+op_src: 2, op_dest: 1
+if you are here you will write to memory!
+######################################################
+current line is:  add r2,STR
+
+Command found
+command is: add
+handle command operators	 r2,STR
+
+next op:	 r2
+next_comma_word	 STR
+
+type: add, is_src_op: 1, is_dest_op: 1
+op_src: 3, op_dest: 1
+if you are here you will write to memory!
+######################################################
+current line is: LOOP: jmp W
+
+One label found
+Command found
+command is: jmp
+handle command operators	 W
+
+next op:	 W
+next_comma_word	 (null)
+type: jmp, is_src_op: 1, is_dest_op: 0
+op_src: -1, op_dest: 1
+if you are here you will write to memory!
+######################################################
+current line is:  prn #-5
+
+Command found
+command is: prn
+handle command operators	 #-5
+
+next op:	 #-5
+next_comma_word	 (null)
+type: prn, is_src_op: 1, is_dest_op: 0
+op_src: -1, op_dest: 0
+if you are here you will write to memory!
+######################################################
+current line is:  sub r1, r4
+
+Command found
+command is: sub
+handle command operators	 r1, r4
+
+next op:	 r1
+next_comma_word	  r4
+
+type: sub, is_src_op: 1, is_dest_op: 1
+op_src: 3, op_dest: 3
+if you are here you will write to memory!
+######################################################
+current line is:  inc K
+
+Command found
+command is: inc
+handle command operators	 K
+
+next op:	 K
+next_comma_word	 (null)
+type: inc, is_src_op: 1, is_dest_op: 0
+op_src: -1, op_dest: 1
+if you are here you will write to memory!
+######################################################
+current line is: mov S1.2, r3
+
+Command found
+command is: mov
+handle command operators	 S1.2, r3
+
+next op:	 S1.2
+next_comma_word	  r3
+
+this must be a struct!
+op was: S1
+new op: 2
+type: mov, is_src_op: 1, is_dest_op: 1
+op_src: 2, op_dest: 3
+if you are here you will write to memory!
+######################################################
+current line is:  bne L3
+
+Command found
+command is: bne
+handle command operators	 L3
+
+next op:	 L3
+next_comma_word	 (null)
+type: bne, is_src_op: 1, is_dest_op: 0
+op_src: -1, op_dest: 1
+if you are here you will write to memory!
+######################################################
+current line is: END: hlt
+
+One label found
+Command found
+command is: hlt
+handle command operators	 (null)
+next op:	 
+type: hlt, is_src_op: 0, is_dest_op: 0
+op_src: -1, op_dest: -1
+if you are here you will write to memory!
+######################################################
+current line is: STR: .string "abcdef"
+
+One label found
+Directive found
+directive is: .string
+######################################################
+current line is: LENGTH: .data 6,-9,15
+
+One label found
+Directive found
+directive is: .data
+######################################################
+current line is: K: .data 22
+
+One label found
+Directive found
+directive is: .data
+######################################################
+current line is: S1: .struct 8, "ab" 
+One label found
+Directive found
+directive is: .struct
+my line is: 8, "ab" 
+line: , "ab" 
+my copy is: 8
+end_of_line: 0
+is_number: 1
+after line: "ab"  	 copy: ,
+Didn't find errors yet! 
+
+name: L3, address: 0, external: 1 -> 
+
+name: W, address: 0, external: 1 -> 
+
+name: MAIN, address: 100, external: 0, is in action statement: 1 -> 
+
+name: LOOP, address: 107, external: 0, is in action statement: 1 -> 
+
+name: END, address: 121, external: 0, is in action statement: 1 -> 
+
+name: STR, address: 122, external: 0, is in action statement: 0 -> 
+
+name: LENGTH, address: 129, external: 0, is in action statement: 0 -> 
+
+name: K, address: 132, external: 0, is in action statement: 0 -> 
+
+name: S1, address: 133, external: 0, is in action statement: 0 -> 
+Starting second phase on file: Tests/example.am
+---------------------------------------------------------
+Phase 2 on file: Tests/example.am
+---------------------------------------------------------
+This is a label: MAIN
+ic = 0
+op1 = 1 , op2 = 1
+instruction is: 36
+src method = 2 , dst method = 1
+op1 = S1.1 op2 = W
+is_dest = 0, method = 2 , op1 = S1.1
+is_dest = 1, method = 1 , op1 = W
+ic = 4
+op1 = 1 , op2 = 1
+instruction is: 180
+src method = 3 , dst method = 1
+op1 = r2 op2 = STR
+is_dest = 0, method = 3 , op1 = r2
+is_dest = 1, method = 1 , op1 = STR
+This is a label: LOOP
+ic = 7
+op1 = 0 , op2 = 1
+instruction is: 4294967292
+src method = 4 , dst method = 3
+op1 = W is_dest = 1, method = 3 , op1 = W
+ic = 9
+op1 = 0 , op2 = 1
+instruction is: 4294967292
+src method = 4 , dst method = 3
+op1 = #-5 is_dest = 1, method = 3 , op1 = #-5
+ic = 11
+op1 = 1 , op2 = 1
+instruction is: 252
+src method = 3 , dst method = 3
+op1 = r1 op2 = r4
+ic = 13
+op1 = 0 , op2 = 1
+instruction is: 4294967292
+src method = 4 , dst method = 3
+op1 = K is_dest = 1, method = 3 , op1 = K
+ic = 15
+op1 = 1 , op2 = 1
+instruction is: 44
+src method = 2 , dst method = 3
+op1 = S1.2 op2 = r3
+is_dest = 0, method = 2 , op1 = S1.2
+is_dest = 1, method = 3 , op1 = r3
+ic = 19
+op1 = 0 , op2 = 1
+instruction is: 4294967292
+src method = 4 , dst method = 3
+op1 = L3 is_dest = 1, method = 3 , op1 = L3
+This is a label: END
+ic = 21
+op1 = 0 , op2 = 0
+instruction is: 240
+src method = 4 , dst method = 4
+This is a label: STR
+This is a label: LENGTH
+This is a label: K
+This is a label: S1
+GOT HEREWEEEEEE
+$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$
+Me Printing Data ah?
+dc 16
+:97::-:98::-:99::-:100::-:101::-:102::-:0::-:6::-
+$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$
+$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$
+Me Printing Instructions ah?
+ic 22
+:36::-:534::-:4::-:1::-:180::-:128::-:490::-:4294967292::-
+$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$

@@ -723,6 +723,7 @@ boolean is_label_exist(labelPtr p, char *name)
 boolean is_label_external(labelPtr p, char *name)
 {
     labelPtr label = get_label(p, name);
+    printf("label = %s\n", label->name);
     if(label != NULL) return label -> external;
     return FALSE;
 }
