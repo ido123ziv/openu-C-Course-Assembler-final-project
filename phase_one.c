@@ -39,8 +39,9 @@ void phase_one(FILE *fp, char *file_name)
         exit(1);
     }
     /* writing to data the addresses*/
-    assign_addresses(symbols_table, 100, FALSE);
-    assign_addresses(symbols_table, ic + 100, TRUE);
+    assign_addresses(symbols_table, MEM_START, FALSE);
+    assign_addresses(symbols_table, ic + MEM_START, TRUE);
+    print_labels(&symbols_table);
 }
 /**
  * @brief this function reads line by line from the file
@@ -150,23 +151,23 @@ int read_line_am(char *line, int line_count)
 int check_for_label(char *line, boolean COLON)
 {
     boolean has_digits = FALSE;
-    int line_lentgh = strlen(line);
+    int line_length = strlen(line);
     char word[LINE_LEN];
     int i;
 
-    if (line == NULL || line_lentgh < (COLON ? MINIMUM_LABEL_LENGTH_WITH_COLON : MINIMUM_LABEL_LENGTH_WITHOUT_COLON))
+    if (line == NULL || line_length < (COLON ? MINIMUM_LABEL_LENGTH_WITH_COLON : MINIMUM_LABEL_LENGTH_WITHOUT_COLON))
     {
         /* printf("check min line length:\n");*/
         return 0;
     }
 
-    if (COLON && line[line_lentgh - 1] != ':')
+    if (COLON && line[line_length - 1] != ':')
     {
         /*     printf("line not ending with :\n");*/
         return 0; /* search for :, if colon is a must then we need to have : */
     }
 
-    if (line_lentgh > LABEL_LEN) /* checking label size */
+    if (line_length > LABEL_LEN) /* checking label size */
     {
         if (COLON) /*error only if it is a label with ':' */
             return LABEL_TOO_LONG;
@@ -179,12 +180,12 @@ int check_for_label(char *line, boolean COLON)
 
     if (COLON)
     { /* removing ':' from line*/
-        line[line_lentgh - 1] = '\0';
-        line_lentgh--;
+        line[line_length - 1] = '\0';
+        line_length--;
     }
 
     /* checking all symbol from here are numbers or letters: */
-    for (i = 0; i < line_lentgh; i++)
+    for (i = 0; i < line_length; i++)
     {
         if (isdigit(line[i]))
             has_digits = TRUE;
@@ -312,7 +313,14 @@ void print_label(labelPtr h)
         printf(" -> ");
     printf("\n");
 }
-
+void print_labels(labelPtr *table){
+    labelPtr temp = *table;
+    while (temp)
+    {
+        print_label(temp);
+        temp = temp->next;
+    }
+}
 /**
  * @brief add label addresses to memory
  *
@@ -538,6 +546,7 @@ int handle_extern_directive(char *line)
     new_label = add_label(&symbols_table, copy, 0);
     if (!new_label)
         return 1;
+    has_extern = TRUE;
     new_label->external = TRUE;
     return 0;
 }
@@ -565,8 +574,8 @@ void write_string_to_data(char *line)
  */
 int handle_command(int type, char *line)
 {
-    boolean first_op = FALSE, second_op = FALSE;
-    int first = -1, second = -1, temp = -1;
+    boolean is_src_op = FALSE, is_dest_op = FALSE;
+    int op_src = -1, op_dest = -1, temp = -1;
     unsigned int word;
     char op1[20], op2[20];
     printf("handle command operators\t %s\n", line);
@@ -574,7 +583,7 @@ int handle_command(int type, char *line)
     printf("next op:\t %s\n", op1);
     if (!end_of_line(op1))
     {
-        first_op = TRUE;
+        is_src_op = TRUE;
         line = next_comma_word(op2, line);
         printf("next_comma_word\t %s\n", line);
         if (!end_of_line(op2))
@@ -589,7 +598,7 @@ int handle_command(int type, char *line)
             {
                 return COMMAND_UNEXPECTED_CHAR;
             }
-            second_op = TRUE;
+            is_dest_op = TRUE;
         }
     }
     /*printf("here\n");*/
@@ -597,41 +606,41 @@ int handle_command(int type, char *line)
     /* printf("handle spaces\t %s\n", line);*/
     if (!end_of_line(line)) /* command a1, a2  a3 is not valid */
         return COMMAND_TOO_MANY_OPERANDS;
-    /*  printf("%d-%d\n", first_op, second_op); */
-    if (first_op)
+    /*  printf("%d-%d\n", is_src_op, is_dest_op); */
+    if (is_src_op)
     {
-        /*        printf("first_op here\n"); */
-        first = method_type(op1);
+        /*        printf("is_src_op here\n"); */
+        op_src = method_type(op1);
     }
     /*   printf("in between here\n"); */
-    if (second_op)
+    if (is_dest_op)
     {
-        second = method_type(op2);
+        op_dest = method_type(op2);
     }
-    if (first_op && !second_op){
-        temp = first;
-        first = second;
-        second = temp;
+    if (is_src_op && !is_dest_op){
+        temp = op_src;
+        op_src = op_dest;
+        op_dest = temp;
     }
-    /*   printf("second_op here\n"); */
+    /*   printf("is_dest_op here\n"); */
     /* check for input errors */
-    if (first == COMMAND_INVALID_METHOD || second == COMMAND_INVALID_METHOD)
+    if (op_src == COMMAND_INVALID_METHOD || op_dest == COMMAND_INVALID_METHOD)
         return COMMAND_INVALID_METHOD;
-    printf("type: %s, first_op: %d, second_op: %d\n", commands[type], first_op, second_op);
-    printf("first: %d, second: %d\n", first,second);
-    if (!num_operation_fits_command(type, first_op, second_op))
+    printf("type: %s, is_src_op: %d, is_dest_op: %d\n", commands[type], is_src_op, is_dest_op);
+    printf("op_src: %d, op_dest: %d\n", op_src,op_dest);
+    if (!num_operation_fits_command(type, is_src_op, is_dest_op))
     {
         return COMMAND_INVALID_NUMBER_OF_OPERANDS;
     }
-    if (!method_fits_command(type, first, second))
+    if (!method_fits_command(type, op_src, op_dest))
     {
         return COMMAND_INVALID_OPERANDS_METHODS;
     }
     printf("if you are here you will write to memory!\n");
     /* done checking, adding to data */
-    word = word_to_bits(type, first_op, second_op, first, second);
+    word = word_to_bits(type, is_src_op, is_dest_op, op_src, op_dest);
     write_command_to_instructions(word);
-    ic += word_count_by_command(first_op, second_op, first, second);
+    ic += word_count_by_command(is_src_op, is_dest_op, op_src, op_dest);
     return 0;
 }
 /**
@@ -681,46 +690,46 @@ int method_type(char *op)
  * @brief this command validates that the command mathces the number of operators
  *
  * @param command_type  command type from enum
- * @param first_op first operator in command
- * @param second_op second operator in command
+ * @param is_src_op first operator in command
+ * @param is_dest_op op_dest operator in command
  * @return boolean
  */
-boolean num_operation_fits_command(int command_type, boolean first_op, boolean second_op)
+boolean num_operation_fits_command(int command_type, boolean is_src_op, boolean is_dest_op)
 {
     switch (command_type)
     {
     case MOV:
-        return first_op && second_op;
+        return is_src_op && is_dest_op;
     case CMP:
-        return first_op && second_op;
+        return is_src_op && is_dest_op;
     case ADD:
-        return first_op && second_op;
+        return is_src_op && is_dest_op;
     case SUB:
-        return first_op && second_op;
+        return is_src_op && is_dest_op;
     case LEA:
-        return first_op && second_op;
+        return is_src_op && is_dest_op;
     case NOT:
-        return first_op && !second_op;
+        return is_src_op && !is_dest_op;
     case CLR:
-        return first_op && !second_op;
+        return is_src_op && !is_dest_op;
     case INC:
-        return first_op && !second_op;
+        return is_src_op && !is_dest_op;
     case DEC:
-        return first_op && !second_op;
+        return is_src_op && !is_dest_op;
     case JMP:
-        return first_op && !second_op;
+        return is_src_op && !is_dest_op;
     case BNE:
-        return first_op && !second_op;
+        return is_src_op && !is_dest_op;
     case GET:
-        return first_op && !second_op;
+        return is_src_op && !is_dest_op;
     case PRN:
-        return first_op && !second_op;
+        return is_src_op && !is_dest_op;
     case JSR:
-        return first_op && !second_op;
+        return is_src_op && !is_dest_op;
     case RTS:
-        return !first_op && !second_op;
+        return !is_src_op && !is_dest_op;
     case HLT:
-        return !first_op && !second_op;
+        return !is_src_op && !is_dest_op;
     }
     return FALSE;
 }
@@ -728,46 +737,46 @@ boolean num_operation_fits_command(int command_type, boolean first_op, boolean s
  * @brief this function validates that the command matches the method type
  *
  * @param commant_type  command type from enum
- * @param first first operator type
- * @param second second operator type
+ * @param op_src first operator type
+ * @param op_dest op_dest operator type
  * @return boolean
  */
-boolean method_fits_command(int command_type, int first, int second)
+boolean method_fits_command(int command_type, int op_src, int op_dest)
 {
     switch (command_type)
     {
     case MOV:
-        return all_source_method(first) && non_immediate_method(second);
+        return all_source_method(op_src) && non_immediate_method(op_dest);
     case CMP:
-        return all_source_method(first) && all_dest_method(second);
+        return all_source_method(op_src) && all_dest_method(op_dest);
     case ADD:
-        return all_source_method(first) && non_immediate_method(second);
+        return all_source_method(op_src) && non_immediate_method(op_dest);
     case SUB:
-        return all_source_method(first) && non_immediate_method(second);
+        return all_source_method(op_src) && non_immediate_method(op_dest);
     case LEA:
-        return (first == M_DIRECT || first == M_STRUCT) && non_immediate_method(second);
+        return (op_src == M_DIRECT || op_src == M_STRUCT) && non_immediate_method(op_dest);
     case NOT:
-        return non_immediate_method(second);
+        return non_immediate_method(op_dest);
     case CLR:
-        return non_immediate_method(second);
+        return non_immediate_method(op_dest);
     case INC:
-        return non_immediate_method(second);
+        return non_immediate_method(op_dest);
     case DEC:
-        return non_immediate_method(second);
+        return non_immediate_method(op_dest);
     case JMP:
-        return non_immediate_method(second);
+        return non_immediate_method(op_dest);
     case BNE:
-        return non_immediate_method(second);
+        return non_immediate_method(op_dest);
     case GET:
-        return non_immediate_method(second);
+        return non_immediate_method(op_dest);
     case PRN:
-        return all_dest_method(second);
+        return all_dest_method(op_dest);
     case JSR:
-        return non_immediate_method(second);
+        return non_immediate_method(op_dest);
     case RTS:
-        return !all_source_method(first) && !all_dest_method(second);
+        return !all_source_method(op_src) && !all_dest_method(op_dest);
     case HLT:
-        return !all_source_method(first) && !all_dest_method(second);
+        return !all_source_method(op_src) && !all_dest_method(op_dest);
     }
     return FALSE;
 }
@@ -819,21 +828,21 @@ int words_count_by_method(int method_type)
 /**
  * @brief this command calculates the word count to insert to memory according to operators and types
  *
- * @param first_op if first operator exists
- * @param second_op if second operator exists
- * @param first first method type from enum
- * @param second second method type from enum
+ * @param is_src_op if first operator exists
+ * @param is_dest_op if second operator exists
+ * @param op_src first method type from enum
+ * @param op_dest second method type from enum
  * @return int
  */
-int word_count_by_command(boolean first_op, boolean second_op, int first, int second)
+int word_count_by_command(boolean is_src_op, boolean is_dest_op, int op_src, int op_dest)
 {
     int word_count = 0;
-    if (first_op)
-        word_count += words_count_by_method(first);
-    if (second_op)
-        word_count += words_count_by_method(second);
+    if (is_src_op)
+        word_count += words_count_by_method(op_src);
+    if (is_dest_op)
+        word_count += words_count_by_method(op_dest);
 
-    if (first_op && second_op && first == M_REGISTER && second == M_REGISTER)
+    if (is_src_op && is_dest_op && op_src == M_REGISTER && op_dest == M_REGISTER)
     {
         word_count--;
     }
@@ -852,28 +861,28 @@ void write_command_to_instructions(unsigned int word)
  * @brief this function creates an unsigned int from command to insert to memory
  *
  * @param method_type  command type from enum
- * @param first_op if first operator exists
- * @param second_op if second operator exists
- * @param first first method type from enum
- * @param second second method type from enum
+ * @param is_src_op if first operator exists
+ * @param is_dest_op if second operator exists
+ * @param op_src first method type from enum
+ * @param op_dest second method type from enum
  * @return unsigned int
  */
-unsigned int word_to_bits(int method_type, boolean first_op, boolean second_op, int first, int second)
+unsigned int word_to_bits(int method_type, boolean is_src_op, boolean is_dest_op, int op_src, int op_dest)
 {
     unsigned int word_in_bits = method_type;
-    /*  printf("method_type: %d,first_op: %d,second_op: %d,first: %d,second: %d\n",method_type,first_op,second_op,first,second); */
+    /*  printf("method_type: %d,is_src_op: %d,is_dest_op: %d,op_src: %d,op_dest: %d\n",method_type,is_src_op,is_dest_op,first,op_dest); */
 
     word_in_bits <<= BITS_IN_METHOD; /* add space for method*/
 
-    if (first_op && second_op)
+    if (is_src_op && is_dest_op)
     {
-        word_in_bits |= first;
+        word_in_bits |= op_src;
         word_in_bits <<= BITS_IN_METHOD;
-        word_in_bits |= second;
+        word_in_bits |= op_dest;
     }
-    else if (first_op)
+    else if (is_src_op)
     {
-        word_in_bits |= first;
+        word_in_bits |= op_src;
     }
     word_in_bits = add_are(word_in_bits, ABSOLUTE);
     return word_in_bits;
