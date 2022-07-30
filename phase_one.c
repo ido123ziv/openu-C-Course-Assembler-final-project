@@ -55,7 +55,7 @@ int read_line_am(char *line, int line_count)
     int dir_type = NOT_FOUND;
     int command_type = NOT_FOUND;
     labelPtr new_label = NULL;
-    char *line_copy, current_word[LINE_LEN];
+    char current_word[LINE_LEN];
     int label_count, is_error;
     printf("######################################################\n");
     printf("current line is: %s\n", line);
@@ -69,7 +69,6 @@ int read_line_am(char *line, int line_count)
         /* first non-blank character must be a letter or a dot */
         return SYNTAX_ERR;
     }
-    line_copy = line;
     copy_word(current_word, line);
     label_count = check_for_label(current_word, TRUE);
     if (label_count)
@@ -448,7 +447,6 @@ int handle_data_directive(char *line)
 int handle_string_directive(char *line)
 {
     int line_len;
-    char copy[LINE_LEN];
     /*   printf("my line is %s\n", line); */
     if (end_of_line(line)) /* || (line != '"' && line[line_len - 1] != '"'))*/
         return STRING_OPERAND_NOT_VALID;
@@ -466,11 +464,7 @@ int handle_string_directive(char *line)
     line = skip_spaces(line);
     if (!end_of_line(line))
     {
-        /*  copy[strlen(copy) - 1] = "\0";*/
         line[line_len - 2] = '\0';
-        /*copy[0] = "\0";*/
-        /*printf("without \": %s\n", copy);
-        printf("with \": %s\n", copy + 1);*/
         write_string_to_data(line);
     }
 
@@ -486,7 +480,7 @@ int handle_struct_directive(char *line)
 {
     int line_len = strlen(line);
 
-    char copy[LINE_LEN], c = copy;
+    char copy[LINE_LEN];
     printf("my line is: %s\n", line);
     line = next_comma_word(copy, line);
     printf("line: %s\nmy copy is: %s\nend_of_line: %d\nis_number: %d\n",line, copy,end_of_line(copy),is_number(copy));
@@ -496,9 +490,6 @@ int handle_struct_directive(char *line)
     data[dc++] = (unsigned int)atoi(copy);
     line = next_comma_word(copy, line);
     printf("after line:%s \t copy: %s\n", line, copy);
-  /*  line = next_comma_word(copy, line); 
-    printf("2x next_comma_word: %s \t copy: %s\n", line, copy); 
-    /* copy_word(copy, line); */
     if (!end_of_line(line) && *copy == ',')
     {
         line = next_comma_word(copy, line); /* copy equvals string with "" */
@@ -641,7 +632,7 @@ int handle_command(int type, char *line)
     printf("if you are here you will write to memory!\n");
     /* done checking, adding to data */
     word = word_to_bits(type, is_src_op, is_dest_op, op_src, op_dest);
-    printf("word is: %u", word);
+    printf("word is: %u\n", word);
     write_command_to_instructions(word);
     ic += word_count_by_command(is_src_op, is_dest_op, op_src, op_dest);
     return 0;
@@ -712,23 +703,23 @@ boolean num_operation_fits_command(int command_type, boolean is_src_op, boolean 
     case LEA:
         return is_src_op && is_dest_op;
     case NOT:
-        return is_src_op && !is_dest_op;
+        return !is_src_op && is_dest_op;
     case CLR:
-        return is_src_op && !is_dest_op;
+        return !is_src_op && is_dest_op;
     case INC:
-        return is_src_op && !is_dest_op;
+        return !is_src_op && is_dest_op;
     case DEC:
-        return is_src_op && !is_dest_op;
+        return !is_src_op && is_dest_op;
     case JMP:
-        return is_src_op && !is_dest_op;
+        return !is_src_op && is_dest_op;
     case BNE:
-        return is_src_op && !is_dest_op;
+        return !is_src_op && is_dest_op;
     case GET:
-        return is_src_op && !is_dest_op;
+        return !is_src_op && is_dest_op;
     case PRN:
-        return is_src_op && !is_dest_op;
+        return !is_src_op && is_dest_op;
     case JSR:
-        return is_src_op && !is_dest_op;
+        return !is_src_op && is_dest_op;
     case RTS:
         return !is_src_op && !is_dest_op;
     case HLT:
@@ -883,7 +874,7 @@ unsigned int word_to_bits(int method_type, boolean is_src_op, boolean is_dest_op
         word_in_bits <<= BITS_IN_METHOD;
         word_in_bits |= op_dest;
     }
-    else if (is_src_op)
+    else if (is_dest_op)
     {
         word_in_bits |= op_dest;
     }

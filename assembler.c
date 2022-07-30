@@ -33,6 +33,10 @@ unsigned int instructions[MACHINE_RAM];
 
 int main(int argc, char *argv[])
 {
+    /*****************************/
+    int i;
+    char *get_filename;
+    FILE *file;
     /* Initialize global vars */
     error_exists = FALSE;
     has_entry = FALSE;
@@ -40,11 +44,7 @@ int main(int argc, char *argv[])
     ic = 0;
     dc = 0;
 
-    /*****************************/
 
-    int i;
-    char *get_filename;
-    FILE *file;
 
     print_data(data, instructions);
     if (argc > 1) /* check if there's atleast one file that is sent with the command */
