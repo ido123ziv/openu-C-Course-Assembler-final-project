@@ -566,7 +566,7 @@ void write_string_to_data(char *line)
 int handle_command(int type, char *line)
 {
     boolean first_op = FALSE, second_op = FALSE;
-    int first, second;
+    int first = -1, second = -1, temp = -1;
     unsigned int word;
     char op1[20], op2[20];
     printf("handle command operators\t %s\n", line);
@@ -608,11 +608,17 @@ int handle_command(int type, char *line)
     {
         second = method_type(op2);
     }
+    if (first_op && !second_op){
+        temp = first;
+        first = second;
+        second = temp;
+    }
     /*   printf("second_op here\n"); */
     /* check for input errors */
     if (first == COMMAND_INVALID_METHOD || second == COMMAND_INVALID_METHOD)
         return COMMAND_INVALID_METHOD;
-    printf("type: %d, first_op: %d, second_op: %d\n", type, first_op, second_op);
+    printf("type: %s, first_op: %d, second_op: %d\n", commands[type], first_op, second_op);
+    printf("first: %d, second: %d\n", first,second);
     if (!num_operation_fits_command(type, first_op, second_op))
     {
         return COMMAND_INVALID_NUMBER_OF_OPERANDS;
@@ -621,6 +627,7 @@ int handle_command(int type, char *line)
     {
         return COMMAND_INVALID_OPERANDS_METHODS;
     }
+    printf("if you are here you will write to memory!\n");
     /* done checking, adding to data */
     word = word_to_bits(type, first_op, second_op, first, second);
     write_command_to_instructions(word);
@@ -659,7 +666,7 @@ int method_type(char *op)
     /* printf("op was: %s\n", strtok(op, "."));
      printf("new op: %s\n", strtok(NULL, "."));*/
     before_dot = strtok(op, ".");
-    printf("op was:: %s\n", before_dot);
+    printf("op was: %s\n", before_dot);
     after_dot = strtok(NULL, ".");
     printf("new op: %s\n", after_dot);
     if (check_for_label(before_dot, FALSE))
