@@ -466,37 +466,7 @@ int find_directive(char *line)
     }
     return NOT_FOUND;
 }
-/**
- * @brief Get the label address object
- *
- * @param h label to search
- * @param name name of label
- * @return unsigned int
- */
-unsigned int get_label_address(labelPtr h, char *name)
-{
-    labelPtr label = get_label(h, name);
-    if (label != NULL)
-        return label->address;
-    return FALSE;
-}
-/**
- * @brief Get the label object
- *
- * @param label label to search
- * @param name name of label
- * @return labelPtr
- */
-labelPtr get_label(labelPtr label, char *name)
-{
-    while (label)
-    {
-        if (strcmp(label->name, name) == 0)
-            return label;
-        label = label->next;
-    }
-    return NULL;
-}
+
 /**
  * @brief prints the data and instruction array
  * 
@@ -675,9 +645,48 @@ void free_ext(extPtr *extTable)
     }
 }
 
+/* Add a node to the end of the external list */
+extPtr add_ext(extPtr *ptr, char *name, unsigned int ref)
+{
+    extPtr t=*ptr;
+    extPtr tmp;
+
+    tmp=(extPtr) malloc(sizeof(ext));
+    if(!tmp)
+    {
+        printf("\nerror, cannot allocate memory\n");
+        exit(1);
+    }
+
+    tmp -> address = ref;
+    strcpy(tmp->name, name);
+
+    if(!(*ptr)) /* If the list is empty */
+    {
+        *ptr = tmp;
+        tmp -> next = tmp;
+        tmp -> prev = tmp;
+        return tmp;
+    }
+
+
+    ((*ptr)->prev)->next = tmp;
+    tmp->next = t;
+    tmp->prev = t->prev;
+    (*ptr)->prev = tmp;
+
+    return tmp;
+}
 
 /******************** labels table methods **************/
 /* Function will return the address of a given label and FALSE if not exist */
+/**
+ * @brief Get the label address object
+ *
+ * @param h label to search
+ * @param name name of label
+ * @return unsigned int
+ */
 unsigned int get_label_address(labelPtr p, char *name)
 {
     labelPtr label = get_label(p, name);
@@ -686,6 +695,13 @@ unsigned int get_label_address(labelPtr p, char *name)
 }
 
 /* Function checks if a given label name is in the list */
+/**
+ * @brief Get the label object
+ *
+ * @param label label to search
+ * @param name name of label
+ * @return labelPtr
+ */
 labelPtr get_label(labelPtr p, char *name)
 {
 	while(p)

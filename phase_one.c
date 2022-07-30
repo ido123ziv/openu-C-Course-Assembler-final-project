@@ -572,16 +572,15 @@ int handle_command(int type, char *line)
     printf("handle command\t %s\n", line);
     line = next_comma_word(op1, line);
     printf("next op:\t %s\n", op1);
-    printf("next_comma_word\t %s\n", line);
     /*    if (end_of_line(op1)) /* || (line == "") || (*line == '\0')) */
     /*  printf("TRUE\n"); */
     if (!end_of_line(op1))
     {
         first_op = TRUE;
         line = next_comma_word(op2, line);
-        /*printf("next next command %s\n", op2);*/
+        printf("next_comma_word\t %s\n", line);
         if (!end_of_line(op2))
-        { /* if not empty must be a , */
+        { /* if not empty must be a ',' */
             /*  printf("next next next command %s\n", op2);*/
             if (op2[0] != ',')
             {

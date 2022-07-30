@@ -83,7 +83,7 @@ int read_line_ph2(char *line, int line_num)
         if (dir == ENTRY)
         { /* only need to take care of entry */
             copy_word(word, line);
-            create_entry(symbols_table, word); /* Add an entry for this symbol */
+            add_entry(symbols_table, word); /* Add an entry for this symbol */
             /* print error if needed? - need to check if needed */
         }
     }
@@ -356,3 +356,4 @@ FILE *new_file(char *filename, int type)
     }
     return file;
 }
+

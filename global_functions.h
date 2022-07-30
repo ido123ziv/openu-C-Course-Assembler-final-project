@@ -33,4 +33,5 @@ int add_entry(labelPtr ptr, char *name);
 char *to_base_32(unsigned int num);
 void free_labels(labelPtr *labelTable);
 void free_ext(extPtr *extTable);
+extPtr add_ext(extPtr *ptr, char *name, unsigned int ref);
 #endif
