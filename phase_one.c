@@ -39,8 +39,9 @@ void phase_one(FILE *fp, char *file_name)
         exit(1);
     }
     /* writing to data the addresses*/
-    assign_addresses(symbols_table, 100, FALSE);
-    assign_addresses(symbols_table, ic + 100, TRUE);
+    assign_addresses(symbols_table, MEM_START, FALSE);
+    assign_addresses(symbols_table, ic + MEM_START, TRUE);
+    print_labels(&symbols_table);
 }
 /**
  * @brief this function reads line by line from the file
@@ -150,23 +151,23 @@ int read_line_am(char *line, int line_count)
 int check_for_label(char *line, boolean COLON)
 {
     boolean has_digits = FALSE;
-    int line_lentgh = strlen(line);
+    int line_length = strlen(line);
     char word[LINE_LEN];
     int i;
 
-    if (line == NULL || line_lentgh < (COLON ? MINIMUM_LABEL_LENGTH_WITH_COLON : MINIMUM_LABEL_LENGTH_WITHOUT_COLON))
+    if (line == NULL || line_length < (COLON ? MINIMUM_LABEL_LENGTH_WITH_COLON : MINIMUM_LABEL_LENGTH_WITHOUT_COLON))
     {
         /* printf("check min line length:\n");*/
         return 0;
     }
 
-    if (COLON && line[line_lentgh - 1] != ':')
+    if (COLON && line[line_length - 1] != ':')
     {
         /*     printf("line not ending with :\n");*/
         return 0; /* search for :, if colon is a must then we need to have : */
     }
 
-    if (line_lentgh > LABEL_LEN) /* checking label size */
+    if (line_length > LABEL_LEN) /* checking label size */
     {
         if (COLON) /*error only if it is a label with ':' */
             return LABEL_TOO_LONG;
@@ -179,12 +180,12 @@ int check_for_label(char *line, boolean COLON)
 
     if (COLON)
     { /* removing ':' from line*/
-        line[line_lentgh - 1] = '\0';
-        line_lentgh--;
+        line[line_length - 1] = '\0';
+        line_length--;
     }
 
     /* checking all symbol from here are numbers or letters: */
-    for (i = 0; i < line_lentgh; i++)
+    for (i = 0; i < line_length; i++)
     {
         if (isdigit(line[i]))
             has_digits = TRUE;
@@ -312,7 +313,14 @@ void print_label(labelPtr h)
         printf(" -> ");
     printf("\n");
 }
-
+void print_labels(labelPtr *table){
+    labelPtr temp = *table;
+    while (temp)
+    {
+        print_label(temp);
+        temp = temp->next;
+    }
+}
 /**
  * @brief add label addresses to memory
  *
@@ -538,6 +546,7 @@ int handle_extern_directive(char *line)
     new_label = add_label(&symbols_table, copy, 0);
     if (!new_label)
         return 1;
+    has_extern = TRUE;
     new_label->external = TRUE;
     return 0;
 }
