@@ -254,7 +254,6 @@ void encode_label(char *label)
 /* Function will write the output files that need to be create: .ob, (.ent, .ext if needed)*/
 void write_files(char *src)
 {
-    /* TODO: finish write_output functions */
     FILE *file;
 
     file = new_file(src, FILE_OBJECT);
@@ -339,9 +338,10 @@ void write_entry(FILE *file)
  */
 void write_extern(FILE *file)
 {
+    
     char *base32_address;
     extPtr node = ext_list;
-
+    printf("GOT HEREWEEEEEE\n");
     /* Go through external linked list and pulling values */
     do
     {

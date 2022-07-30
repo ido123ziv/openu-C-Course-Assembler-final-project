@@ -27,7 +27,7 @@ order to provide central place for all of the constants and functions declaratio
    ****************************************************
 */
 typedef enum boolean {FALSE,TRUE}boolean;
-enum ARE {ABSOLUTE, RELOCATABLE ,EXTERNAL};
+enum ARE {ABSOLUTE, EXTERNAL, RELOCATABLE};
 enum filetypes {FILE_INPUT, FILE_MACRO, FILE_OBJECT,FILE_ENTRY,FILE_EXTERN };
 enum directives {DATA, STRING, STRUCT, ENTRY, EXTERN,UNKNOWN_TYPE};
 enum commands {MOV, CMP, ADD, SUB, LEA, NOT, CLR,  INC, DEC, JMP, BNE, GET, PRN, JSR, RTS, HLT, UNKNOWN_COMMAND};

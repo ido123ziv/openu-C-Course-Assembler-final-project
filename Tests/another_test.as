@@ -11,7 +11,6 @@ LOOP:   jmp R
 	prn K
 	inc r7
 	jsr S.2
-	red W
-END: stop
+END: mov r1, r2
 K: .data -5
 S: .struct 2,"ab"
