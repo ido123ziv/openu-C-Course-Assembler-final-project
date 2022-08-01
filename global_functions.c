@@ -9,40 +9,7 @@ Project by Eran Cohen and Ido Ziv
 This script will include all the global function that will be require for more than 1 script
 for example: ignore spaces and tabs on input etc.
 */
-/*
-const char *commands[] = {
-    "mov", "cmp", "add", "sub", "not", "clr", "lea", "inc", "dec", "jmp", "bne",
-    "get", "prn", "jsr", "rts", "hlt"};
-const char *directives[] = {
-    ".data", ".string", ".struct", ".entry", ".extern"};*/
-/**
- * @brief
- * This function skippes the whitespaces from the begining of a given string by incrementing the first index
- * @param c string
- * @param start index of first char
- * @return int -> the first index of character from which is not a whitespace
- */
-int skip_whitespaces_at_begining(char c[], int start)
-{
-    for (; c[start] == ' ' || c[start] == '\t'; start++)
-        ; /*incrementing start until to skip whitespaces in the begining of a string */
-    return start;
-}
-/**
- * @brief
- * This function skippes the whitespaces from the end of a given string
- * @param c string
- * @param end index of last char
- * @return int the index of the first char from the end that is not a whitespace
- */
-int skip_whitespaces_at_end(char c[], int end)
-{
-    int i;
-    for (i = end; i > 0; i--)
-        if (!isspace(c[i]))
-            return i + 1;
-    return 1;
-}
+
 /**
  * @brief gets a string that represent a number, if the string contains characters that are not numbers returns false
  *
@@ -107,53 +74,6 @@ char *create_file(char *original, int type)
     return modified;
 }
 
-/**
- * @brief
- * this function validates the syntax of a given line regarding immediate and relative addresing methods
- * @param operand operand of the line
- * @param line_num number of the line
- * @param file_name name of the file
- * @return boolean whether the syntax is valid
- */
-boolean syntax_validator(char operand[], int line_num, char *file_name)
-{
-
-    if (operand[0] == '#') /* immediate methods must begin with a '#' and a number must follow*/
-    {
-
-        if (strlen(operand) > 1)
-        {
-            if (!is_number(operand + 1))
-            {
-                fprintf(stdout, "<file %s, line %d> Illegal input, The operand after '#' must be a real number)\n", file_name, line_num);
-                return FALSE;
-            }
-        }
-        else
-        {
-            fprintf(stdout, "<file %s, line %d> Illegal input, There is no char after the '#' sign must be a real number\n", file_name, line_num);
-            return FALSE;
-        }
-    }
-    if (operand[0] == '%')
-    {
-        if (strlen(operand) > 1)
-        {
-            if (operand[1] == ' ') /*whether there is a space after % */
-            {
-                fprintf(stdout, "<file %s, line %d> Illegal space after the precent sign\n", file_name, line_num);
-                return FALSE;
-            }
-        }
-        else
-        {
-            fprintf(stdout, "<file %s, line %d> Illegal input, There is no char after the precent sign\n", file_name, line_num);
-            return FALSE;
-        }
-    }
-
-    return TRUE;
-}
 
 /**
  * @brief gets a string that represent a register, and validates the format
@@ -468,30 +388,6 @@ int find_directive(char *line)
 }
 
 /**
- * @brief prints the data and instruction array
- * 
- * @param data array in memory
- * @param instructions array in memory
- */
-void print_data(unsigned int *data, unsigned int *instructions)
-{
-    int i;
-    printf("$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$\nMe Printing Data ah?\n");
-    printf("dc %d\n", dc);
-    for (i = 0; i < (sizeof(data)); i++)
-    {
-        printf(":%u::-", data[i]);
-    }
-    printf("\n$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$\n");
-    printf("$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$\nMe Printing Instructions ah?\n");
-    printf("ic %d\n", ic);
-    for (i = 0; i < (sizeof(instructions)); i++)
-    {
-        printf(":%u::-", instructions[i]);
-    }
-    printf("\n$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$\n");
-}
-/**
  * @brief Get the bits object
  * 
  * @param word unsigned int we want to parse
@@ -554,7 +450,6 @@ char * next_comma_word(char *word, char * line){
 char * next_string_word(char *word, char * line){
     char *tmp = word;
     line = next_comma_word(word,line);
-    printf("next_comma_word %s\n", word);
     if(end_of_line(line)){
         word[0] = '\0';
         return NULL;
@@ -618,7 +513,6 @@ char *to_base_32(unsigned int num)
 /* Free the memory we allocated for the labels list */
 void free_labels(labelPtr *labelTable)
 {
-
     labelPtr p;
     while (*labelTable)
     {
@@ -723,7 +617,6 @@ boolean is_label_exist(labelPtr p, char *name)
 boolean is_label_external(labelPtr p, char *name)
 {
     labelPtr label = get_label(p, name);
-    printf("label = %s\n", label->name);
     if(label != NULL) return label -> external;
     return FALSE;
 }
