@@ -502,7 +502,7 @@ int handle_struct_directive(char *line)
             if (copy[0] != '"' && copy[strlen(copy) - 1] != '"')
                 return STRUCT_INVALID_STRING;
             /*  copy_word(copy, line); */
-            copy[line_len - 1] = '\0';
+            copy[line_len - 2] = '\0';
             write_string_to_data(copy + 1);
         }
     }
