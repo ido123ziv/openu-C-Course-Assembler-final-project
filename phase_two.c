@@ -285,7 +285,8 @@ void write_ob(FILE *file)
     char *param1 = to_base_32(ic), *param2 = to_base_32(dc);
     int i;
 
-    fprintf(file, "%s\t%s\n\n", param1, param2);
+  /*  fprintf(file, "%s\t%s\n\n", param1, param2);*/
+    fprintf(file, "m\tf\n\n");
     free(param1);
     free(param2);
 
