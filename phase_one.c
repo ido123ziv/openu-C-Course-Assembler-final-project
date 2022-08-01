@@ -42,7 +42,6 @@ void phase_one(FILE *fp, char *file_name)
     /* writing to data the addresses*/
     assign_addresses(symbols_table, MEM_START, FALSE);
     assign_addresses(symbols_table, ic + MEM_START, TRUE);
-    print_labels(&symbols_table);
 }
 /**
  * @brief this function reads line by line from the file
@@ -80,7 +79,6 @@ int read_line_am(char *line, int line_count)
         else
         {
             new_label = add_label(&symbols_table, current_word, 0);
-         /*   print_label(new_label); */
             if (!new_label)
                 return LABEL_ALREADY_EXISTS;
             line = next_word(line);
@@ -99,7 +97,6 @@ int read_line_am(char *line, int line_count)
 
     if (dir_type != NOT_FOUND)
     {
-/*        printf("directive is: %s\n", directives[dir_type]); */
         if (label_count)
         {
             if (dir_type == EXTERN || dir_type == ENTRY)
@@ -123,7 +120,6 @@ int read_line_am(char *line, int line_count)
             new_label->address = ic;
             new_label->action = TRUE;
         }
-/*        printf("command is: %s\n", commands[command_type]); */
         line = next_word(line);
         is_error = handle_command(command_type, line);
         if (is_error)
@@ -280,33 +276,6 @@ boolean delete_label(labelPtr *table, char *name)
         table_pointer = table_pointer->next;
     }
     return FALSE;
-}
-/**
- * @brief prints a label according to format
- *
- * @param l which label to print
- */
-void print_label(labelPtr l)
-{
-    printf("\nname: %s, address: %d, external: %d", l->name, l->address, l->external);
-    if (l->external == 0)
-        printf(", is in action statement: %d -> ", l->action);
-    else
-        printf(" -> ");
-    printf("\n");
-}
-/**
- * @brief prints entire labels table
- * 
- * @param table 
- */
-void print_labels(labelPtr *table){
-    labelPtr temp = *table;
-    while (temp)
-    {
-        print_label(temp);
-        temp = temp->next;
-    }
 }
 /**
  * @brief add label addresses to memory
