@@ -611,6 +611,10 @@ int handle_command(int type, char *line)
         op_dest = method_type(op2);
     }
     if (is_src_op && !is_dest_op){
+        printf("614: \n");
+        printf("type: %s, is_src_op: %d, is_dest_op: %d\n", commands[type], is_src_op, is_dest_op);
+        printf("op_src: %s, op_dest: %d\n", types[op_src],op_dest);
+        printf("617: \n");
         temp = op_src;
         op_src = op_dest;
         op_dest = temp;
@@ -878,8 +882,10 @@ unsigned int word_to_bits(int method_type, boolean is_src_op, boolean is_dest_op
     }
     else if (is_dest_op)
     {
+        word_in_bits <<= BITS_IN_METHOD;
         word_in_bits |= op_dest;
     }
+    printf("word_in_bits: %u\n", word_in_bits);
     word_in_bits = add_are(word_in_bits, ABSOLUTE);
     return word_in_bits;
 }

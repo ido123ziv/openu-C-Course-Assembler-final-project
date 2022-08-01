@@ -53,6 +53,7 @@ enum errors {SYNTAX_ERR = 1,LABEL_ALREADY_EXISTS ,LABEL_TOO_LONG ,
 
 extern const char base32[32];
 extern const char *commands[];
+extern const char *types[];
 extern const char *directives[];
 extern int error_code;
 extern boolean error_exists, has_entry, has_extern;

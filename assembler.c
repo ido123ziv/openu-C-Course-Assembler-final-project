@@ -24,6 +24,10 @@ const char base32[32] = {
 const char *directives[] = {
     ".data", ".string", ".struct", ".entry", ".extern"};
 
+const char *types[] = {
+    "M_IMMEDIATE", "M_DIRECT", "M_STRUCT", "M_REGISTER"
+};
+
 int ic, dc;
 int error_code;
 boolean error_exists, has_entry, has_extern;
