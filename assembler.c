@@ -13,7 +13,7 @@ translate it to different files as needed
 #include "phases.h"
 
 const char *commands[] = {
-    "mov", "cmp", "add", "sub", "lea", "not", "clr", "inc", "dec", "jmp", "bne",
+    "mov", "cmp", "add", "sub", "not", "clr", "lea", "inc", "dec", "jmp", "bne",
     "get", "prn", "jsr", "rts", "hlt"};
 
 const char base32[32] = {
