@@ -885,6 +885,7 @@ unsigned int word_to_bits(int method_type, boolean is_src_op, boolean is_dest_op
     }
     else {
         word_in_bits <<= BITS_IN_METHOD;
+
     }
     printf("word_in_bits: %u\n", word_in_bits);
     word_in_bits = add_are(word_in_bits, ABSOLUTE);
