@@ -94,7 +94,6 @@ int read_line_ph2(char *line, int line_num)
         }
     }
     return 0;
-
 }
 
 /* Function will encode words in the command that could not be encode on phase 1 */
@@ -177,6 +176,7 @@ void check_operands(int cmd, boolean *is_src, boolean *is_dest)
             *is_src = FALSE;
             *is_dest = FALSE;
     }
+  
 }
 
 
@@ -285,7 +285,7 @@ void write_ob(FILE *file)
     char *param1 = to_base_32(ic), *param2 = to_base_32(dc);
     int i;
 
-  /*  fprintf(file, "%s\t%s\n\n", param1, param2);*/
+    /*fprintf(file, "%s\t%s\n\n", param1, param2);*/
     fprintf(file, "m\tf\n\n");
     free(param1);
     free(param2);

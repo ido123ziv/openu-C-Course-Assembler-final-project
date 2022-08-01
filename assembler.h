@@ -51,13 +51,7 @@ enum errors {SYNTAX_ERR = 1,LABEL_ALREADY_EXISTS ,LABEL_TOO_LONG ,
    ****************************************************
 */
 
-extern const char base32[32];
-extern const char *commands[];
-extern const char *types[];
-extern const char *directives[];
-extern int error_code;
-extern boolean error_exists, has_entry, has_extern;
-extern int ic, dc;
+
 
 #define BITS_IN_WORD 10
 #define BITS_IN_OPCODE 4
@@ -89,14 +83,19 @@ extern int ic, dc;
 #define ERROR 1
 #define NOT_FOUND -1
 #define MEM_START 100
+
+#define REGISTER_LENGTH 2 /* a register's name contains 2 characters */
+#define MIN_REGISTER 0 /* r0 is the first register */
+#define MAX_REGISTER 7 /* r7 is the last register */
+
+
 /* ****************************************************
     ****************************************************
     ****************************************************
-    ************          Variables             *******
+    ************          Structures              *******
     ****************************************************
    ****************************************************
 */
- 
 /* Linked list to store program labels */
 typedef struct structLabels * labelPtr;
 typedef struct  structLabels {
@@ -117,22 +116,28 @@ typedef struct ext {
     extPtr prev; /* Pointer to the previous label on list */
 } ext;
 
-extern int ic, dc;
-extern labelPtr symbols_table;
-extern unsigned int data[];
-extern unsigned int instructions[];
-#define REGISTER_LENGTH 2 /* a register's name contains 2 characters */
-#define MIN_REGISTER 0 /* r0 is the first register */
-#define MAX_REGISTER 7 /* r7 is the last register */
+
 /* ****************************************************
     ****************************************************
     ****************************************************
-    ************          Functions              *******
+    ************          Variables             *******
     ****************************************************
    ****************************************************
 */
+ extern const char base32[32];
+extern const char *commands[];
+extern const char *types[];
+extern const char *directives[];
+extern int error_code;
+extern boolean error_exists, has_entry, has_extern;
+extern int ic, dc;
+extern labelPtr symbols_table;
+extern extPtr ext_list;
+extern unsigned int data[];
+extern unsigned int instructions[];
+
 
 /*************** DECLARETIONS  ****************/
 /*void assembler(FILE *file, char *file_name);*/
-
+void reset_vars();
 #endif
