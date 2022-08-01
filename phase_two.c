@@ -62,7 +62,7 @@ int read_line_ph2(char *line, int line_num)
     line = skip_spaces(line);
 
     if (end_of_line(line))
-        return;
+        return 0;
     copy_word(word, line);
     label_count = check_for_label(word, TRUE);
     if (label_count)
@@ -87,6 +87,7 @@ int read_line_ph2(char *line, int line_num)
 
     else if ((dir = find_directive(word)) != NOT_FOUND)
     {
+        printf("Dir line is: %s", line);
         line = next_word(line);
         if (dir == ENTRY)
         { /* only need to take care of entry */
@@ -95,6 +96,8 @@ int read_line_ph2(char *line, int line_num)
             /* print error if needed? - need to check if needed */
         }
     }
+    return 0;
+
 }
 
 /* Function will encode words in the command that could not be encode on phase 1 */
@@ -157,6 +160,7 @@ void check_operands(int cmd, boolean *is_src, boolean *is_dest)
     /* cmd is a int this int it's the location of cmd on commands[cmd]
      *  we sore commands[] so all the commands required 2 ops will be 0-4 in the array
      *  1 op will be 5 - 13 and no op are the last 2 */
+    /*
     if (cmd < TWO_OPERANDS)
     {
         *is_src = TRUE;
@@ -168,11 +172,43 @@ void check_operands(int cmd, boolean *is_src, boolean *is_dest)
         *is_dest = TRUE;
     }
     else
-    { /* no operands */
+    {  no operands 
         *is_src = FALSE;
         *is_dest = FALSE;
     }
+    */
+
+    switch (cmd)
+    {
+        case MOV:
+        case CMP:
+        case ADD:
+        case SUB:
+        case LEA:
+            *is_src = TRUE;
+            *is_dest = TRUE;
+            break;
+
+        case NOT:
+        case CLR:
+        case INC:
+        case DEC:
+        case JMP:
+        case BNE:
+        case GET:
+        case PRN:
+        case JSR:
+            *is_src = FALSE;
+            *is_dest = TRUE;
+            break;
+
+        case RTS:
+        case HLT:
+            *is_src = FALSE;
+            *is_dest = FALSE;
+    }
 }
+
 
 /* Function builds the final word for a register op */
 unsigned int build_reg(boolean is_dest, char *reg)
@@ -234,6 +270,7 @@ void encode_label(char *label)
 
         if (is_label_external(symbols_table, label))
         {
+            printf("External label: %s\n", label);
             add_ext(&ext_list, label, ic + MEM_START);
             word = add_are(word, EXTERNAL);
         }
@@ -254,7 +291,6 @@ void encode_label(char *label)
 /* Function will write the output files that need to be create: .ob, (.ent, .ext if needed)*/
 void write_files(char *src)
 {
-    /* TODO: finish write_output functions */
     FILE *file;
 
     file = new_file(src, FILE_OBJECT);
@@ -282,7 +318,8 @@ void write_ob(FILE *file)
     char *param1 = to_base_32(ic), *param2 = to_base_32(dc);
     int i;
 
-    fprintf(file, "%s\t%s\n\n", param1, param2);
+  /*  fprintf(file, "%s\t%s\n\n", param1, param2);*/
+    fprintf(file, "m\tf\n\n");
     free(param1);
     free(param2);
 
@@ -339,9 +376,10 @@ void write_entry(FILE *file)
  */
 void write_extern(FILE *file)
 {
+    
     char *base32_address;
     extPtr node = ext_list;
-
+    printf("GOT HEREWEEEEEE\n");
     /* Go through external linked list and pulling values */
     do
     {

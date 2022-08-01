@@ -32,13 +32,13 @@ dec S2.1
 jmp C
 bne r5
 bne S3.2
-red S2.2
+not S2.2
 prn C
 prn B
 prn #-7
 prn S1.2
 rts 
-E: stop
+E: hlt
 
 
 

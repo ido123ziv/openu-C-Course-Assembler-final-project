@@ -39,8 +39,9 @@ void phase_one(FILE *fp, char *file_name)
         exit(1);
     }
     /* writing to data the addresses*/
-    assign_addresses(symbols_table, 100, FALSE);
-    assign_addresses(symbols_table, ic + 100, TRUE);
+    assign_addresses(symbols_table, MEM_START, FALSE);
+    assign_addresses(symbols_table, ic + MEM_START, TRUE);
+    print_labels(&symbols_table);
 }
 /**
  * @brief this function reads line by line from the file
@@ -54,7 +55,7 @@ int read_line_am(char *line, int line_count)
     int dir_type = NOT_FOUND;
     int command_type = NOT_FOUND;
     labelPtr new_label = NULL;
-    char *line_copy, current_word[LINE_LEN];
+    char current_word[LINE_LEN];
     int label_count, is_error;
     printf("######################################################\n");
     printf("current line is: %s\n", line);
@@ -68,7 +69,6 @@ int read_line_am(char *line, int line_count)
         /* first non-blank character must be a letter or a dot */
         return SYNTAX_ERR;
     }
-    line_copy = line;
     copy_word(current_word, line);
     label_count = check_for_label(current_word, TRUE);
     if (label_count)
@@ -150,23 +150,23 @@ int read_line_am(char *line, int line_count)
 int check_for_label(char *line, boolean COLON)
 {
     boolean has_digits = FALSE;
-    int line_lentgh = strlen(line);
+    int line_length = strlen(line);
     char word[LINE_LEN];
     int i;
 
-    if (line == NULL || line_lentgh < (COLON ? MINIMUM_LABEL_LENGTH_WITH_COLON : MINIMUM_LABEL_LENGTH_WITHOUT_COLON))
+    if (line == NULL || line_length < (COLON ? MINIMUM_LABEL_LENGTH_WITH_COLON : MINIMUM_LABEL_LENGTH_WITHOUT_COLON))
     {
         /* printf("check min line length:\n");*/
         return 0;
     }
 
-    if (COLON && line[line_lentgh - 1] != ':')
+    if (COLON && line[line_length - 1] != ':')
     {
         /*     printf("line not ending with :\n");*/
         return 0; /* search for :, if colon is a must then we need to have : */
     }
 
-    if (line_lentgh > LABEL_LEN) /* checking label size */
+    if (line_length > LABEL_LEN) /* checking label size */
     {
         if (COLON) /*error only if it is a label with ':' */
             return LABEL_TOO_LONG;
@@ -179,12 +179,12 @@ int check_for_label(char *line, boolean COLON)
 
     if (COLON)
     { /* removing ':' from line*/
-        line[line_lentgh - 1] = '\0';
-        line_lentgh--;
+        line[line_length - 1] = '\0';
+        line_length--;
     }
 
     /* checking all symbol from here are numbers or letters: */
-    for (i = 0; i < line_lentgh; i++)
+    for (i = 0; i < line_length; i++)
     {
         if (isdigit(line[i]))
             has_digits = TRUE;
@@ -312,7 +312,14 @@ void print_label(labelPtr h)
         printf(" -> ");
     printf("\n");
 }
-
+void print_labels(labelPtr *table){
+    labelPtr temp = *table;
+    while (temp)
+    {
+        print_label(temp);
+        temp = temp->next;
+    }
+}
 /**
  * @brief add label addresses to memory
  *
@@ -440,7 +447,6 @@ int handle_data_directive(char *line)
 int handle_string_directive(char *line)
 {
     int line_len;
-    char copy[LINE_LEN];
     /*   printf("my line is %s\n", line); */
     if (end_of_line(line)) /* || (line != '"' && line[line_len - 1] != '"'))*/
         return STRING_OPERAND_NOT_VALID;
@@ -458,11 +464,7 @@ int handle_string_directive(char *line)
     line = skip_spaces(line);
     if (!end_of_line(line))
     {
-        /*  copy[strlen(copy) - 1] = "\0";*/
         line[line_len - 2] = '\0';
-        /*copy[0] = "\0";*/
-        /*printf("without \": %s\n", copy);
-        printf("with \": %s\n", copy + 1);*/
         write_string_to_data(line);
     }
 
@@ -476,9 +478,7 @@ int handle_string_directive(char *line)
  */
 int handle_struct_directive(char *line)
 {
-    int line_len = strlen(line);
-
-    char copy[LINE_LEN], c = copy;
+    char copy[LINE_LEN];
     printf("my line is: %s\n", line);
     line = next_comma_word(copy, line);
     printf("line: %s\nmy copy is: %s\nend_of_line: %d\nis_number: %d\n",line, copy,end_of_line(copy),is_number(copy));
@@ -488,9 +488,6 @@ int handle_struct_directive(char *line)
     data[dc++] = (unsigned int)atoi(copy);
     line = next_comma_word(copy, line);
     printf("after line:%s \t copy: %s\n", line, copy);
-  /*  line = next_comma_word(copy, line); 
-    printf("2x next_comma_word: %s \t copy: %s\n", line, copy); 
-    /* copy_word(copy, line); */
     if (!end_of_line(line) && *copy == ',')
     {
         line = next_comma_word(copy, line); /* copy equvals string with "" */
@@ -503,7 +500,9 @@ int handle_struct_directive(char *line)
             if (copy[0] != '"' && copy[strlen(copy) - 1] != '"')
                 return STRUCT_INVALID_STRING;
             /*  copy_word(copy, line); */
-            copy[line_len - 1] = '\0';
+            copy[strlen(copy) -1] = '\0';
+            printf("my name is slim shady: %s\n", copy+1);
+            printf("my name is not slim shady: %c\n", copy[strlen(copy) -2]);
             write_string_to_data(copy + 1);
         }
     }
@@ -538,6 +537,7 @@ int handle_extern_directive(char *line)
     new_label = add_label(&symbols_table, copy, 0);
     if (!new_label)
         return 1;
+    has_extern = TRUE;
     new_label->external = TRUE;
     return 0;
 }
@@ -609,9 +609,15 @@ int handle_command(int type, char *line)
         op_dest = method_type(op2);
     }
     if (is_src_op && !is_dest_op){
+        printf("614: \n");
+        printf("type: %s, is_src_op: %d, is_dest_op: %d\n", commands[type], is_src_op, is_dest_op);
+        printf("op_src: %s, op_dest: %d\n", types[op_src],op_dest);
+        printf("617: \n");
         temp = op_src;
         op_src = op_dest;
         op_dest = temp;
+        is_src_op = FALSE;
+        is_dest_op = TRUE;
     }
     /*   printf("is_dest_op here\n"); */
     /* check for input errors */
@@ -630,6 +636,7 @@ int handle_command(int type, char *line)
     printf("if you are here you will write to memory!\n");
     /* done checking, adding to data */
     word = word_to_bits(type, is_src_op, is_dest_op, op_src, op_dest);
+    printf("word is: %u\n", word);
     write_command_to_instructions(word);
     ic += word_count_by_command(is_src_op, is_dest_op, op_src, op_dest);
     return 0;
@@ -700,23 +707,23 @@ boolean num_operation_fits_command(int command_type, boolean is_src_op, boolean 
     case LEA:
         return is_src_op && is_dest_op;
     case NOT:
-        return is_src_op && !is_dest_op;
+        return !is_src_op && is_dest_op;
     case CLR:
-        return is_src_op && !is_dest_op;
+        return !is_src_op && is_dest_op;
     case INC:
-        return is_src_op && !is_dest_op;
+        return !is_src_op && is_dest_op;
     case DEC:
-        return is_src_op && !is_dest_op;
+        return !is_src_op && is_dest_op;
     case JMP:
-        return is_src_op && !is_dest_op;
+        return !is_src_op && is_dest_op;
     case BNE:
-        return is_src_op && !is_dest_op;
+        return !is_src_op && is_dest_op;
     case GET:
-        return is_src_op && !is_dest_op;
+        return !is_src_op && is_dest_op;
     case PRN:
-        return is_src_op && !is_dest_op;
+        return !is_src_op && is_dest_op;
     case JSR:
-        return is_src_op && !is_dest_op;
+        return !is_src_op && is_dest_op;
     case RTS:
         return !is_src_op && !is_dest_op;
     case HLT:
@@ -871,10 +878,16 @@ unsigned int word_to_bits(int method_type, boolean is_src_op, boolean is_dest_op
         word_in_bits <<= BITS_IN_METHOD;
         word_in_bits |= op_dest;
     }
-    else if (is_src_op)
+    else if (is_dest_op)
     {
-        word_in_bits |= op_src;
+        word_in_bits <<= BITS_IN_METHOD;
+        word_in_bits |= op_dest;
     }
+    else {
+        word_in_bits <<= BITS_IN_METHOD;
+
+    }
+    printf("word_in_bits: %u\n", word_in_bits);
     word_in_bits = add_are(word_in_bits, ABSOLUTE);
     return word_in_bits;
 }

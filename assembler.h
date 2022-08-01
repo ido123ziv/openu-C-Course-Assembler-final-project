@@ -27,10 +27,10 @@ order to provide central place for all of the constants and functions declaratio
    ****************************************************
 */
 typedef enum boolean {FALSE,TRUE}boolean;
-enum ARE {ABSOLUTE, RELOCATABLE ,EXTERNAL};
+enum ARE {ABSOLUTE, EXTERNAL, RELOCATABLE};
 enum filetypes {FILE_INPUT, FILE_MACRO, FILE_OBJECT,FILE_ENTRY,FILE_EXTERN };
 enum directives {DATA, STRING, STRUCT, ENTRY, EXTERN,UNKNOWN_TYPE};
-enum commands {MOV, CMP, ADD, SUB, LEA, NOT, CLR,  INC, DEC, JMP, BNE, GET, PRN, JSR, RTS, HLT, UNKNOWN_COMMAND};
+enum commands {MOV, CMP, ADD, SUB, NOT, CLR, LEA,  INC, DEC, JMP, BNE, GET, PRN, JSR, RTS, HLT, UNKNOWN_COMMAND};
 enum methods {M_IMMEDIATE, M_DIRECT, M_STRUCT, M_REGISTER, M_UNKNOWN};
 enum errors {SYNTAX_ERR = 1,LABEL_ALREADY_EXISTS ,LABEL_TOO_LONG ,
     LABEL_INVALID_FIRST_CHAR ,LABEL_ONLY_ALPHANUMERIC ,LABEL_CANT_BE_COMMAND ,
@@ -53,6 +53,7 @@ enum errors {SYNTAX_ERR = 1,LABEL_ALREADY_EXISTS ,LABEL_TOO_LONG ,
 
 extern const char base32[32];
 extern const char *commands[];
+extern const char *types[];
 extern const char *directives[];
 extern int error_code;
 extern boolean error_exists, has_entry, has_extern;
@@ -118,8 +119,8 @@ typedef struct ext {
 
 extern int ic, dc;
 extern labelPtr symbols_table;
-unsigned int data[];
-unsigned int instructions[];
+extern unsigned int data[];
+extern unsigned int instructions[];
 #define REGISTER_LENGTH 2 /* a register's name contains 2 characters */
 #define MIN_REGISTER 0 /* r0 is the first register */
 #define MAX_REGISTER 7 /* r7 is the last register */
