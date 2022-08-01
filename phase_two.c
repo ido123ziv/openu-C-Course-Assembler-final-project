@@ -160,6 +160,7 @@ void check_operands(int cmd, boolean *is_src, boolean *is_dest)
     /* cmd is a int this int it's the location of cmd on commands[cmd]
      *  we sore commands[] so all the commands required 2 ops will be 0-4 in the array
      *  1 op will be 5 - 13 and no op are the last 2 */
+    /*
     if (cmd < TWO_OPERANDS)
     {
         *is_src = TRUE;
@@ -171,11 +172,43 @@ void check_operands(int cmd, boolean *is_src, boolean *is_dest)
         *is_dest = TRUE;
     }
     else
-    { /* no operands */
+    {  no operands 
         *is_src = FALSE;
         *is_dest = FALSE;
     }
+    */
+
+    switch (cmd)
+    {
+        case MOV:
+        case CMP:
+        case ADD:
+        case SUB:
+        case LEA:
+            *is_src = TRUE;
+            *is_dest = TRUE;
+            break;
+
+        case NOT:
+        case CLR:
+        case INC:
+        case DEC:
+        case JMP:
+        case BNE:
+        case GET:
+        case PRN:
+        case JSR:
+            *is_src = FALSE;
+            *is_dest = TRUE;
+            break;
+
+        case RTS:
+        case HLT:
+            *is_src = FALSE;
+            *is_dest = FALSE;
+    }
 }
+
 
 /* Function builds the final word for a register op */
 unsigned int build_reg(boolean is_dest, char *reg)
