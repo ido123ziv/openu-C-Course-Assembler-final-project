@@ -62,7 +62,7 @@ int read_line_ph2(char *line, int line_num)
     line = skip_spaces(line);
 
     if (end_of_line(line))
-        return;
+        return 0;
     copy_word(word, line);
     label_count = check_for_label(word, TRUE);
     if (label_count)
@@ -96,6 +96,8 @@ int read_line_ph2(char *line, int line_num)
             /* print error if needed? - need to check if needed */
         }
     }
+    return 0;
+
 }
 
 /* Function will encode words in the command that could not be encode on phase 1 */

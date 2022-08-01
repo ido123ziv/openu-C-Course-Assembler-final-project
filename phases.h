@@ -19,6 +19,7 @@ void cmd_ph2_binary(int cmd, char *line);
 void check_operands(int cmd, boolean *is_src, boolean *is_dest);
 unsigned int build_reg(boolean is_dest, char *reg);
 void encode_ph2_word(boolean is_dest, int method, char * op);
+void encode_label(char *label);
 void write_ob(FILE *file);
 void write_files(char *src);
 void write_entry(FILE *file);

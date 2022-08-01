@@ -478,8 +478,6 @@ int handle_string_directive(char *line)
  */
 int handle_struct_directive(char *line)
 {
-    int line_len = strlen(line);
-
     char copy[LINE_LEN];
     printf("my line is: %s\n", line);
     line = next_comma_word(copy, line);
