@@ -62,7 +62,7 @@ int read_line_ph2(char *line, int line_num)
     line = skip_spaces(line);
 
     if (end_of_line(line))
-        return 0;
+        return;
     copy_word(word, line);
     label_count = check_for_label(word, TRUE);
     if (label_count)
@@ -91,13 +91,13 @@ int read_line_ph2(char *line, int line_num)
         line = next_word(line);
         if (dir == ENTRY)
         { /* only need to take care of entry */
+            printf("Entry is here: %s\n", word);
             copy_word(word, line);
+            printf("Entry new word: %s\n", word);
             add_entry(symbols_table, word); /* Add an entry for this symbol */
             /* print error if needed? - need to check if needed */
         }
     }
-    return 0;
-
 }
 
 /* Function will encode words in the command that could not be encode on phase 1 */
@@ -160,6 +160,7 @@ void check_operands(int cmd, boolean *is_src, boolean *is_dest)
     /* cmd is a int this int it's the location of cmd on commands[cmd]
      *  we sore commands[] so all the commands required 2 ops will be 0-4 in the array
      *  1 op will be 5 - 13 and no op are the last 2 */
+    /*
     if (cmd < TWO_OPERANDS)
     {
         *is_src = TRUE;
@@ -171,9 +172,40 @@ void check_operands(int cmd, boolean *is_src, boolean *is_dest)
         *is_dest = TRUE;
     }
     else
-    { /* no operands */
+    {  no operands 
         *is_src = FALSE;
         *is_dest = FALSE;
+    }
+    */
+
+    switch (cmd)
+    {
+        case MOV:
+        case CMP:
+        case ADD:
+        case SUB:
+        case LEA:
+            *is_src = TRUE;
+            *is_dest = TRUE;
+            break;
+
+        case NOT:
+        case CLR:
+        case INC:
+        case DEC:
+        case JMP:
+        case BNE:
+        case GET:
+        case PRN:
+        case JSR:
+            *is_src = FALSE;
+            *is_dest = TRUE;
+            break;
+
+        case RTS:
+        case HLT:
+            *is_src = FALSE;
+            *is_dest = FALSE;
     }
 }
 
@@ -285,8 +317,7 @@ void write_ob(FILE *file)
     char *param1 = to_base_32(ic), *param2 = to_base_32(dc);
     int i;
 
-  /*  fprintf(file, "%s\t%s\n\n", param1, param2);*/
-    fprintf(file, "m\tf\n\n");
+    fprintf(file, "%s\t%s\n\n", param1, param2);
     free(param1);
     free(param2);
 

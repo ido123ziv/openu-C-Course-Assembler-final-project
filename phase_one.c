@@ -13,6 +13,8 @@ Project by Eran Cohen and Ido Ziv
  */
 void phase_one(FILE *fp, char *file_name)
 {
+    ic = 0;
+    dc = 0;
     char current_line[LINE_LEN]; /* holds the current line */
     int line_count = 1;          /* initializing the line counter to 1, the file starts with line 1 */
 
