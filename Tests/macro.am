@@ -1,16 +1,10 @@
-
-; comment - test it out
-
 MAIN: mov S1.1 ,LENGTH
  add r2,STR
 LOOP: jmp END
-macro m1
- inc L
- mov S1.2 ,r3
-endmacro
  prn #-5
  sub r1, r4
-m1
+ inc L
+ mov S1.2 ,r3
  bne LOOP
 END: hlt
 STR: .string "abcdef"

@@ -1,5 +1,5 @@
 #!/bin/bash
-MY_PATH="/home/ubuntu/openu-C-Course-Assembler-final-project"
+MY_PATH="/home/ido/openu-C-Course-Assembler-final-project"
 if [[ $MY_PATH == $(pwd) ]]; then 
     echo good to go!; 
 else 
