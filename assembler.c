@@ -77,6 +77,7 @@ int main(int argc, char *argv[])
                     if (file != NULL)
                     { /* File exists */
                         printf("Starting second phase on file: %s\n", get_filename);
+                        get_filename[strlen(get_filename) -3] = '\0';
                         phase_two(file, get_filename);
                         fclose(file);
                     }
