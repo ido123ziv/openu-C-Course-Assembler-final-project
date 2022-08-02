@@ -13,13 +13,12 @@ Project by Eran Cohen and Ido Ziv
  */
 void phase_one(FILE *fp, char *file_name)
 {
+    int line_count = 1; /* initializing the line counter to 1, the file starts with line 1 */
+    char current_line[LINE_LEN]; /* holds the current line */
     ic = 0;
     dc = 0;
-    char current_line[LINE_LEN]; /* holds the current line */
-    int line_count = 1;          /* initializing the line counter to 1, the file starts with line 1 */
-
     printf("---------------------------------------------------------\n");
-    printf("let's do this shit %s\n", file_name);
+    printf("Phase 1 on file: %s\n", file_name);
     printf("---------------------------------------------------------\n");
     while (fgets(current_line, LINE_LEN, fp) != NULL)
     {
@@ -43,7 +42,6 @@ void phase_one(FILE *fp, char *file_name)
     /* writing to data the addresses*/
     assign_addresses(symbols_table, MEM_START, FALSE);
     assign_addresses(symbols_table, ic + MEM_START, TRUE);
-    print_labels(&symbols_table);
 }
 /**
  * @brief this function reads line by line from the file
@@ -59,8 +57,6 @@ int read_line_am(char *line, int line_count)
     labelPtr new_label = NULL;
     char current_word[LINE_LEN];
     int label_count, is_error;
-    printf("######################################################\n");
-    printf("current line is: %s\n", line);
     line = skip_spaces(line);
     if (end_of_line(line))
     {
@@ -83,7 +79,6 @@ int read_line_am(char *line, int line_count)
         else
         {
             new_label = add_label(&symbols_table, current_word, 0);
-         /*   print_label(new_label); */
             if (!new_label)
                 return LABEL_ALREADY_EXISTS;
             line = next_word(line);
@@ -91,11 +86,8 @@ int read_line_am(char *line, int line_count)
             { /* line can't be just a label */
                 return LABEL_ONLY;
             }
-            printf("One label found\n");
         }
     }
-    /* else
-         printf("No label found\n");*/
     copy_word(current_word, line);
 
     dir_type = find_directive(current_word);
@@ -105,13 +97,10 @@ int read_line_am(char *line, int line_count)
 
     if (dir_type != NOT_FOUND)
     {
-        printf("Directive found\n");
-        printf("directive is: %s\n", directives[dir_type]);
         if (label_count)
         {
             if (dir_type == EXTERN || dir_type == ENTRY)
             {
-                /*TODO: Remove from table*/
                 delete_label(&symbols_table, new_label->name);
                 label_count = 0;
             }
@@ -126,14 +115,11 @@ int read_line_am(char *line, int line_count)
 
     if (command_type != NOT_FOUND)
     {
-        printf("Command found\n");
         if (label_count)
         {
             new_label->address = ic;
             new_label->action = TRUE;
-            /* TODO: edit label struct*/
         }
-        printf("command is: %s\n", commands[command_type]);
         line = next_word(line);
         is_error = handle_command(command_type, line);
         if (is_error)
@@ -155,27 +141,20 @@ int check_for_label(char *line, boolean COLON)
     int line_length = strlen(line);
     char word[LINE_LEN];
     int i;
-
     if (line == NULL || line_length < (COLON ? MINIMUM_LABEL_LENGTH_WITH_COLON : MINIMUM_LABEL_LENGTH_WITHOUT_COLON))
     {
-        /* printf("check min line length:\n");*/
         return 0;
     }
-
     if (COLON && line[line_length - 1] != ':')
     {
-        /*     printf("line not ending with :\n");*/
         return 0; /* search for :, if colon is a must then we need to have : */
     }
-
     if (line_length > LABEL_LEN) /* checking label size */
     {
         if (COLON) /*error only if it is a label with ':' */
             return LABEL_TOO_LONG;
-        /*  printf("check max line length:\n");*/
         return 0;
     }
-
     if (!isalpha(*line)) /* first symbol in label must be letter */
         return LABEL_INVALID_FIRST_CHAR;
 
@@ -199,9 +178,7 @@ int check_for_label(char *line, boolean COLON)
         if (find_command(line) != NOT_FOUND)
             return LABEL_CANT_BE_COMMAND;
     }
-    /* printf("current REGS is: %s\n", line);*/
     copy_word(word, line);
-    /*printf("current WORD is: %s\n", word);*/
     /* labels can't be registers */
     if (is_register(word))
     {
@@ -270,11 +247,11 @@ boolean existing_label(labelPtr label, char *name)
 }
 
 /**
- * @brief
+ * @brief this function deletes labeles from table
  *
- * @param table
- * @param name
- * @return boolean
+ * @param table labels table
+ * @param name which label to delete
+ * @return boolean if succeeded
  */
 boolean delete_label(labelPtr *table, char *name)
 {
@@ -299,28 +276,6 @@ boolean delete_label(labelPtr *table, char *name)
         table_pointer = table_pointer->next;
     }
     return FALSE;
-}
-/**
- * @brief
- *
- * @param h
- */
-void print_label(labelPtr h)
-{
-    printf("\nname: %s, address: %d, external: %d", h->name, h->address, h->external);
-    if (h->external == 0)
-        printf(", is in action statement: %d -> ", h->action);
-    else
-        printf(" -> ");
-    printf("\n");
-}
-void print_labels(labelPtr *table){
-    labelPtr temp = *table;
-    while (temp)
-    {
-        print_label(temp);
-        temp = temp->next;
-    }
 }
 /**
  * @brief add label addresses to memory
@@ -382,7 +337,6 @@ int handle_directive(int dir_type, char *line)
 
     case EXTERN:
         /* Handle .extern directive */
-        printf("handle extern %d\n", EXTERN);
         return handle_extern_directive(line);
     }
     return 0;
@@ -400,8 +354,6 @@ int handle_data_directive(char *line)
     while (!end_of_line(line))
     {
         line = next_comma_word(copy, line);
-        /* printf("next_comma_word: %s\n%s\n", line, copy);
-         printf(".....comma_word: %s\n%s\n", line, copy);*/
         if (strlen(copy) > 0)
         {
             if (!isnumber)
@@ -433,7 +385,6 @@ int handle_data_directive(char *line)
                 }
             }
         }
-        /* code */
     }
     if (iscomma)
         return DATA_UNEXPECTED_COMMA;
@@ -449,18 +400,14 @@ int handle_data_directive(char *line)
 int handle_string_directive(char *line)
 {
     int line_len;
-    /*   printf("my line is %s\n", line); */
-    if (end_of_line(line)) /* || (line != '"' && line[line_len - 1] != '"'))*/
+    if (end_of_line(line)) 
         return STRING_OPERAND_NOT_VALID;
-    /*printf("im not empty: %s\n", line);*/
-    /* next_string_word(copy,line);*/
+
     next_word(line);
-    /*  printf("after next word %s\n", line); */
     if (line[0] != '\"')
         return STRING_OPERAND_NOT_VALID;
     line++;
     line_len = strlen(line);
-    /*  printf("line++ %s\t strlen: %d, char: %c\n", line, line_len, line[line_len -2]);*/
     if (line[line_len - 2] != '\"')
         return STRING_OPERAND_NOT_VALID;
     line = skip_spaces(line);
@@ -469,7 +416,6 @@ int handle_string_directive(char *line)
         line[line_len - 2] = '\0';
         write_string_to_data(line);
     }
-
     return 0;
 }
 /**
@@ -481,30 +427,23 @@ int handle_string_directive(char *line)
 int handle_struct_directive(char *line)
 {
     char copy[LINE_LEN];
-    printf("my line is: %s\n", line);
     line = next_comma_word(copy, line);
-    printf("line: %s\nmy copy is: %s\nend_of_line: %d\nis_number: %d\n",line, copy,end_of_line(copy),is_number(copy));
 
     if (end_of_line(copy) || !is_number(copy))
         return STRUCT_INVALID_NUM;
     data[dc++] = (unsigned int)atoi(copy);
     line = next_comma_word(copy, line);
-    printf("after line:%s \t copy: %s\n", line, copy);
     if (!end_of_line(line) && *copy == ',')
     {
         line = next_comma_word(copy, line); /* copy equvals string with "" */
-        /*printf("and now copy is: %s\n", copy);*/
         if (end_of_line(copy))
             return STRUCT_EXPECTED_STRING;
         else
         {
-         /*   printf("copy: %c, strlen: %c\n", copy[0], copy[strlen(copy) - 1]); */
             if (copy[0] != '"' && copy[strlen(copy) - 1] != '"')
                 return STRUCT_INVALID_STRING;
             /*  copy_word(copy, line); */
             copy[strlen(copy) -1] = '\0';
-            printf("my name is slim shady: %s\n", copy+1);
-            printf("my name is not slim shady: %c\n", copy[strlen(copy) -2]);
             write_string_to_data(copy + 1);
         }
     }
@@ -571,15 +510,12 @@ int handle_command(int type, char *line)
     int op_src = -1, op_dest = -1, temp = -1;
     unsigned int word;
     char op1[20], op2[20];
-    printf("handle command operators\t %s\n", line);
     line = next_comma_word(op1, line);
-    printf("next op:\t %s\n", op1);
     if (!end_of_line(op1))
     {
         is_src_op = TRUE;
         line = skip_spaces(line);
         line = next_comma_word(op2, line);
-        /**op2 = skip_spaces(op2);*/
         if (!end_of_line(op2))
         { /* if not empty must be a ',' */
             if (op2[0] != ',')
@@ -595,39 +531,27 @@ int handle_command(int type, char *line)
             is_dest_op = TRUE;
         }
     }
-    /*printf("here\n");*/
     line = skip_spaces(line);
-    /* printf("handle spaces\t %s\n", line);*/
     if (!end_of_line(line)) /* command a1, a2  a3 is not valid */
         return COMMAND_TOO_MANY_OPERANDS;
-    /*  printf("%d-%d\n", is_src_op, is_dest_op); */
     if (is_src_op)
     {
-        /*        printf("is_src_op here\n"); */
         op_src = method_type(op1);
     }
-    /*   printf("in between here\n"); */
     if (is_dest_op)
     {
         op_dest = method_type(op2);
     }
     if (is_src_op && !is_dest_op){
-        printf("614: \n");
-        printf("type: %s, is_src_op: %d, is_dest_op: %d\n", commands[type], is_src_op, is_dest_op);
-        printf("op_src: %s, op_dest: %d\n", types[op_src],op_dest);
-        printf("617: \n");
         temp = op_src;
         op_src = op_dest;
         op_dest = temp;
         is_src_op = FALSE;
         is_dest_op = TRUE;
     }
-    /*   printf("is_dest_op here\n"); */
     /* check for input errors */
     if (op_src == COMMAND_INVALID_METHOD || op_dest == COMMAND_INVALID_METHOD)
         return COMMAND_INVALID_METHOD;
-    printf("type: %s, is_src_op: %d, is_dest_op: %d\n", commands[type], is_src_op, is_dest_op);
-    printf("op_src: %d, op_dest: %d\n", op_src,op_dest);
     if (!num_operation_fits_command(type, is_src_op, is_dest_op))
     {
         return COMMAND_INVALID_NUMBER_OF_OPERANDS;
@@ -636,10 +560,8 @@ int handle_command(int type, char *line)
     {
         return COMMAND_INVALID_OPERANDS_METHODS;
     }
-    printf("if you are here you will write to memory!\n");
     /* done checking, adding to data */
     word = word_to_bits(type, is_src_op, is_dest_op, op_src, op_dest);
-    printf("word is: %u\n", word);
     write_command_to_instructions(word);
     ic += word_count_by_command(is_src_op, is_dest_op, op_src, op_dest);
     return 0;
@@ -672,13 +594,8 @@ int method_type(char *op)
         return M_DIRECT;
     }
 
-    printf("this must be a struct!\n");
-    /* printf("op was: %s\n", strtok(op, "."));
-     printf("new op: %s\n", strtok(NULL, "."));*/
     before_dot = strtok(op, ".");
-    printf("op was: %s\n", before_dot);
     after_dot = strtok(NULL, ".");
-    printf("new op: %s\n", after_dot);
     if (check_for_label(before_dot, FALSE))
     {                                                       /* Splitting by dot character */
         if (strlen(after_dot) == 1 && (*after_dot == '1' || /* After the dot there should be '1' or '2' */
@@ -871,8 +788,6 @@ void write_command_to_instructions(unsigned int word)
 unsigned int word_to_bits(int method_type, boolean is_src_op, boolean is_dest_op, int op_src, int op_dest)
 {
     unsigned int word_in_bits = method_type;
-    /*  printf("method_type: %d,is_src_op: %d,is_dest_op: %d,op_src: %d,op_dest: %d\n",method_type,is_src_op,is_dest_op,first,op_dest); */
-
     word_in_bits <<= BITS_IN_METHOD; /* add space for method*/
 
     if (is_src_op && is_dest_op)
@@ -888,8 +803,8 @@ unsigned int word_to_bits(int method_type, boolean is_src_op, boolean is_dest_op
     }
     else {
         word_in_bits <<= BITS_IN_METHOD;
+
     }
-    printf("word_in_bits: %u\n", word_in_bits);
     word_in_bits = add_are(word_in_bits, ABSOLUTE);
     return word_in_bits;
 }

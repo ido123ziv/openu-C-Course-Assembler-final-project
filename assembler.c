@@ -42,9 +42,6 @@ int main(int argc, char *argv[])
     int i;
     char *get_filename;
     FILE *file;
-
-
-    print_data(data, instructions);
     if (argc > 1) /* check if there's atleast one file that is sent with the command */
     {
         for (i = 1; i < argc; i++)
@@ -86,7 +83,6 @@ int main(int argc, char *argv[])
             else
             {
                 write_error_code(CANNOT_OPEN_FILE, -1);
-                /* filerintf(stderr, "there was an error while trying to open the requested file or file not exist.\n"); */
             }
         }
     }
@@ -94,7 +90,6 @@ int main(int argc, char *argv[])
     {
         write_error_code(NOT_ENOUGH_ARGUMENTS, -1);
     }
-    print_data(data, instructions);
     return 0;
 }
 
