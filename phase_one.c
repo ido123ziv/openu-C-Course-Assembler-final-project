@@ -577,8 +577,9 @@ int handle_command(int type, char *line)
     if (!end_of_line(op1))
     {
         is_src_op = TRUE;
+        line = skip_spaces(line);
         line = next_comma_word(op2, line);
-        printf("next_comma_word\t %s\n", line);
+        /**op2 = skip_spaces(op2);*/
         if (!end_of_line(op2))
         { /* if not empty must be a ',' */
             if (op2[0] != ',')
@@ -586,7 +587,7 @@ int handle_command(int type, char *line)
                 return COMMAND_UNEXPECTED_CHAR;
             }
             line = next_comma_word(op2, line);
-            /*printf("next next next next command %s,line: %s\n", op2, line);*/
+            line = skip_spaces(line);
             if (!end_of_line(line))
             {
                 return COMMAND_UNEXPECTED_CHAR;
