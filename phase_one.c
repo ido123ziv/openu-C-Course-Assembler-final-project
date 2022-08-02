@@ -514,6 +514,7 @@ int handle_command(int type, char *line)
     if (!end_of_line(op1))
     {
         is_src_op = TRUE;
+        line = skip_spaces(line);
         line = next_comma_word(op2, line);
         if (!end_of_line(op2))
         { /* if not empty must be a ',' */
@@ -522,6 +523,7 @@ int handle_command(int type, char *line)
                 return COMMAND_UNEXPECTED_CHAR;
             }
             line = next_comma_word(op2, line);
+            line = skip_spaces(line);
             if (!end_of_line(line))
             {
                 return COMMAND_UNEXPECTED_CHAR;
