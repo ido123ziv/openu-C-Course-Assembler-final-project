@@ -77,6 +77,7 @@ int main(int argc, char *argv[])
                         get_filename[strlen(get_filename) -3] = '\0';
                         phase_two(file, get_filename);
                         fclose(file);
+                        printf("Finished creating output files, successfully assembled the project!\n");
                     }
                 }
             }
